@@ -21,6 +21,7 @@ from django.core import urlresolvers
 from django.template.defaultfilters import title
 from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 
 from horizon import api
 from horizon import tables
@@ -257,20 +258,20 @@ def get_ips(instance):
 
 
 def get_usage(instance):
-    return instance.id
+    return mark_safe("<div class='progressBar' id='pb1'>75%</div>")
 
 def get_iname(instance):
     return instance.image_name
 
 def get_size(instance):
     if hasattr(instance, "full_flavor"):
-        size_string = _("%(name)s | %(RAM)s RAM | %(VCPU)s VCPU "
-                        "| %(disk)s Disk")
+        size_string = _("%(name)s | %(RAM)s RAM <br> %(VCPU)s VCPU"
+                        "|  %(disk)s Disk")
         vals = {'name': instance.full_flavor.name,
                 'RAM': sizeformat.mbformat(instance.full_flavor.ram),
                 'VCPU': instance.full_flavor.vcpus,
                 'disk': sizeformat.diskgbformat(instance.full_flavor.disk)}
-        return size_string % vals
+        return mark_safe(size_string % vals)
     return _("Not available")
 
 
@@ -325,6 +326,7 @@ class InstancesTable(tables.DataTable):
                           filters=(title, replace_underscores),
                           verbose_name=_("Power State"))
     usage = tables.Column(get_usage,
+			  attrs={'data-type': 'string'},
                           verbose_name=_("Usage"))
     
 

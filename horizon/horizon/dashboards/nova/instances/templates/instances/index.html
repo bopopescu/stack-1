@@ -1,5 +1,20 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% block myjs %}
+<script type="text/javascript" src="../../../static/dashboard/js/progressbar.js"></script>
+
+
+		<script type="text/javascript">
+			var progress_key = '5092421186ad2';
+
+			$(document).ready(function() {
+				$("#pb1").progressBar();
+			});
+
+		</script>
+
+
+{%endblock%}
 {% block title %}{% trans "Instances" %}{% endblock %}
 
 {% block page_header %}

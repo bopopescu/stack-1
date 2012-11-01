@@ -70,8 +70,18 @@ class VNCTab(tabs.Tab):
                                 'instance "%s".') % instance.id)
         return {'vnc_url': vnc_url, 'instance_id': instance.id}
 
+class MonitorTab(tabs.Tab):
+    name=_("Monitor")
+    slug = "monitor"
+    template_name = "nova/instances/_detail_monitor.html"
+    preload = True
+
+    def get_context_data(self, request):
+	return {"test":"test"}    
+    
+
 
 class InstanceDetailTabs(tabs.TabGroup):
     slug = "instance_details"
-    tabs = (OverviewTab, LogTab, VNCTab)
+    tabs = (OverviewTab, LogTab, VNCTab, MonitorTab)
     sticky = True

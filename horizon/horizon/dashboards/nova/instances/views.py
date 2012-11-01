@@ -22,6 +22,7 @@
 Views for managing Nova instances.
 """
 import logging
+import pdb
 
 from django import http
 from django import shortcuts
