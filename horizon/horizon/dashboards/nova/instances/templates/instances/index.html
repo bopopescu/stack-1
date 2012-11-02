@@ -1,6 +1,39 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block myjs %}
+<script type="text/javascript">
+function get_usage()
+{
+	var xmlhttp;
+	var count = 1
+	if (window.XMLHttpRequest)
+	{// code for IE7+, Firefox, Chrome, Opera, Safari
+		xmlhttp=new XMLHttpRequest();
+	}else{// code for IE6, IE5
+		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	}
+	xmlHttp.setRequestHeader("If-Modified-Since","0");
+	xmlhttp.onreadystatechange=function(){
+		if (xmlhttp.readyState==4 && xmlhttp.status==200)
+    		{
+			document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
+		}
+	}
+	//xmlhttp.open("GET","http://www.baidu.com",true);
+	//xmlhttp.send();
+	document.getElementById("rsusage").innerHTML=x
+	
+	setTimeout("get_usage('hjjjjjjjjjjjjjjjjjjjjjjjj')", 1000)
+}
+
+window.onload = function(){
+	get_usage(); 
+}
+</script>
+
+
+
+
 <script type="text/javascript" src="../../../static/dashboard/js/progressbar.js"></script>
 
 

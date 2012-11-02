@@ -258,7 +258,7 @@ def get_ips(instance):
 
 
 def get_usage(instance):
-    return mark_safe("<div class='progressBar' id='pb1'>75%</div>")
+    return mark_safe("<div id='rsusage'>--</div>")
 
 def get_iname(instance):
     return instance.image_name
@@ -326,7 +326,6 @@ class InstancesTable(tables.DataTable):
                           filters=(title, replace_underscores),
                           verbose_name=_("Power State"))
     usage = tables.Column(get_usage,
-			  attrs={'data-type': 'string'},
                           verbose_name=_("Usage"))
     
 
