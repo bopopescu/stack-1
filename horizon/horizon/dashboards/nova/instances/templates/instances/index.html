@@ -12,22 +12,22 @@ function reload_usage(){
 	var ins = todo.join(",") ;
 
 	$.ajax({ 
-		url: "./test.py",
-		data: { query : ins } ,
+		url: "http://159.226.50.227/md",
+		data: { query : ins, stime: "latest", horizon:"we" } ,
 		dataType: "json",
 		success: function(data){
 			for ( ins in data){
-				$(".rsusage[value=" + ins + "]").html( data[ins] [0] );
+				$(".rsusage[value=" + ins + "]").html( "CPU:"+data[ins]['cpu']+"<br>MEM:"+data[ins]['mem'] );
 			}
-			window.setTimeout("reload_usage()", 6000);
+			window.setTimeout("reload_usage()", 5000);
 		},
 		error: function(xhr, code, msg){
-			$(".rsusage").html(msg);
-			window.setTimeout("reload_usage()", 10000);
+			$(".rsusage").html("--");
+			window.setTimeout("reload_usage()", 5000);
 		}
 	});
 }
-window.setTimeout("reload_usage()", 6000);
+window.setTimeout("reload_usage()", 5000);
 
 $(function(){
 	reload_usage();

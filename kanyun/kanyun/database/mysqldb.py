@@ -6,7 +6,6 @@ from redisclient import CacheClient;
 
 class MysqlDb(object):
     def __init__(self,conn_dict):
-#        self.conn=mysql.connect(host="localhost",user="root",passwd="ljsljs",db="openstack");
         self.conn=mysql.connect(conn_dict['host'],conn_dict['user'],conn_dict['passwd'],conn_dict['db']);
         self.cursor=self.conn.cursor();
         ### create Memecached Client Object
@@ -24,11 +23,9 @@ class MysqlDb(object):
         sql_cmd='''insert into vm_monitor(instance_id,cpu_usage,mem_free,mem_max,nic_in,nic_out,\
 disk_read,disk_write,monitor_time,uuid)values('%s','%s',%s,%s,'%s','%s','%s','%s',from_unixtime('%s',\
 '%%Y-%%m-%%d %%T'),'%s');'''%tuple(data);
-        #print "in insert_monitor_data, the data=",data;
-        #print "\nsql_cmd=%s\n"%(sql_cmd);
-        sys.stdout.flush();
-        self.cursor.execute(sql_cmd);
-        self.conn.commit();
+        #sys.stdout.flush();
+        #self.cursor.execute(sql_cmd);
+        #self.conn.commit();
         self.cache.push_vm_info(data);
         return True;
 
@@ -42,7 +39,6 @@ disk_read,disk_write,monitor_time,uuid)values('%s','%s',%s,%s,'%s','%s','%s','%s
         """ list all instances from time ${start_time} to now"""
         self.__reconnect_db__();
         sql_cmd='''select distinct instance_id from vm_monitor where monitor_time>='%s';'''%start_time;
- #       print ' in get all instances func: sql_cmd=%s'%sql_cmd;
         self.cursor.execute(sql_cmd);
         return self.cursor.fetchall();
 
@@ -103,8 +99,7 @@ disk_read,disk_write,monitor_time,uuid)values('%s','%s',%s,%s,'%s','%s','%s','%s
 
 if __name__=='__main__':
     info= {'test':[('cpu','total', (1344394313.516737, 0.0)), ('mem', 'total', (1344394313.516737, 524288L, 0L)), ('nic', 'vnet0', (1344394313.52059, 29645L, 0L)), ('blk', 'vda', (1344394313.525229, 512L,0L)),('nic','vnet1',(13,2954L,0L)),('blk','vdb',(144,10234L,243L))]};
-#   info={'instance-00000001':[('cpu','total',(1344394313.516737,0.0)),('mem','total',(134394313.5167337,524288L,0L))]};
-    mysql_conn_str="{'host':'localhost','user':'root','passwd':'ljsljs','db':'openstack'}";
+    mysql_conn_str="{'host':'localhost','user':'root','passwd':'csdb123cnic','db':'monitor', 'cache_server':'localhost', 'cache_time_buffer':3600}";
     mysql_server=MysqlDb(eval(mysql_conn_str));
     mysql_server.process_monitor_info(info);
     print 'test over';  

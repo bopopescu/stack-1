@@ -66,7 +66,7 @@ if __name__ == '__main__':
     # data DB
     #db = CassaDb('data', cfg['db_host'])
 
-### change by lanjinsong
+    ### change by lanjinsong
     mysql_db=MysqlDb(app.get_cfg('mysql_db'));
 
     while True:

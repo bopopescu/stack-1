@@ -17,6 +17,11 @@
 from django import shortcuts
 from django.views import generic
 from django.views.decorators import vary
+from django.http import HttpResponse
+from django.utils import simplejson
+from ThRedisClient import *
+import string
+
 
 from openstack_auth.views import Login
 
@@ -43,6 +48,25 @@ def splash(request):
     request.session.clear()
     request.session.set_test_cookie()
     return shortcuts.render(request, 'splash.html', {'form': form})
+
+def get_md(request):
+    result = {}
+    rediscli = ThRedisClient('localhost')
+    qin = request.GET['query'].split(',')
+    tstart = request.GET['stime']
+    if tstart == 'latest':
+	for id in qin:
+		temp = {}
+		iinfo = rediscli.get1byinstance(id, -1).split('$')
+		temp['cpu'] = iinfo[0]+"%"
+		temp['mem'] = round((string.atof(iinfo[2])-string.atof(iinfo[1]))/string.atof(iinfo[2]), 2)
+		result[id] = temp
+    else:
+	pass
+    
+    
+   	 
+    return HttpResponse(simplejson.dumps(result))
 
 
 class APIView(generic.TemplateView):
