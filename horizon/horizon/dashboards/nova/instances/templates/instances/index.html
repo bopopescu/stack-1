@@ -1,53 +1,40 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% block myjs %}
-<script type="text/javascript">
-function get_usage()
-{
-	var xmlhttp;
-	var count = 1
-	if (window.XMLHttpRequest)
-	{// code for IE7+, Firefox, Chrome, Opera, Safari
-		xmlhttp=new XMLHttpRequest();
-	}else{// code for IE6, IE5
-		xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
-	}
-	xmlHttp.setRequestHeader("If-Modified-Since","0");
-	xmlhttp.onreadystatechange=function(){
-		if (xmlhttp.readyState==4 && xmlhttp.status==200)
-    		{
-			document.getElementById("myDiv").innerHTML=xmlhttp.responseText;
-		}
-	}
-	//xmlhttp.open("GET","http://www.baidu.com",true);
-	//xmlhttp.send();
-	document.getElementById("rsusage").innerHTML=x
+<script type="text/javascript" src="../../../static/dashboard/js/jquery.min.js"></script>
+<script >
+function reload_usage(){
+	var todo = []
+        $(".rsusage").each(function(i, o){
+		todo.push( $(o).attr("value")  );
+        });
 	
-	setTimeout("get_usage('hjjjjjjjjjjjjjjjjjjjjjjjj')", 1000)
-}
+	var ins = todo.join(",") ;
 
-window.onload = function(){
-	get_usage(); 
+	$.ajax({ 
+		url: "./test.py",
+		data: { query : ins } ,
+		dataType: "json",
+		success: function(data){
+			for ( ins in data){
+				$(".rsusage[value=" + ins + "]").html( data[ins] [0] );
+			}
+			window.setTimeout("reload_usage()", 6000);
+		},
+		error: function(xhr, code, msg){
+			$(".rsusage").html(msg);
+			window.setTimeout("reload_usage()", 10000);
+		}
+	});
 }
+window.setTimeout("reload_usage()", 6000);
+
+$(function(){
+	reload_usage();
+})
 </script>
-
-
-
-
-<script type="text/javascript" src="../../../static/dashboard/js/progressbar.js"></script>
-
-
-		<script type="text/javascript">
-			var progress_key = '5092421186ad2';
-
-			$(document).ready(function() {
-				$("#pb1").progressBar();
-			});
-
-		</script>
-
-
 {%endblock%}
+
 {% block title %}{% trans "Instances" %}{% endblock %}
 
 {% block page_header %}

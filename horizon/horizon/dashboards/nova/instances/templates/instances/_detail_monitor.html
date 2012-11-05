@@ -1,7 +1,123 @@
-
-
 <div id="chartdiv" style="width: 100%; height: 400px;"></div>
 
+        <script type="text/javascript">
+
+	chartData = [
+            {
+                date: new Date(2012, 0, 0,10,10,15),
+                value: 2
+            }, {
+                date: new Date(2012, 0, 0,10,10,20),
+                value: 3
+            }, {
+                date: new Date(2012, 0, 0,10,10,25),
+                value: 4
+            }];
+
+function amcharts() {
+	// SERIAL CHART        
+	chart = new AmCharts.AmSerialChart();
+	chart.pathToImages = "../amcharts/images/";
+	chart.dataProvider = chartData;
+	chart.categoryField = "date";
+
+
+	// AXES
+	// category
+	var categoryAxis = chart.categoryAxis;
+	categoryAxis.parseDates = true; // as our data is date-based, we set parseDates to true
+	categoryAxis.minPeriod = "ss"; // our data is daily, so we set minPeriod to DD				 
+	categoryAxis.gridAlpha = 0.10;
+	categoryAxis.axisAlpha = 0;
+	categoryAxis.inside = true;
+
+	// value
+	var valueAxis = new AmCharts.ValueAxis();
+	valueAxis.tickLength = 0;
+	valueAxis.axisAlpha = 0;
+	valueAxis.gridAlpha = 0;
+	valueAxis.showFirstLabel = false;
+	valueAxis.showLastLabel = false;
+	chart.addValueAxis(valueAxis);
+
+	// GRAPH
+	var graph = new AmCharts.AmGraph();
+	graph.dashLength = 3;
+	graph.lineColor = "#00CC00";
+	graph.valueField = "value";
+	graph.dashLength = 3;
+	graph.bullet = "round";
+	chart.addGraph(graph);
+
+	// CURSOR
+	var chartCursor = new AmCharts.ChartCursor();
+	chart.addChartCursor(chartCursor);
+
+	// SCROLLBAR
+	var chartScrollbar = new AmCharts.ChartScrollbar();
+	chart.addChartScrollbar(chartScrollbar);                
+
+	// HORIZONTAL GREEN RANGE
+	var guide = new AmCharts.Guide();
+	guide.value = 10;
+	guide.toValue = 20;
+	guide.fillColor = "#00CC00";
+	guide.inside = true;
+	guide.fillAlpha = 0.2;
+	guide.lineAlpha = 0;
+	valueAxis.addGuide(guide);
+
+	// TREND LINES
+	// first trend line
+	var trendLine = new AmCharts.TrendLine();
+	trendLine.initialDate = new Date(2012, 0, 2, 12); // 12 is hour - to start trend line in the middle of the day
+	trendLine.finalDate = new Date(2012, 0, 11, 12);
+	trendLine.initialValue = 10;
+	trendLine.finalValue = 19;
+	trendLine.lineColor = "#CC0000";
+	chart.addTrendLine(trendLine);
+
+	// second trend line
+	var trendLine = new AmCharts.TrendLine();
+	trendLine.initialDate = new Date(2012, 0, 17, 12);
+	trendLine.finalDate = new Date(2012, 0, 22, 12);
+	trendLine.initialValue = 16;
+	trendLine.finalValue = 10;
+	trendLine.lineColor = "#CC0000";
+	chart.addTrendLine(trendLine);
+
+	// WRITE
+	chart.write("chartdiv");
+};
+
+function reload_chart(){
+	$.ajax({ 
+		url : "test.py",
+		dataType: "json",
+		success: function(data){
+			chartData = data;
+
+		        $("#chartdiv").empty();
+		        amcharts() ;
+
+			window.setTimeout("reload_chart()", 2000);
+		},
+		error : function(xhr, code, msg){
+			window.setTimeout("reload_chart()", 5000);		
+		}
+	});
+
+//	$("#chartdiv").empty();
+//	amcharts() ;
+}
+
+$(function(){
+	 reload_chart();
+});
+
+window.setTimeout("reload_chart()", 2000);
+
+</script>
 
 
 

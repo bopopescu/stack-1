@@ -74,9 +74,10 @@ class MonitorTab(tabs.Tab):
     name=_("Monitor")
     slug = "monitor"
     template_name = "nova/instances/_detail_monitor.html"
-    preload = True
+    preload = False
 
     def get_context_data(self, request):
+        instance = self.tab_group.kwargs['instance']
 	return {"test":"test"}    
     
 

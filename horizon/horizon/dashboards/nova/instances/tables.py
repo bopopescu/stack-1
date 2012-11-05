@@ -258,10 +258,15 @@ def get_ips(instance):
 
 
 def get_usage(instance):
-    return mark_safe("<div id='rsusage'>--</div>")
+    instance_name = getattr(instance, "OS-EXT-SRV-ATTR:instance_name", 0)
+    ret = "<div class='rsusage' value='" + instance_name + "' >--</div>"
+    return mark_safe(ret)
 
 def get_iname(instance):
     return instance.image_name
+
+def get_instance_url(instance):
+    return "159.226.50.227:6300" 
 
 def get_size(instance):
     if hasattr(instance, "full_flavor"):
@@ -303,7 +308,7 @@ class InstancesTable(tables.DataTable):
     )
     name = tables.Column("name",
                          link=("horizon:nova:instances:detail"),
-                         verbose_name=_("Instance Name"))
+                         verbose_name=_("Name"))
     ip = tables.Column(get_ips, verbose_name=_("IP Address"))
     size = tables.Column(get_size,
                          verbose_name=_("Size"),
@@ -327,6 +332,8 @@ class InstancesTable(tables.DataTable):
                           verbose_name=_("Power State"))
     usage = tables.Column(get_usage,
                           verbose_name=_("Usage"))
+    instance_url = tables.Column(get_instance_url,
+			  verbose_name=_('Instance URL'))
     
 
     class Meta:
