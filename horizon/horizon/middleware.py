@@ -88,9 +88,9 @@ class HorizonMiddleware(object):
         Convert HttpResponseRedirect to HttpResponse if request is via ajax
         to allow ajax request to redirect url
         """
-        if request.is_ajax():
-	    if request.GET['query'] == "" and request.method == 'GET':
-	            queued_msgs = request.horizon['async_messages']
+        #if request.is_ajax():
+        if False:
+	    queued_msgs = request.horizon['async_messages']
             if type(response) == http.HttpResponseRedirect:
                 # Drop our messages back into the session as per usual so they
                 # don't disappear during the redirect. Not that we explicitly
@@ -100,12 +100,11 @@ class HorizonMiddleware(object):
                 redirect_response = http.HttpResponse()
                 redirect_response['X-Horizon-Location'] = response['location']
                 return redirect_response
-	    if request.GET['query'] == "" and request.method == 'GET':
-            	if queued_msgs:
-                	# TODO(gabriel): When we have an async connection to the
-	                # client (e.g. websockets) this should be pushed to the
-        	        # socket queue rather than being sent via a header.
-                	# The header method has notable drawbacks (length limits,
-	                # etc.) and is not meant as a long-term solution.
-        	        response['X-Horizon-Messages'] = jsonutils.dumps(queued_msgs)
+            if queued_msgs:
+               	# TODO(gabriel): When we have an async connection to the
+	        # client (e.g. websockets) this should be pushed to the
+                # socket queue rather than being sent via a header.
+               	# The header method has notable drawbacks (length limits,
+	        # etc.) and is not meant as a long-term solution.
+                response['X-Horizon-Messages'] = jsonutils.dumps(queued_msgs)
         return response
