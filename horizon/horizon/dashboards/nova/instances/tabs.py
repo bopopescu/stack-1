@@ -78,7 +78,8 @@ class MonitorTab(tabs.Tab):
 
     def get_context_data(self, request):
         instance = self.tab_group.kwargs['instance']
-	return {"test":"test"}    
+	instance_name = getattr(instance, "OS-EXT-SRV-ATTR:instance_name", 0)
+	return {"instance_name":instance_name}    
     
 
 

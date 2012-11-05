@@ -20,7 +20,7 @@ from django.views.decorators import vary
 from django.http import HttpResponse
 from django.utils import simplejson
 from ThRedisClient import *
-import string
+import string, time, datetime
 
 
 from openstack_auth.views import Login
@@ -54,18 +54,29 @@ def get_md(request):
     rediscli = ThRedisClient('localhost')
     qin = request.GET['query'].split(',')
     tstart = request.GET['stime']
+    
     if tstart == 'latest':
 	for id in qin:
 		temp = {}
 		iinfo = rediscli.get1byinstance(id, -1).split('$')
 		temp['cpu'] = iinfo[0]+"%"
 		temp['mem'] = round((string.atof(iinfo[2])-string.atof(iinfo[1]))/string.atof(iinfo[2]), 2)
+		temp['netin'] = string.atoi(iinfo[3].split(':')[1])/1024/1024
+		temp['netout'] = string.atoi(iinfo[4].split(':')[1])/1024/1024
+		temp['timestamp'] = time.localtime(string.atoi(iinfo[-1]))[0]
 		result[id] = temp
     else:
-	pass
-    
-    
-   	 
+	for id in qin:
+		result[id] = []
+		iinfos = rediscli.getallbyinstance(id)
+		amcharts_item = {}
+		for s in iinfos:
+			schips = s.split('$')
+			date_obj =str( datetime.datetime.fromtimestamp(string.atoi(schips[-1])))
+			cpu = schips[0]
+			amcharts_item = {'date':date_obj, 'value':string.atof(cpu)}
+			result[id].append(amcharts_item)
+
     return HttpResponse(simplejson.dumps(result))
 
 
