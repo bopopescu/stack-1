@@ -17,7 +17,7 @@ function reload_usage(){
 		dataType: "json",
 		success: function(data){
 			for ( ins in data){
-				$(".rsusage[value=" + ins + "]").html( "CPU:"+data[ins]['cpu']+"<br>MEM:"+data[ins]['mem'] + "<br>NetIn:"+data[ins]['netin']+"M<br>NetOut:"+data[ins]['netout']+"M<br>TimeStamp:"+data[ins]['timestamp']+"<br>" );
+				$(".rsusage[value=" + ins + "]").html( "CPU:"+data[ins]['cpu']+"<br>MEM:"+data[ins]['mem'] + "%<br>NetIn:"+data[ins]['netin']+"M<br>NetOut:"+data[ins]['netout']+"M<br>TimeStamp:"+data[ins]['timestamp']+"<br>" );
 			}
 			window.setTimeout("reload_usage()", 5000);
 		},
