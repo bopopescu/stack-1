@@ -15,13 +15,14 @@
 #    under the License.
 
 import logging
-
+import random
 from django import template
 from django.core import urlresolvers
 from django.template.defaultfilters import title
 from django.utils.http import urlencode
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
+import os
 
 from horizon import api
 from horizon import tables
@@ -266,7 +267,11 @@ def get_iname(instance):
     return instance.image_name
 
 def get_instance_url(instance):
-    return "159.226.50.227:6300" 
+    port = random.randint(10000, 60000) 
+    rule = "iptables -t nat -I PREROUTING -d 159.226.50.227/32 -p tcp -m tcp --dport %s -j DNAT --to-destination %s:22" % (str(port), instance.addresses['private'][0]['addr'])
+    #os.popen(rule)
+    #return "ssh -p %s 159.226.50.227" % (str(port))
+    return "we"
 
 def get_size(instance):
     if hasattr(instance, "full_flavor"):

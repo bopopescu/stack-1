@@ -68,7 +68,8 @@ def get_md(request):
     else:
 	for id in qin:
 		result[id] = []
-		iinfos = rediscli.getallbyinstance(id)
+		iinfos = rediscli.getrangebyinstance(id, -100, -1)
+		#iinfos = rediscli.getallbyinstance(id)
 		amcharts_item = {}
 		for s in iinfos:
 			schips = s.split('$')

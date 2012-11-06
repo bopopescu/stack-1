@@ -1,26 +1,20 @@
 <div id="chartdiv" style="width: 100%; height: 400px;"></div>
-
 <script type="text/javascript">
-
-	var chartData = new Array();
-	/*var chartData = [
-            {
-                date: new Date(2012, 0, 0,10,10,15),
-                value: 2
-            }, {
-                date: new Date(2012, 0, 0,10,10,20),
-                value: 3
-            }, {
-                date: new Date(2012, 0, 0,10,10,25),
-                value: 4
-            }];*/
-
+var chartData = new Array();
 function amcharts() {
 	// SERIAL CHART        
 	chart = new AmCharts.AmSerialChart();
-	chart.pathToImages = "../amcharts/images/";
+	chart.pathToImages = "../../../../../../static/dashboard/images/";
 	chart.dataProvider = chartData;
 	chart.categoryField = "date";
+
+                var xAxis = new AmCharts.ValueAxis();
+                xAxis.title = "CPU USAGE(%)";
+                xAxis.position = "bottom";
+                xAxis.dashLength = 1;
+                xAxis.axisAlpha = 0;
+                xAxis.autoGridCount = true;
+                chart.addValueAxis(xAxis);
 
 
 	// AXES
@@ -59,34 +53,14 @@ function amcharts() {
 	chart.addChartScrollbar(chartScrollbar);                
 
 	// HORIZONTAL GREEN RANGE
-	var guide = new AmCharts.Guide();
-	guide.value = 10;
-	guide.toValue = 20;
-	guide.fillColor = "#00CC00";
-	guide.inside = true;
-	guide.fillAlpha = 0.2;
-	guide.lineAlpha = 0;
-	valueAxis.addGuide(guide);
-
-	// TREND LINES
-	// first trend line
-	var trendLine = new AmCharts.TrendLine();
-	trendLine.initialDate = new Date(2012, 0, 2, 12); // 12 is hour - to start trend line in the middle of the day
-	trendLine.finalDate = new Date(2012, 0, 11, 12);
-	trendLine.initialValue = 10;
-	trendLine.finalValue = 19;
-	trendLine.lineColor = "#CC0000";
-	chart.addTrendLine(trendLine);
-
-	// second trend line
-	var trendLine = new AmCharts.TrendLine();
-	trendLine.initialDate = new Date(2012, 0, 17, 12);
-	trendLine.finalDate = new Date(2012, 0, 22, 12);
-	trendLine.initialValue = 16;
-	trendLine.finalValue = 10;
-	trendLine.lineColor = "#CC0000";
-	chart.addTrendLine(trendLine);
-
+	//var guide = new AmCharts.Guide();
+	//guide.value = 10;
+	//guide.toValue = 20;
+	//guide.fillColor = "#00CC00";
+	//guide.inside = true;
+	//guide.fillAlpha = 0.2;
+	//guide.lineAlpha = 0;
+	//valueAxis.addGuide(guide);
 	// WRITE
 	chart.write("chartdiv");
 };
@@ -99,36 +73,28 @@ function reload_chart(){
 		dataType: "json",
 		success: function(data){
 			monitor_data = data[instance_name];
-			var obj1 = new Object()
-			obj1[date] = new Date(2012, 0, 0,10,10,15);
-			obj1[value]= 2;
-			charData.push(obj1);
-
-//			charData.push( {"date": new Date(2012, 0, 0,10,10,15),         "value": 2});
-//			charData.push( {"date": new Date(2012, 0, 0,10,10,20),         "value": 3});
-/*			for(var i=0;i<monitor_data.length;i++)
+			for(var i=0;i<monitor_data.length;i++)
 			{
-				charData.push({"date":new Date(monitor_data[i].date), "value":monitor_data[i].value})			
-				//charData.push({"date":new Date(2012, 0, 0,10,10,15), "value":monitor_data[i].value})			
+				chartData.push( {date: new Date(monitor_data[i].date),value: monitor_data[i].value});
 			}
 
-*/		        $("#chartdiv").empty();
+		        $("#chartdiv").empty();
 		        amcharts() ;
-			window.setTimeout("reload_chart()", 9000);
+			chartData.splice(0,chartData.length);  
+			window.setTimeout("reload_chart()", 5000);
 		},
 		error : function(xhr, code, msg){
-			window.setTimeout("reload_chart()", 9000);		
+			window.setTimeout("reload_chart()", 5000);		
 		}
 	});
-//	$("#chartdiv").empty();
-//	amcharts() ;
+	//$("#chartdiv").empty();
+	//amcharts() ;
 }
 
 $(function(){
 	 reload_chart();
 });
-window.setTimeout("reload_chart()", 9000);
-
+//window.setTimeout("reload_chart()", 200000);
 </script>
 
 

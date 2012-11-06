@@ -89,7 +89,7 @@ class HorizonMiddleware(object):
         to allow ajax request to redirect url
         """
         #if request.is_ajax() and request.GET['query'] is None:
-        if request.is_ajax() and request.GET.get('query') == "":
+        if request.is_ajax() and request.GET.get('query') is None:
 	    queued_msgs = request.horizon['async_messages']
             if type(response) == http.HttpResponseRedirect:
                 # Drop our messages back into the session as per usual so they
