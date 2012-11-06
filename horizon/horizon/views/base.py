@@ -50,6 +50,13 @@ def splash(request):
     return shortcuts.render(request, 'splash.html', {'form': form})
 
 def get_md(request):
+    def total_IO(s):
+        total = 0
+	list_by_sharp = s.split('#')
+	for l in list_by_sharp:
+	    v = string.atof(l.split(':')[1])
+            total = total + v
+        return total
     result = {}
     rediscli = ThRedisClient('localhost')
     qin = request.GET['query'].split(',')
@@ -67,16 +74,42 @@ def get_md(request):
 		result[id] = temp
     else:
 	for id in qin:
-		result[id] = []
+		result[id+"-cpu"] = []
+		result[id+"-mem"] = []
+		result[id+"-NetIn"] = []
+		result[id+"-NetOut"] = []
+		result[id+"-DiskRead"] = []
+		result[id+"-DiskWrite"] = []
 		iinfos = rediscli.getrangebyinstance(id, -100, -1)
 		#iinfos = rediscli.getallbyinstance(id)
-		amcharts_item = {}
+		amcharts_item_cpu = {}
+		amcharts_item_mem = {}
+		amcharts_item_NetIn = {}
+		amcharts_item_NetOut = {}
+		amcharts_item_DiskRead = {}
+		amcharts_item_DiskWrite = {}
 		for s in iinfos:
 			schips = s.split('$')
 			date_obj =str( datetime.datetime.fromtimestamp(string.atoi(schips[-1])))
 			cpu = schips[0]
-			amcharts_item = {'date':date_obj, 'value':string.atof(cpu)}
-			result[id].append(amcharts_item)
+                        mem = round((string.atof(schips[2]) - string.atof(schips[1]))/string.atof(schips[1])*100, 2)
+                        NetIn = round(total_IO(schips[3])/1024/102,2)
+                        NetOut = round(total_IO(schips[4])/1024/1024,2)
+                        DiskRead = round(total_IO(schips[5])/1024/1024,2)
+                        DiskWrite = round(total_IO(schips[6])/1024/1024,2)
+			
+			amcharts_item_cpu = {'date':date_obj, 'value':string.atof(cpu)}
+			amcharts_item_mem = {'date':date_obj, 'value':string.atof(mem)}
+			amcharts_item_NetIn = {'date':date_obj, 'value':string.atof(NetIn)}
+			amcharts_item_NetOut = {'date':date_obj, 'value':string.atof(NetOut)}
+			amcharts_item_DiskRead = {'date':date_obj, 'value':string.atof(DiskRead)}
+			amcharts_item_DiskWrite = {'date':date_obj, 'value':string.atof(DiskWrite)}
+			result[id+"-cpu"].append(amcharts_item_cpu)
+			result[id+"-mem"].append(amcharts_item_mem)
+			result[id+"-NetIn"].append(amcharts_item_NetIn)
+			result[id+"-NetOut"].append(amcharts_item_NetOut)
+			result[id+"-DiskRead"].append(amcharts_item_DiskRead)
+			result[id+"-DiskWrite"].append(amcharts_item_DiskWrite)
 
     return HttpResponse(simplejson.dumps(result))
 
