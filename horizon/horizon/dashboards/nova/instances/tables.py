@@ -260,7 +260,7 @@ def get_ips(instance):
 
 def get_usage(instance):
     instance_name = getattr(instance, "OS-EXT-SRV-ATTR:instance_name", 0)
-    ret = "<div class='rsusage' value='" + instance_name + "' >--</div>"
+    ret = "<div class='rsusage' value='" + instance_name + "' ><B>CPU: </B>--<br><B>MEM: </B>-------<br><B>NetIn: </B>--<br><B>NetOut: </B>--</div>"
     return mark_safe(ret)
 
 def get_iname(instance):
@@ -270,13 +270,22 @@ def get_instance_url(instance):
     port = random.randint(10000, 60000) 
     rule = "iptables -t nat -I PREROUTING -d 159.226.50.227/32 -p tcp -m tcp --dport %s -j DNAT --to-destination %s:22" % (str(port), instance.addresses['private'][0]['addr'])
     #os.popen(rule)
-    #return "ssh -p %s 159.226.50.227" % (str(port))
-    return "we"
+    #return "159.226.50.227:%s" % (str(port))
+    if instance.id == "7f737ac1-03ed-4863-976c-55b3222baa89":
+    	url= "159.226.50.227:%s" % (str(16390))
+	return mark_safe("<a href= 'http://%s' target='blank'>%s</a>"%(url, url))
+    elif instance.id == "12cae4d0-af8a-42cf-831b-cb6e47cc4817":
+    	url = "159.226.50.227:%s" % (str(17391))
+	return mark_safe("<a href= 'http://%s' target='blank'>%s</a>"%(url, url))
+    elif instance.id == "b94620ef-cb4a-4bb4-bb8d-1e099c3c9e1c":
+    	url = "159.226.50.227:%s" % (str(18910))
+	return mark_safe("<a href= 'http://%s' target='blank'>%s</a>"%(url, url))
+    return instance.id
 
 def get_size(instance):
     if hasattr(instance, "full_flavor"):
-        size_string = _("%(name)s | %(RAM)s RAM <br> %(VCPU)s VCPU"
-                        "|  %(disk)s Disk")
+        size_string = _("%(name)s<br>%(RAM)s RAM<br>%(VCPU)s VCPU"
+                        "<br>%(disk)s Disk")
         vals = {'name': instance.full_flavor.name,
                 'RAM': sizeformat.mbformat(instance.full_flavor.ram),
                 'VCPU': instance.full_flavor.vcpus,
@@ -334,7 +343,7 @@ class InstancesTable(tables.DataTable):
                          display_choices=TASK_DISPLAY_CHOICES)
     state = tables.Column(get_power_state,
                           filters=(title, replace_underscores),
-                          verbose_name=_("Power State"))
+                          verbose_name=_("Power"))
     usage = tables.Column(get_usage,
                           verbose_name=_("Usage"))
     instance_url = tables.Column(get_instance_url,
