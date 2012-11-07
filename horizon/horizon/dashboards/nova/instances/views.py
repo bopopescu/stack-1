@@ -41,6 +41,7 @@ from .forms import UpdateInstance
 from .tabs import InstanceDetailTabs
 from .tables import InstancesTable
 from .workflows import LaunchInstance
+from .workflows import InstanceResize
 
 
 LOG = logging.getLogger(__name__)
@@ -151,11 +152,11 @@ class UpdateView(forms.ModalFormView):
                 'tenant_id': self.request.user.tenant_id,
                 'name': getattr(self.get_object(), 'name', '')}
 
-class ResizeView(forms.ModalFormView):
-    form_class = UpdateInstance
+class ResizeView(workflows.WorkflowView):
+    workflow_class = InstanceResize
     template_name = 'nova/instances/resize.html'
-    context_object_name = 'instance'
-    success_url = reverse_lazy("horizon:nova:instances:index")
+    #context_object_name = 'instance'
+    #success_url = reverse_lazy("horizon:nova:instances:index")
 
     def get_context_data(self, **kwargs):
         context = super(ResizeView, self).get_context_data(**kwargs)

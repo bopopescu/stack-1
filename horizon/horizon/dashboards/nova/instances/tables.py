@@ -185,6 +185,15 @@ class Resize(tables.LinkAction):
     def allowed(self, request, instance=None):
         return instance.status in ACTIVE_STATES and not _is_deleting(instance)
 
+    #def get_link_url(self, datum):
+        #base_url = urlresolvers.reverse(self.url)
+    #    next = urlresolvers.reverse("horizon:nova:instances:index")
+        #params = {"instance_id": self.table.get_object_id(datum)}#,
+                  #IPAssociationWorkflow.redirect_param_name: next}
+        #params = urlencode(params)
+    #    return self.url#"?".join([base_url, params])
+
+
 class CreateSnapshot(tables.LinkAction):
     name = "snapshot"
     verbose_name = _("Create Snapshot")

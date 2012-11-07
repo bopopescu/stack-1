@@ -508,3 +508,116 @@ class LaunchInstance(workflows.Workflow):
         except:
             exceptions.handle(request)
             return False
+
+
+class ResizeInstanceDetailsAction(workflows.Action):
+    name = forms.CharField(max_length=80, label=_("Instance Name"))
+    flavor = forms.ChoiceField(label=_("Flavor"),help_text=_("Size of image to launch."))
+
+    class Meta:
+        name = _("Details")
+        help_text_template = ("nova/instances/_launch_details_help.html")
+
+    def clean(self):
+        cleaned_data = super(ResizeInstanceDetailsAction, self).clean()
+
+        # Validate our instance source.
+        source = cleaned_data['source_type']
+        # There should always be at least one image_id choice, telling the user
+        # that there are "No Images Available" so we check for 2 here...
+        if source == 'image_id' and not \
+                filter(lambda x: x[0] != '', self.fields['image_id'].choices):
+            raise forms.ValidationError(_("There are no image sources "
+                                          "available; you must first create "
+                                          "an image before attempting to "
+                                          "launch an instance."))
+        if not cleaned_data[source]:
+            raise forms.ValidationError(_("Please select an option for the "
+                                          "instance source."))
+
+        # Prevent launching multiple instances with the same volume.
+        # TODO(gabriel): is it safe to launch multiple instances with
+        # a snapshot since it should be cloned to new volumes?
+        count = cleaned_data.get('count', 1)
+        volume_type = self.data.get('volume_type', None)
+        if volume_type and count > 1:
+            msg = _('Launching multiple instances is only supported for '
+                    'images and instance snapshots.')
+            raise forms.ValidationError(msg)
+
+        return cleaned_data
+
+    def populate_flavor_choices(self, request, context):
+        try:
+            flavors = api.nova.flavor_list(request)
+            flavor_list = [(flavor.id, "%s" % flavor.name) for flavor in flavors]
+        except:
+            flavor_list = []
+            exceptions.handle(request,_('Unable to retrieve instance flavors.'))
+        return sorted(flavor_list)
+
+    def get_help_text(self):
+        extra = {}
+        try:
+            flavors = jsonutils.dumps([f._info for f in
+                                       api.nova.flavor_list(self.request)])
+            extra['flavors'] = flavors
+        except:
+            exceptions.handle(self.request,
+                              _("Unable to retrieve quota information."))
+        return super(ResizeInstanceDetailsAction, self).get_help_text(extra)
+
+class SelectFlavor(workflows.Step):
+    action_class = ResizeInstanceDetailsAction
+    contributes = ("source_type", "source_id", "name", "count", "flavor")
+
+    def contribute(self, data, context):
+        context = super(SetInstanceDetails, self).contribute(data, context)
+        # Allow setting the source dynamically.
+        if ("source_type" in context and "source_id" in context
+                and context["source_type"] not in context):
+            context[context["source_type"]] = context["source_id"]
+
+        # Translate form input to context for source values.
+        if "source_type" in data:
+            context["source_id"] = data.get(data['source_type'], None)
+
+        return context
+
+
+class InstanceResize(workflows.Workflow):
+    slug = "resize_instance"
+    name = _("Resize Instance")
+    finalize_button_name = _("Resize")
+    success_message = _('Launched %(count)s named "%(name)s".')
+    failure_message = _('Unable to launch %(count)s named "%(name)s".')
+    success_url = "horizon:nova:instances:index"
+    default_steps = (SelectProjectUser,SelectFlavor)
+
+    def format_status_message(self, message):
+        name = self.context.get('name', 'unknown instance')
+        count = self.context.get('count', 1)
+        if int(count) > 1:
+            return message % {"count": _("%s instances") % count,
+                              "name": name}
+        else:
+            return message % {"count": _("instance"), "name": name}
+
+    def handle(self, request, context):
+        try:
+            #api.nova.server_create(request,
+            #                       context['name'],
+            #                       context['source_id'],
+            #                       context['flavor'],
+            #                       context['keypair_id'],
+            #                       normalize_newlines(custom_script),
+            #                       context['security_group_ids'],
+            #                       dev_mapping,
+            #                       nics=nics,
+            #                       instance_count=int(context['count']))
+            return True
+        except:
+            exceptions.handle(request)
+            return False
+
+
