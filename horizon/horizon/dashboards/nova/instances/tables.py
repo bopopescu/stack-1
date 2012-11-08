@@ -375,6 +375,6 @@ class InstancesTable(tables.DataTable):
         status_columns = ["status", "task"]
         row_class = UpdateRow
         table_actions = (LaunchLink, TerminateInstance)
-        row_actions = (CreateSnapshot, Resize, ConfirmResize, AssociateIP, EditInstance, ConsoleLink,
+        row_actions = (ConsoleLink, CreateSnapshot, Resize, ConfirmResize, AssociateIP, EditInstance,
                        LogLink, TogglePause, ToggleSuspend, RebootInstance,
                        TerminateInstance)

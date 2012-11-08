@@ -378,6 +378,9 @@ def server_resize(request, instance_id, flavor_id):
 def server_confirm_resize(request, instance_id):
     novaclient(request).servers.confirm_resize(instance_id)
 
+def server_revert_resize(request, instance_id):
+    novaclient(request).servers.revert_resize(instance_id)
+
 def server_update(request, instance_id, name):
     response = novaclient(request).servers.update(instance_id, name=name)
     # TODO(gabriel): servers.update method doesn't return anything. :-(
