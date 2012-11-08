@@ -569,7 +569,7 @@ class ResizeInstanceDetailsAction(workflows.Action):
 
 class SelectFlavor(workflows.Step):
     action_class = ResizeInstanceDetailsAction
-    contributes = ("source_type", "source_id", "name", "count", "flavor")
+    contributes = ("name", "flavor")
 
     def contribute(self, data, context):
         context = super(SetInstanceDetails, self).contribute(data, context)
@@ -615,6 +615,8 @@ class InstanceResize(workflows.Workflow):
             #                       dev_mapping,
             #                       nics=nics,
             #                       instance_count=int(context['count']))
+	    #api.nova.server_resize(request, context['instance_id'], context['flavor'])
+	    api.nova.server_resize(request, '7f737ac1-03ed-4863-976c-55b3222baa89', context['flavor'])
             return True
         except:
             exceptions.handle(request)

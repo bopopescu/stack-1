@@ -372,6 +372,9 @@ def server_reboot(request, instance_id, hardness=REBOOT_HARD):
     server = server_get(request, instance_id)
     server.reboot(hardness)
 
+def server_resize(request, instance_id, flavor_id, **kwargs):
+    server = server_get(request, instance_id)
+    server.resize(flavor_id, **kwargs)
 
 def server_update(request, instance_id, name):
     response = novaclient(request).servers.update(instance_id, name=name)

@@ -32,14 +32,19 @@ class BasePanels(horizon.PanelGroup):
 
 class ObjectStorePanels(horizon.PanelGroup):
     slug = "object_store"
-    name = _("Object Store")
-    panels = ('containers',)
+    name = _("Cloud Storage")
+    panels = ('containers','sql',)
+
+class Analysis_Reports_Panels(horizon.PanelGroup):
+    slug = "arpg"
+    name = _("Analysis Reports")
+    panels = ('monitor',)
 
 
 class Nova(horizon.Dashboard):
     name = _("Project")
     slug = "nova"
-    panels = (BasePanels, ObjectStorePanels)
+    panels = (BasePanels, ObjectStorePanels, Analysis_Reports_Panels,)
     default_panel = 'overview'
     supports_tenants = True
 

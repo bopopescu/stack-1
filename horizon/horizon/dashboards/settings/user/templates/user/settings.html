@@ -1,11 +1,12 @@
 {% extends 'base.html' %}
 {% load i18n %}
-{% block title %}{% trans "User Settings" %}{% endblock %}
+{% block title %}{% trans "My Account" %}{% endblock %}
 
 {% block page_header %}
   {% include "horizon/common/_page_header.html" with title=_("User Settings") %}
 {% endblock page_header %}
 
 {% block main %}
+  {% include "settings/user/_account_info.html" %}
   {% include "settings/user/_settings.html" %}
 {% endblock %}

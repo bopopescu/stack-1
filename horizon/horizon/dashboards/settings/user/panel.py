@@ -21,7 +21,7 @@ from horizon.dashboards.settings import dashboard
 
 
 class UserPanel(horizon.Panel):
-    name = _("User Settings")
+    name = _("My Account")
     slug = 'user'
 
 
