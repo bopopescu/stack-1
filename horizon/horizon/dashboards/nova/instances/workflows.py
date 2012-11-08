@@ -511,50 +511,43 @@ class LaunchInstance(workflows.Workflow):
 
 
 class ResizeInstanceDetailsAction(workflows.Action):
-    name = forms.CharField(max_length=80, label=_("Instance Name"))
-    flavor = forms.ChoiceField(label=_("Flavor"),help_text=_("Size of image to launch."))
+    instance_id = forms.ChoiceField(label=_("Instance"))
+    flavor_id = forms.ChoiceField(label=_("Flavor"),help_text=_("Size of image to launch."))
 
     class Meta:
         name = _("Details")
-        help_text_template = ("nova/instances/_launch_details_help.html")
+        help_text_template = ("nova/instances/_resize_details_help.html")
 
-    def clean(self):
-        cleaned_data = super(ResizeInstanceDetailsAction, self).clean()
-
-        # Validate our instance source.
-        source = cleaned_data['source_type']
-        # There should always be at least one image_id choice, telling the user
-        # that there are "No Images Available" so we check for 2 here...
-        if source == 'image_id' and not \
-                filter(lambda x: x[0] != '', self.fields['image_id'].choices):
-            raise forms.ValidationError(_("There are no image sources "
-                                          "available; you must first create "
-                                          "an image before attempting to "
-                                          "launch an instance."))
-        if not cleaned_data[source]:
-            raise forms.ValidationError(_("Please select an option for the "
-                                          "instance source."))
-
-        # Prevent launching multiple instances with the same volume.
-        # TODO(gabriel): is it safe to launch multiple instances with
-        # a snapshot since it should be cloned to new volumes?
-        count = cleaned_data.get('count', 1)
-        volume_type = self.data.get('volume_type', None)
-        if volume_type and count > 1:
-            msg = _('Launching multiple instances is only supported for '
-                    'images and instance snapshots.')
-            raise forms.ValidationError(msg)
-
-        return cleaned_data
-
-    def populate_flavor_choices(self, request, context):
+    def populate_flavor_id_choices(self, request, context):
         try:
             flavors = api.nova.flavor_list(request)
-            flavor_list = [(flavor.id, "%s" % flavor.name) for flavor in flavors]
+            flavor_list = [(flavor.id, "%s (%s)" % (flavor.name,flavor.id)) for flavor in flavors]
         except:
             flavor_list = []
             exceptions.handle(request,_('Unable to retrieve instance flavors.'))
         return sorted(flavor_list)
+
+    def populate_instance_id_choices(self, request, context):
+        try:
+            servers = api.nova.server_list(self.request)
+        except:
+            redirect = reverse('horizon:nova:instance:index')
+            exceptions.handle(self.request,
+                              _('Unable to retrieve instance list.'),
+                              redirect=redirect)
+        instances = []
+        for server in servers:
+            server_name = "%s (%s)" % (server.name, server.id)
+            instances.append((server.id, server_name))
+
+        # Sort instances for easy browsing
+        instances = sorted(instances, key=lambda x: x[1])
+
+        if instances:
+            instances.insert(0, ("", _("Select an instance")))
+        else:
+            instances = (("", _("No instances available")),)
+        return instances
 
     def get_help_text(self):
         extra = {}
@@ -567,20 +560,21 @@ class ResizeInstanceDetailsAction(workflows.Action):
                               _("Unable to retrieve quota information."))
         return super(ResizeInstanceDetailsAction, self).get_help_text(extra)
 
+
 class SelectFlavor(workflows.Step):
     action_class = ResizeInstanceDetailsAction
-    contributes = ("name", "flavor")
+    contributes = ("instance_id", "flavor_id", 'instance_name', "flavor_name")
 
     def contribute(self, data, context):
-        context = super(SetInstanceDetails, self).contribute(data, context)
-        # Allow setting the source dynamically.
-        if ("source_type" in context and "source_id" in context
-                and context["source_type"] not in context):
-            context[context["source_type"]] = context["source_id"]
-
-        # Translate form input to context for source values.
-        if "source_type" in data:
-            context["source_id"] = data.get(data['source_type'], None)
+        context = super(SelectFlavor, self).contribute(data, context)
+	iid = data.get('instance_id', None)
+	fid = data.get('flavor_id', None)
+	if iid:
+	    instance_choices = dict(self.action.fields['instance_id'].choices)
+	    context["instance_name"] = instance_choices.get(iid, None)
+        if fid:
+            flavor_choices = dict(self.action.fields['flavor_id'].choices)
+            context["flavor_name"] = flavor_choices.get(fid, None)
 
         return context
 
@@ -589,37 +583,88 @@ class InstanceResize(workflows.Workflow):
     slug = "resize_instance"
     name = _("Resize Instance")
     finalize_button_name = _("Resize")
-    success_message = _('Launched %(count)s named "%(name)s".')
-    failure_message = _('Unable to launch %(count)s named "%(name)s".')
+    success_message = _('Resizing instance "%(instance_id)s" to "%(flavor_id)s".')
+    failure_message = _('Unable to Resize "%(instance_id)s" to "%(flavor_id)s".')
     success_url = "horizon:nova:instances:index"
-    default_steps = (SelectProjectUser,SelectFlavor)
+    default_steps = (SelectProjectUser,SelectFlavor,)
 
     def format_status_message(self, message):
-        name = self.context.get('name', 'unknown instance')
-        count = self.context.get('count', 1)
-        if int(count) > 1:
-            return message % {"count": _("%s instances") % count,
-                              "name": name}
-        else:
-            return message % {"count": _("instance"), "name": name}
+        return message % {'instance_id': self.context['instance_name'].split('(')[0], 'flavor_id':self.context['flavor_name'].split('(')[0]}
 
-    def handle(self, request, context):
+
+    def handle(self, request, data):
         try:
-            #api.nova.server_create(request,
-            #                       context['name'],
-            #                       context['source_id'],
-            #                       context['flavor'],
-            #                       context['keypair_id'],
-            #                       normalize_newlines(custom_script),
-            #                       context['security_group_ids'],
-            #                       dev_mapping,
-            #                       nics=nics,
-            #                       instance_count=int(context['count']))
-	    #api.nova.server_resize(request, context['instance_id'], context['flavor'])
-	    api.nova.server_resize(request, '7f737ac1-03ed-4863-976c-55b3222baa89', context['flavor'])
-            return True
+            api.nova.server_resize(request, data['instance_id'], data['flavor_id'])
+	    pass
         except:
             exceptions.handle(request)
             return False
+        return True
+
+class ConfirmResizeInstanceDetailsAction(workflows.Action):
+    instance_id = forms.ChoiceField(label=_("Instance"))
+
+    class Meta:
+        name = _("Details")
+        help_text_template = ("nova/instances/_confirm_resize_help.html")
+
+    def populate_instance_id_choices(self, request, context):
+        try:
+            servers = api.nova.server_list(self.request)
+        except:
+            redirect = reverse('horizon:nova:instance:index')
+            exceptions.handle(self.request,
+                              _('Unable to retrieve instance list.'),
+                              redirect=redirect)
+        instances = []
+        for server in servers:
+            server_name = "%s (%s)" % (server.name, server.id)
+            instances.append((server.id, server_name))
+
+        # Sort instances for easy browsing
+        instances = sorted(instances, key=lambda x: x[1])
+
+        if instances:
+            instances.insert(0, ("", _("Select an instance")))
+        else:
+            instances = (("", _("No instances available")),)
+        return instances
+
+class ConfirmSelectFlavor(workflows.Step):
+    action_class = ConfirmResizeInstanceDetailsAction
+    contributes = ("instance_id", "flavor_id", 'instance_name', "flavor_name")
+
+    def contribute(self, data, context):
+        context = super(ConfirmSelectFlavor, self).contribute(data, context)
+	iid = data.get('instance_id', None)
+	fid = data.get('flavor_id', None)
+	if iid:
+	    instance_choices = dict(self.action.fields['instance_id'].choices)
+	    context["instance_name"] = instance_choices.get(iid, None)
+        if fid:
+            flavor_choices = dict(self.action.fields['flavor_id'].choices)
+            context["flavor_name"] = flavor_choices.get(fid, None)
+
+        return context
+
+class ConfirmInstanceResize(workflows.Workflow):
+    slug = "confirm_resize_instance"
+    name = _("Confirm Resize Result")
+    finalize_button_name = _("Confirm Resize")
+    success_message = _('Resizing instance "%(instance_id)s" to "%(flavor_id)s" is confirmed.')
+    failure_message = _('Unable to Resize "%(instance_id)s" to "%(flavor_id)s".')
+    success_url = "horizon:nova:instances:index"
+    default_steps = (SelectProjectUser,ConfirmSelectFlavor,)
+
+    def format_status_message(self, message):
+        return message % {'instance_id': self.context['instance_name'].split('(')[0], 'flavor_id':self.context['flavor_name'].split('(')[0]}
 
 
+    def handle(self, request, data):
+        try:
+            api.nova.server_confirm_resize(request, data['instance_id'])
+	    pass
+        except:
+            exceptions.handle(request)
+            return False
+        return True

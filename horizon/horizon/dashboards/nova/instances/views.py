@@ -42,6 +42,7 @@ from .tabs import InstanceDetailTabs
 from .tables import InstancesTable
 from .workflows import LaunchInstance
 from .workflows import InstanceResize
+from .workflows import ConfirmInstanceResize
 
 
 LOG = logging.getLogger(__name__)
@@ -152,32 +153,36 @@ class UpdateView(forms.ModalFormView):
                 'tenant_id': self.request.user.tenant_id,
                 'name': getattr(self.get_object(), 'name', '')}
 
+class ConfirmResizeView(workflows.WorkflowView):
+    workflow_class = ConfirmInstanceResize
+    template_name = 'nova/instances/confirmresize.html'
+
 class ResizeView(workflows.WorkflowView):
     workflow_class = InstanceResize
     template_name = 'nova/instances/resize.html'
     #context_object_name = 'instance'
     #success_url = reverse_lazy("horizon:nova:instances:index")
 
-    def get_context_data(self, **kwargs):
-        context = super(ResizeView, self).get_context_data(**kwargs)
-        context["instance_id"] = self.kwargs['instance_id']
-        return context
-
-    def get_object(self, *args, **kwargs):
-        if not hasattr(self, "_object"):
-            instance_id = self.kwargs['instance_id']
-            try:
-                self._object = api.server_get(self.request, instance_id)
-            except:
-                redirect = reverse("horizon:nova:instances:index")
-                msg = _('Unable to retrieve instance details.')
-                exceptions.handle(self.request, msg, redirect=redirect)
-        return self._object
-
-    def get_initial(self):
-        return {'instance': self.kwargs['instance_id'],
-                'tenant_id': self.request.user.tenant_id,
-                'name': getattr(self.get_object(), 'name', '')}
+#    def get_context_data(self, **kwargs):
+#        context = super(ResizeView, self).get_context_data(**kwargs)
+#        context["instance_id"] = self.kwargs['instance_id']
+#        return context
+#
+#    def get_object(self, *args, **kwargs):
+#        if not hasattr(self, "_object"):
+#            instance_id = self.kwargs['instance_id']
+#            try:
+#                self._object = api.server_get(self.request, instance_id)
+#            except:
+#                redirect = reverse("horizon:nova:instances:index")
+#                msg = _('Unable to retrieve instance details.')
+#                exceptions.handle(self.request, msg, redirect=redirect)
+#        return self._object
+#
+#    def get_initial(self):
+#        return {'instance': self.kwargs['instance_id'],
+#                'tenant_id': self.request.user.tenant_id,
+#                'name': getattr(self.get_object(), 'name', '')}
 
 class DetailView(tabs.TabView):
     tab_group_class = InstanceDetailTabs

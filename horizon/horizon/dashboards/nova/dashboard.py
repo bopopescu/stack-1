@@ -38,7 +38,7 @@ class ObjectStorePanels(horizon.PanelGroup):
 class Analysis_Reports_Panels(horizon.PanelGroup):
     slug = "arpg"
     name = _("Analysis Reports")
-    panels = ('monitor',)
+    panels = ('monitor','messages')
 
 
 class Nova(horizon.Dashboard):
@@ -47,6 +47,7 @@ class Nova(horizon.Dashboard):
     panels = (BasePanels, ObjectStorePanels, Analysis_Reports_Panels,)
     default_panel = 'overview'
     supports_tenants = True
+    nav = True
 
 
 horizon.register(Nova)

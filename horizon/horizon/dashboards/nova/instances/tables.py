@@ -175,6 +175,16 @@ class EditInstance(tables.LinkAction):
     def allowed(self, request, instance):
         return not _is_deleting(instance)
 
+class ConfirmResize(tables.LinkAction):
+    name = 'confirm_resize'
+    verbose_name = _("Confirm Resize")
+    url = "horizon:nova:instances:confirmresize"
+    classes = ('ajax-modal', "btn-associate")
+
+    def allowed(self, request, instance=None):
+        return instance.status in ('VERIFY_RESIZE',)
+
+
 class Resize(tables.LinkAction):
     name = "resize"
     verbose_name = _("Resize Instance")
@@ -211,7 +221,7 @@ class ConsoleLink(tables.LinkAction):
     classes = ("btn-console",)
 
     def allowed(self, request, instance=None):
-        return instance.status in ACTIVE_STATES and not _is_deleting(instance)
+        return instance.status in ACTIVE_STATES and not _is_deleting(instance) or instance.status in ('RESIZE', 'VERIFY_RESIZE')
 
     def get_link_url(self, datum):
         base_url = super(ConsoleLink, self).get_link_url(datum)
@@ -276,8 +286,8 @@ def get_iname(instance):
     return instance.image_name
 
 def get_instance_url(instance):
-    port = random.randint(10000, 60000) 
-    rule = "iptables -t nat -I PREROUTING -d 159.226.50.227/32 -p tcp -m tcp --dport %s -j DNAT --to-destination %s:22" % (str(port), instance.addresses['private'][0]['addr'])
+    #port = random.randint(10000, 60000) 
+    #rule = "iptables -t nat -I PREROUTING -d 159.226.50.227/32 -p tcp -m tcp --dport %s -j DNAT --to-destination %s:22" % (str(port), instance.addresses['private'][0]['addr'])
     #os.popen(rule)
     #return "159.226.50.227:%s" % (str(port))
     if instance.id == "7f737ac1-03ed-4863-976c-55b3222baa89":
@@ -289,7 +299,7 @@ def get_instance_url(instance):
     elif instance.id == "b94620ef-cb4a-4bb4-bb8d-1e099c3c9e1c":
     	url = "159.226.50.227:%s" % (str(18910))
 	return mark_safe("<a href= 'http://%s' target='blank'>%s</a>"%(url, url))
-    return instance.id
+    return "we"
 
 def get_size(instance):
     if hasattr(instance, "full_flavor"):
@@ -356,7 +366,7 @@ class InstancesTable(tables.DataTable):
     usage = tables.Column(get_usage,
                           verbose_name=_("Usage"))
     instance_url = tables.Column(get_instance_url,
-			  verbose_name=_('Instance URL'))
+    			  verbose_name=_('Instance URL'))
     
 
     class Meta:
@@ -365,6 +375,6 @@ class InstancesTable(tables.DataTable):
         status_columns = ["status", "task"]
         row_class = UpdateRow
         table_actions = (LaunchLink, TerminateInstance)
-        row_actions = (CreateSnapshot, Resize, AssociateIP, EditInstance, ConsoleLink,
+        row_actions = (CreateSnapshot, Resize, ConfirmResize, AssociateIP, EditInstance, ConsoleLink,
                        LogLink, TogglePause, ToggleSuspend, RebootInstance,
                        TerminateInstance)

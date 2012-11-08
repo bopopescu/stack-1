@@ -20,7 +20,7 @@
 
 from django.conf.urls.defaults import patterns, url
 
-from .views import IndexView, UpdateView, DetailView, LaunchInstanceView, ResizeView
+from .views import IndexView, UpdateView, DetailView, LaunchInstanceView, ResizeView, ConfirmResizeView
 
 
 INSTANCES = r'^(?P<instance_id>[^/]+)/%s$'
@@ -32,6 +32,7 @@ urlpatterns = patterns('horizon.dashboards.nova.instances.views',
     url(r'^(?P<instance_id>[^/]+)/$', DetailView.as_view(), name='detail'),
     url(INSTANCES % 'update', UpdateView.as_view(), name='update'),
     url(INSTANCES % 'resize', ResizeView.as_view(), name='resize'),
+    url(INSTANCES % 'confirmresize', ConfirmResizeView.as_view(), name='confirmresize'),
     url(INSTANCES % 'console', 'console', name='console'),
     url(INSTANCES % 'vnc', 'vnc', name='vnc')
 )
