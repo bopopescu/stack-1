@@ -1,0 +1,17 @@
+{% extends "horizon/common/_modal_form.html" %}
+{% load i18n %}
+
+{% block form_id %}user_settings_modal{% endblock %}
+{% block form_action %}{% url horizon:settings:user:index %}{% endblock %}
+
+{% block modal_id %}user_settings_modal{% endblock %}
+{% block modal-header %}{% trans "Account Info" %}{% endblock %}
+
+{% block modal-body %}
+<div > 
+{%trans "User Name:"%}<br>
+{%trans "Email::"%}
+</div>
+{% endblock %}
+
+

@@ -1,0 +1,16 @@
+{% load i18n horizon humanize %}
+
+<p>{% blocktrans %}Choose resized instance {% endblocktrans %}</p>
+
+<h4>{% trans "Attentions!!!" %}</h4>
+<h1>Make sure everything is OK through ssh or vnc console.</h1>
+
+<script type="text/javascript" charset="utf-8">
+  if(typeof horizon.Quota !== 'undefined') {
+    horizon.Quota.initWithFlavors({{ flavors|safe|default:"{}" }});
+  } else {
+    addHorizonLoadEvent(function() {
+      horizon.Quota.initWithFlavors({{ flavors|safe|default:"{}" }});
+    });
+  }
+</script>
