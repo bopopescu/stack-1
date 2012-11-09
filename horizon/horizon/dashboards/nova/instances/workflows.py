@@ -632,18 +632,14 @@ class ConfirmResizeInstanceDetailsAction(workflows.Action):
 
 class ConfirmSelectFlavor(workflows.Step):
     action_class = ConfirmResizeInstanceDetailsAction
-    contributes = ("instance_id", "flavor_id", 'instance_name', "flavor_name")
+    contributes = ("instance_id", 'instance_name')
 
     def contribute(self, data, context):
         context = super(ConfirmSelectFlavor, self).contribute(data, context)
 	iid = data.get('instance_id', None)
-	fid = data.get('flavor_id', None)
 	if iid:
 	    instance_choices = dict(self.action.fields['instance_id'].choices)
 	    context["instance_name"] = instance_choices.get(iid, None)
-        if fid:
-            flavor_choices = dict(self.action.fields['flavor_id'].choices)
-            context["flavor_name"] = flavor_choices.get(fid, None)
 
         return context
 
@@ -651,13 +647,13 @@ class ConfirmInstanceResize(workflows.Workflow):
     slug = "confirm_resize_instance"
     name = _("Confirm Resize Result")
     finalize_button_name = _("Confirm Resize")
-    success_message = _('Resizing instance "%(instance_id)s" to "%(flavor_id)s" is confirmed.')
+    success_message = _('Resizing instance "%(instance_id)s" is confirmed.')
     failure_message = _('Unable to Resize "%(instance_id)s" to "%(flavor_id)s".')
     success_url = "horizon:nova:instances:index"
     default_steps = (SelectProjectUser,ConfirmSelectFlavor,)
 
     def format_status_message(self, message):
-        return message % {'instance_id': self.context['instance_name'].split('(')[0], 'flavor_id':self.context['flavor_name'].split('(')[0]}
+        return message % {'instance_id': self.context['instance_name'].split('(')[0]}
 
 
     def handle(self, request, data):
