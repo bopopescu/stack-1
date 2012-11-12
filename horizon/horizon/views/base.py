@@ -47,7 +47,9 @@ def splash(request):
     form = Login(request)
     request.session.clear()
     request.session.set_test_cookie()
-    return shortcuts.render(request, 'splash.html', {'form': form})
+    # modified by shengeng for zeda
+    #return shortcuts.render(request, 'splash.html', {'form': form})
+    return shortcuts.render(request, 'splash_zeda.html', {'form': form})
 
 def get_md(request):
     def total_IO(s):

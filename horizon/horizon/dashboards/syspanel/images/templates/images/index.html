@@ -2,9 +2,9 @@
 {% load i18n %}
 {% block title %}{% trans "Images" %}{% endblock %}
 
-{% block page_header %}
-  {% include "horizon/common/_page_header.html" with title=_("Images") %}
-{% endblock page_header %}
+{% block position_info%}
+{%trans "Syspanel"%} &gt; {%trans "Images"%}
+{% endblock %}
 
 {% block main %}
   {{ table.render }}

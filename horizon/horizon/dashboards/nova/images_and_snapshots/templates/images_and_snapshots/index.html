@@ -2,9 +2,9 @@
 {% load i18n %}
 {% block title %}{% trans "Images &amp; Snapshots" %}{% endblock %}
 
-{% block page_header %}
-  {% include "horizon/common/_page_header.html" with title=_("Images &amp; Snapshots") %}
-{% endblock page_header %}
+{% block position_info %}
+{%trans "Projects:"%} &gt; {% trans "Images and Snapshots" %}
+{% endblock %}
 
 {% block main %}
   <div class="images">

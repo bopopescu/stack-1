@@ -41,6 +41,10 @@ $(function(){
   {% include "horizon/common/_page_header.html" with title=_("Instances") %}
 {% endblock page_header %}
 
+{% block position_info %}
+{%trans "Projects:"%} &gt; {% trans "Instances"%}
+{% endblock %}
+
 {% block main %}
   {{ table.render }}
 {% endblock %}

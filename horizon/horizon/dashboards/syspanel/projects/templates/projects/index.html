@@ -8,6 +8,10 @@
   {% include "horizon/common/_page_header.html" with title=_("Projects") refresh_link=refresh_link searchable="true" %}
 {% endblock page_header %}
 
+{% block position_info%}
+{%trans "Syspanel"%} &gt; {%trans "Projects"%}
+{% endblock %}
+
 {% block main %}
   {{ table.render }}
 {% endblock %}
