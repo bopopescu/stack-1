@@ -1,11 +1,14 @@
 {% load i18n %}
-<div id="user_info" class="pull-right">
-  <span>{% trans "Logged in as" %}: {{ request.user.username }}</span>
-  <a href="{% url horizon:settings:user:index %}">{% trans "Settings" %}</a>
-  {% if HORIZON_CONFIG.help_url %}
-  <a href="{{ HORIZON_CONFIG.help_url }}" target="_new">{% trans "Help" %}</a>
-  {% endif %}
-  <img src="/static/dashboard/images/xgmm.png">
-  <a href="{% url logout %}">{% trans "Sign Out" %}</a>
-  {% include "horizon/common/_region_selector.html" %}
-</div>
+<table id="user_info" class="pull-right" height="20px">
+         <tbody>
+	 <tr>
+             <td>{% trans "Logged in as" %}: {{ request.user.username }}</td>
+             <td><img src="/static/dashboard/images/bjzl.png" width="16" height="16"></td><td><a href="{% url horizon:settings:user:index %}">{% trans "Settings" %}</a></td>
+             <td><img src="/static/dashboard/images/xgmm.png" width="16" height="16"></td><td><a href="{% url logout %}">{% trans "Sign Out" %}</a></td>
+             <td>{% include "horizon/common/_region_selector.html" %}</td>
+             {% if HORIZON_CONFIG.help_url %}
+             <td width="16"><img src="/static/dashboard/images/bz.png" width="16" height="16"></td><td><a href="{{ HORIZON_CONFIG.help_url }}" target="_new">{% trans "Help" %}</a></td>
+  	     {% endif %}
+        </tr>
+       </tbody>
+</table>

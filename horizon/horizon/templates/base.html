@@ -14,7 +14,7 @@
   <body id="{% block body_id %}{% endblock %}">
     {%block openstack_header%}
     <div class='openstack_header'>
-	  <div  height=35px><br><br><br></div>
+	  <div  height=35px><br><br></div>
           {% include "_header.html" %}
     </div>
     <div id="container">
@@ -24,7 +24,7 @@
     {% block content %}
       <div id="container">
         {% block sidebar %}
-          {% include 'horizon/common/_sidebar.html' %}
+          {% include 'horizon/common/_sidebar_new.html' %}
         {% endblock %}
         <div id='main_content'>
           <div class='topbar'>

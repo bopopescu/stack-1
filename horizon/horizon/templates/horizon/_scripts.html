@@ -40,7 +40,20 @@
   // Call init on DOM ready.
   $(document).ready(horizon.init);
 window.onload = function () {
-    document.getElementById("vnc_console_frame").contentWindow.focus();
+   if(document.getElementById("vnc_console_frame")!=null)
+     document.getElementById("vnc_console_frame").contentWindow.focus();
+   var urlll = document.location.href;
+   var new_url = urlll.substring(22,26);
+  // alert(new_url);
+   if(new_url=='nova')
+   {
+     document.getElementById('nova').style.display="";
+     document.getElementById('sysp').style.display="none";
+   }else{
+     document.getElementById('nova').style.display="none";
+     document.getElementById('sysp').style.display="";
+   }
+
 }
 
 
