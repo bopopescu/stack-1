@@ -1,0 +1,40 @@
+[openstack.cli]
+create_endpoint = openstackclient.identity.v2_0.endpoint:CreateEndpoint
+delete_user = openstackclient.identity.v2_0.user:DeleteUser
+list_user = openstackclient.identity.v2_0.user:ListUser
+delete_endpoint = openstackclient.identity.v2_0.endpoint:DeleteEndpoint
+create_user = openstackclient.identity.v2_0.user:CreateUser
+reboot_server = openstackclient.compute.v2.server:RebootServer
+delete_service = openstackclient.identity.v2_0.service:DeleteService
+show_service = openstackclient.identity.v2_0.service:ShowService
+show_tenant = openstackclient.identity.v2_0.tenant:ShowTenant
+delete_role = openstackclient.identity.v2_0.role:DeleteRole
+remove_role = openstackclient.identity.v2_0.role:RemoveRole
+list_role = openstackclient.identity.v2_0.role:ListRole
+list_tenant = openstackclient.identity.v2_0.tenant:ListTenant
+create_service = openstackclient.identity.v2_0.service:CreateService
+rebuild_server = openstackclient.compute.v2.server:RebuildServer
+show_endpoint = openstackclient.identity.v2_0.endpoint:ShowEndpoint
+suspend_server = openstackclient.compute.v2.server:SuspendServer
+pause_server = openstackclient.compute.v2.server:PauseServer
+list_server = openstackclient.compute.v2.server:ListServer
+create_tenant = openstackclient.identity.v2_0.tenant:CreateTenant
+create_role = openstackclient.identity.v2_0.role:CreateRole
+show_user = openstackclient.identity.v2_0.user:ShowUser
+show_server = openstackclient.compute.v2.server:ShowServer
+show_role = openstackclient.identity.v2_0.role:ShowRole
+resume_server = openstackclient.compute.v2.server:ResumeServer
+delete_tenant = openstackclient.identity.v2_0.tenant:DeleteTenant
+unpause_server = openstackclient.compute.v2.server:UnpauseServer
+add_role = openstackclient.identity.v2_0.role:AddRole
+create_server = openstackclient.compute.v2.server:CreateServer
+list_service = openstackclient.identity.v2_0.service:ListService
+delete_server = openstackclient.compute.v2.server:DeleteServer
+set_tenant = openstackclient.identity.v2_0.tenant:SetTenant
+set_user = openstackclient.identity.v2_0.user:SetUser
+list_endpoint = openstackclient.identity.v2_0.endpoint:ListEndpoint
+list_user-role = openstackclient.identity.v2_0.role:ListUserRole
+
+[console_scripts]
+openstack = openstackclient.shell:main
+
