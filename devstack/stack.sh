@@ -18,7 +18,7 @@
 
 # Learn more and get the most recent version at http://devstack.org
 
-killall screen
+
 # Keep track of the devstack directory
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 

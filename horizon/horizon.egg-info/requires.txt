@@ -9,3 +9,4 @@ python-quantumclient>=2.0
 python-swiftclient>1.1,<2
 pytz
 lockfile # for SECURE_KEY generation
+captcha

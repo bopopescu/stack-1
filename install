@@ -1,0 +1,13 @@
+#!/bin/bash
+
+TOP_DIR=$(cd $(dirname "$0") && pwd)
+cd django-simple-captcha-0.3.0
+python setup.py install
+
+cd ../kanyun/
+python setup.py install
+cd ..
+
+cd devstack
+killall screen
+./stack.sh
