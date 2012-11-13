@@ -1,16 +1,10 @@
 {% load branding horizon i18n %}
 
 <div class='sidebar'>
+  <h1 class="brand clearfix"></h1>
+
   {% horizon_main_nav %}
 
-  <div id="sidebar_right">
-  	<table cellpadding="0" cellspacing="0" border="0" class="xiahua">
-         <tbody><tr>
-         </tr>
-        </tbody></table>
-  </div>
-
-  <div id='sidebar_center'>
   {% if request.horizon.dashboard.supports_tenants %}
   <div id="tenant_switcher" class="dropdown switcher_bar" tabindex="1">
     {% with num_of_tenants=authorized_tenants|length %}
@@ -38,6 +32,4 @@
   {% endif %}
 
   {% horizon_dashboard_nav %}
-  </div>
-
 </div>
