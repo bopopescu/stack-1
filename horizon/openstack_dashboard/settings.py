@@ -36,10 +36,10 @@ TEMPLATE_DEBUG = DEBUG
 SITE_BRANDING = 'OpenStack Dashboard'
 
 #modified for zeda, by shengeng 
-#LOGIN_URL = '/auth/login/'
-#LOGOUT_URL = '/auth/logout/'
-LOGIN_URL = '/'
-LOGOUT_URL = '/'
+LOGIN_URL = '/auth/login/'
+LOGOUT_URL = '/auth/logout/'
+#LOGIN_URL = '/'
+#LOGOUT_URL = '/'
 # LOGIN_REDIRECT_URL can be used as an alternative for
 # HORIZON_CONFIG.user_home, if user_home is not set.
 # Do not set it to '/home/', as this will cause circular redirect loop
@@ -128,6 +128,7 @@ INSTALLED_APPS = (
     'horizon.dashboards.syspanel',
     'horizon.dashboards.settings',
     'openstack_auth',
+    'captcha',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

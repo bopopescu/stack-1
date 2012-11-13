@@ -1,13 +1,31 @@
-{% extends "base.html" %}
-{% load i18n %}
-
-{%block openstack_header%}
-{%endblock%}
-
-{% block title %}{% trans "Login" %}{% endblock %}
-
-{% block body_id %}splash_zeda{% endblock %}
-
-{% block content %}
-  {% include 'auth/_login.html' %}
-{% endblock %}
+{% load i18n branding %}
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<!--<title>{% trans "Login" %} - {% site_branding %}</title>-->
+	<title>-{% site_branding %}</title>
+	{% include "_stylesheets_zeda.html" %}
+</head>
+<body>
+	<div class="mian_div">
+    	<div class="mian_con">
+        	<div class="logo_div"><img src="/static/dashboard/images/03.png" height="69" width="464" /></div>
+            <div class="table_div">
+       	  	<table cellpadding="0" cellspacing="0" border="0">
+                	
+                      <tr>
+                    	<td height="10"></td>
+                        <td width="10"></td>
+                        <td></td>
+                      </tr>
+		{% include "auth/_login.html" %}
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="foot_div">
+    	请使用IE5.0以上浏览器登陆 1024*768以上分辨率<br/>北龙泽达（北京）数据科技有限公司 版权所有 京ICP备09112359号
+    </div>
+</body>
+</html>

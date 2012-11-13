@@ -45,11 +45,13 @@ def splash(request):
     if request.user.is_authenticated():
         return shortcuts.redirect(get_user_home(request.user))
     form = Login(request)
+    if form.is_valid():
+        human = True
     request.session.clear()
     request.session.set_test_cookie()
     # modified by shengeng for zeda
     #return shortcuts.render(request, 'splash.html', {'form': form})
-    return shortcuts.render(request, 'splash_zeda.html', {'form': form})
+    return shortcuts.render(request, 'auth/login.html', {'form': form})
 
 def get_md(request):
     def total_IO(s):

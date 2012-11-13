@@ -1,12 +1,13 @@
 {% load horizon i18n %}
 
-<div class='sidebar_left'>
+<div id='sidebar_left'>
   <!--<ul class="nav nav-tabs">-->
-  <ul class="bg_div">
+  <ul class="nav_tabs">
     {% for component in components %}
       {% if user|has_permissions:component %}
-        <div{% if current.slug == component.slug %} class="active_bg" {% else %} class='notactive_bg' {% endif %}>
-          <a href="{{ component.get_absolute_url }}" tabindex='1'>{{ component.name }}</a>
+        <div {% if current.slug == component.slug %} class="active_bg" {% else %} class='notactive_bg' {% endif %}>
+          <!--<a style="writing-mode:tb-rl" href="{{ component.get_absolute_url }}" tabindex='1'>{{ component.name }}</a>-->
+          <a style="writing-mode:tb-rl" href="{{ component.get_absolute_url }}" tabindex='1'>test</a>
         </div>
       {% endif %}
     {% endfor %}
