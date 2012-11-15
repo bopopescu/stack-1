@@ -2,14 +2,16 @@
 
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 cd django-simple-captcha-0.3.0
-python setup.py install
+sudo python setup.py install
 
 cd ../kanyun/
-python setup.py install
+apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq
+nohup ./kanyun-server > .kanyun-server.nohup&
+nohup ./kanyun-worker >.kanyun-worker.nohup &
 cd ..
 
 cd devstack
-killall screen
+sudo killall screen
 cat <<EOF >localrc
 FLAT_INTERFACE=eth0
 FIXED_RANGE=10.0.0.0/20

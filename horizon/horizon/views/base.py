@@ -20,6 +20,7 @@ from django.views.decorators import vary
 from django.http import HttpResponse
 from django.utils import simplejson
 from ThRedisClient import *
+from captcha.fields import CaptchaField
 import string, time, datetime
 
 
@@ -45,6 +46,7 @@ def splash(request):
     if request.user.is_authenticated():
         return shortcuts.redirect(get_user_home(request.user))
     form = Login(request)
+    form.captcha = CaptchaField()
     if form.is_valid():
         human = True
     request.session.clear()

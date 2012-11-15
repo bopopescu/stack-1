@@ -13,22 +13,17 @@ function reload_usage(){
 
 	$.ajax({ 
 		url: "http://159.226.50.227/md",
-		data: { query : ins, stime: "latest", horizon:"we" } ,
+		data: { query : ins, stime: "latest" } ,
 		dataType: "json",
 		success: function(data){
 			for ( ins in data){
 				$(".rsusage[value=" + ins + "]").html( "<B>CPU: </B>"+data[ins]['cpu']+"<br><B>MEM: </B>"+data[ins]['mem'] + "%<br><B>NetIn: </B>"+data[ins]['netin']+"M<br><B>NetOut: </B>"+data[ins]['netout']+"M<br>" );
 			}
-			window.setTimeout("reload_usage()", 5000);
 		},
-		error: function(xhr, code, msg){
-			$(".rsusage").html("--");
-			window.setTimeout("reload_usage()", 5000);
-		}
 	});
 }
-window.setTimeout("reload_usage()", 5000);
 
+window.setTimeout("reload_usage()", 4000);
 $(function(){
 	reload_usage();
 })

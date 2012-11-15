@@ -23,3 +23,9 @@ python-migrate
 nodejs
 python-netaddr
 python-captcha
+libzmq-dev
+python-setuptools
+python-mysqldb
+redis-server
+python-redis
+python-zmq

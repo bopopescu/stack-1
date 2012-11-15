@@ -26,14 +26,7 @@ import json
 import zmq
 from kanyun.common.const import *
 from kanyun.common.app import *
-##from kanyun.common.nova_tools import *
-## changed by lanjinsong
 
-"""
-Save the vm's system info data to db.
-protocol:
-    http://wiki.sinaapp.com/doku.php?id=monitoring
-"""
 living_status = dict()
 
 app = App(conf="kanyun.conf", log="/tmp/kanyun-server.log")
@@ -114,27 +107,22 @@ def list_workers():
     print len(living_status), "workers."
     
     
-def plugin_heartbeat(app, db, data):
+def plugin_heartbeat(app, db, cache, data):
     if data is None or len(data) < 3:
-        logger.debug("[ERR]invalid heartbeat data")
         return
     worker_id, update_time, status = data
     if living_status.has_key(worker_id):
         living_status[worker_id].update()
     else:
         living_status[worker_id] = LivingStatus(worker_id)
-    logger.debug("heartbeat:%s" % data)
     if 0 == status:
-        logger.debug("%s quited" % (worker_id))
         del living_status[worker_id]
 
 
-def plugin_decoder_agent(app, db, data):
+def plugin_decoder_agent(app=None, db=None, cache=None, data=None):
     if data is None or len(data) <= 0:
-        logger.debug('invalid data:%s' % (data))
         return
     def formate_vm_info(info):
-##     info= {'instance-00000001': [('cpu', 'total', (1344394313.516737, 0.0)), ('mem', 'total', (1344394313.516737, 524288L, 0L)), ('nic', 'vnet0', (1344394313.52059, 29645L, 0L)), ('blk', 'vda', (1344394313.525229, 512L, 0L)),$uuid]
         formated_info=[];
         for instance in info:
             ## create a list with length 10
@@ -186,42 +174,12 @@ def plugin_decoder_agent(app, db, data):
     print "-"*30, "vminfo", "-" * 30
     pass_time = time.time()
     formated_info=formate_vm_info(data);
-    #print 'instances num=%s'%(len(formated_info));
-    #print 'formated_info[0]=',formated_info[0];
     for info in formated_info:
+ 	print info
         db.insert_monitor_data(info);
-##    db.process_monitor_info(tool,data);
-    
-##    plugin_agent_srv.plugin_decoder_agent(tool, db, data)
+        cache.push_vm_info(info);
     print 'spend \033[1;33m%f\033[0m seconds' % (time.time() - pass_time)
-#    print '-' * 60
     
-    
-def plugin_decoder_traffic_accounting(app, db, data):
-    # protocol:{'instance-00000001': ('10.0.0.2', 1332409327, '0')}
-    # verify the data
-    if data is None or len(data) <= 0:
-        logger.debug('invalid data:%s' % (data))
-        return
-    
-    print "-"*30, "traffic", "-" * 30
-    logger.debug('save traffic data:%s' % (data))
-    pass_time = time.time()
-#    for i in data:
-#        # instance_uuid = tool.get_uuid_by_novaid(nova_id)
-#        if len(i) > 0 and len(data[i]) > 2:
-#            db.insert('vmnetwork', i, {data[i][0]: {data[i][1]: data[i][2]}})
-    for nova_id, i in data.iteritems():
-        instance_uuid = tool.get_uuid_by_novaid(nova_id)
-        if instance_uuid is None:
-            instance_uuid = nova_id
-            print "Invalid instance_id format:", nova_id
-        if len(i) > 2:
-            traffic = i[2]
-            print nova_id, "-->", instance_uuid, "\033[1;32m", traffic, "\033[0m"
-            db.insert('vmnetwork', instance_uuid, {i[0]: {i[1]: traffic}})
-    print 'spend \033[1;33m%f\033[0m seconds' % (time.time() - pass_time)
-
 def SignalHandler(sig, id):
     global running
     

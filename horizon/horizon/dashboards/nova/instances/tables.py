@@ -278,8 +278,7 @@ def get_ips(instance):
 
 
 def get_usage(instance):
-    instance_name = getattr(instance, "OS-EXT-SRV-ATTR:instance_name", 0)
-    ret = "<div class='rsusage' value='" + instance_name + "' ><B>CPU: </B>--<br><B>MEM: </B>-------<br><B>NetIn: </B>--<br><B>NetOut: </B>--</div>"
+    ret = "<div class='rsusage' value='" + instance.id + "' ><B>CPU: </B>--<br><B>MEM: </B>-------<br><B>NetIn: </B>--<br><B>NetOut: </B>--</div>"
     return mark_safe(ret)
 
 def get_iname(instance):
@@ -299,7 +298,7 @@ def get_instance_url(instance):
     elif instance.id == "b94620ef-cb4a-4bb4-bb8d-1e099c3c9e1c":
     	url = "159.226.50.227:%s" % (str(18910))
 	return mark_safe("<a href= 'http://%s' target='blank'>%s</a>"%(url, url))
-    return "we"
+    return "--"
 
 def get_size(instance):
     if hasattr(instance, "full_flavor"):

@@ -45,12 +45,8 @@ class CacheClient(object):
         self.client.flushdb();
         ### assume kanyun-worker send vm info every 5 seconds,but actually not, the time gap maybe 1 minute.
         self.cache_time_buffer=int(config['cache_time_buffer']);
-        print "cache_time_buffer=%s"%(self.cache_time_buffer);
-        self.recordRemover=RecordRemover(self.client);
-        self.recordRemover.start();
-
-    def __del__(self):
-        self.recordRemover.stop();
+        #self.recordRemover=RecordRemover(self.client);
+        #self.recordRemover.start();
 
     def push_vm_info(self,info):
         """ push instance info into memcached server""";
@@ -64,26 +60,9 @@ class CacheClient(object):
         #### process vm info
         dict_info=formate_to_cache_info(info);
         recordTime=int(info[8]);
-        #print 'dict_info=','$'*60;
-        #print dict_info;
-        index_key=dict_info['instance_id'];
+        index_key=dict_info['uuid'];
         self.client.rpush(index_key,dict_info['info']);
         self.client.expire(index_key,self.cache_time_buffer);
-        self.recordRemover.add_job((index_key,recordTime+self.cache_time_buffer));
-        print "add record of %s at time:%s,will delete at time:%s"%(index_key,recordTime,recordTime+self.cache_time_buffer);
-        print "system time:%s"%(int(time()));
-        index_key='uuid#'+dict_info['instance_id'];
-        self.client.set(index_key,dict_info['uuid']);
-        self.client.expire(index_key,self.cache_time_buffer);
-       #print 'the index_key=%s'%(index_key);
-
-    def get_instance_list(self):
-        """ return the instance list the memcached server keeped"""
-        instances=[];
-        instance_list=self.client.keys('instance-*');
-        for instance_id in instance_list:
-            instances.append((instance_id,self.client.get('uuid#'+instance_id)));
-        return instances;
 
     def get_instance_info(self,instance_id):
         """ get instance info from cache server"""
