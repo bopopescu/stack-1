@@ -1,5 +1,4 @@
 .coveragerc
-.gitignore
 .gitreview
 HACKING
 LICENSE
@@ -11,7 +10,6 @@ run_tests.sh
 setup.cfg
 setup.py
 tox.ini
-doc/.gitignore
 doc/Makefile
 doc/source/conf.py
 doc/source/index.rst

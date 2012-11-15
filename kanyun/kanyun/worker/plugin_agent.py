@@ -61,6 +61,7 @@ class LibvirtMonitor(object):
         self.conn = libvirt.openReadOnly(uri)
         self.hostname = self.conn.getHostname()
         self.diffs = dict()
+	self.uri = uri
         """
         (model, memory_kb, cpus, mhz, nodes,
          sockets, cores, threads) = conn.getInfo()
@@ -87,7 +88,12 @@ class LibvirtMonitor(object):
 
     def collect_info(self):
         infos_by_dom_name = dict()
-        domainIDList=self.conn.listDomainsID();
+	try:
+	        domainIDList=self.conn.listDomainsID();
+	except Exception, e:
+		self.conn = libvirt.openReadOnly(self.uri)
+	        domainIDList=self.conn.listDomainsID();
+				
         pid_map=self.__get_pid_of_instances();
         for dom_id in domainIDList:
             dom_conn = self.conn.lookupByID(dom_id)

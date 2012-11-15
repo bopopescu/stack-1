@@ -153,3 +153,4 @@ class TenantUsage(BaseUsage):
                     instances.append(server_usage)
         usage.server_usages = instances
         return (usage,)
+

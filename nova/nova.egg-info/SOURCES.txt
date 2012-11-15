@@ -334,6 +334,9 @@ nova.egg-info/SOURCES.txt
 nova.egg-info/dependency_links.txt
 nova.egg-info/requires.txt
 nova.egg-info/top_level.txt
+nova/CA/geninter.sh
+nova/CA/genrootca.sh
+nova/CA/openssl.cnf.tmpl
 nova/api/__init__.py
 nova/api/auth.py
 nova/api/manager.py
@@ -767,6 +770,8 @@ nova/tests/test_wsgi.py
 nova/tests/test_xenapi.py
 nova/tests/test_xensm.py
 nova/tests/utils.py
+nova/tests/CA/cacert.pem
+nova/tests/CA/private/cakey.pem
 nova/tests/api/__init__.py
 nova/tests/api/test_auth.py
 nova/tests/api/test_sizelimit.py

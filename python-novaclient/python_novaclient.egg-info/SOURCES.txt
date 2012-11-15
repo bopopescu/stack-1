@@ -1,4 +1,3 @@
-.gitignore
 .gitreview
 .mailmap
 HACKING
@@ -10,7 +9,6 @@ run_tests.sh
 setup.cfg
 setup.py
 tox.ini
-doc/.gitignore
 doc/Makefile
 doc/source/api.rst
 doc/source/conf.py

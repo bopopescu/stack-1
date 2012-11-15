@@ -557,12 +557,10 @@ msgstr "访问 &amp; 安全"
 #: dashboards/nova/instances/templates/instances/index.html:40
 #: dashboards/nova/overview/templates/overview/usage.html:6
 #: dashboards/nova/volumes/templates/volumes/index.html:10
-#, fuzzy
 msgid "Projects:"
 msgstr "工程"
 
 #: dashboards/nova/access_and_security/templates/access_and_security/index.html:10
-#, fuzzy
 msgid "Access and Security"
 msgstr "访问 & 安全"
 
@@ -1223,7 +1221,6 @@ msgid "Images &amp; Snapshots"
 msgstr ""
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/index.html:6
-#, fuzzy
 msgid "Images and Snapshots"
 msgstr "镜像 & 快照"
 
@@ -1386,12 +1383,10 @@ msgid "Create a Snapshot"
 msgstr ""
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/snapshots/detail.html:3
-#, fuzzy
 msgid "Volume Snapshot Details"
 msgstr "卷快照"
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/snapshots/detail.html:6
-#, fuzzy
 msgid "Volume Snapshot Detail"
 msgstr "卷快照"
 
@@ -1418,7 +1413,6 @@ msgid "Volume Name"
 msgstr ""
 
 #: dashboards/nova/images_and_snapshots/volume_snapshots/tabs.py:40
-#, fuzzy
 msgid "Unable to retrieve snapshot details."
 msgstr "找不到快照。"
 
@@ -1517,17 +1511,16 @@ msgstr "确认升级"
 #: dashboards/nova/instances/templates/instances/confirmresize.html:3
 #: dashboards/nova/instances/templates/instances/resize.html:3
 #: dashboards/nova/instances/templates/instances/resize.html:6
-#, fuzzy
 msgid "Resize Instance"
 msgstr "升级实例"
 
 #: dashboards/nova/instances/tables.py:219
 msgid "VNC Console"
-msgstr ""
+msgstr "VNC连接"
 
 #: dashboards/nova/instances/tables.py:234
 msgid "View Log"
-msgstr ""
+msgstr "查看日志"
 
 #: dashboards/nova/instances/tables.py:305
 #, python-format
@@ -1554,7 +1547,6 @@ msgid "Usage"
 msgstr ""
 
 #: dashboards/nova/instances/tables.py:368
-#, fuzzy
 msgid "Instance URL"
 msgstr "实例"
 
@@ -1675,7 +1667,7 @@ msgstr ""
 #: dashboards/nova/instances/workflows.py:175
 #: dashboards/syspanel/instances/tables.py:70 usage/tables.py:57
 msgid "Instance Name"
-msgstr ""
+msgstr "云主机"
 
 #: dashboards/nova/instances/workflows.py:176
 #: dashboards/nova/instances/workflows.py:515
@@ -1856,7 +1848,6 @@ msgstr ""
 
 #: dashboards/nova/instances/workflows.py:587
 #: dashboards/nova/instances/workflows.py:651
-#, fuzzy, python-format
 msgid "Unable to Resize \"%(instance_id)s\" to \"%(flavor_id)s\"."
 msgstr "无法检索实例类型。"
 
@@ -1903,7 +1894,7 @@ msgstr ""
 #: dashboards/nova/instances/templates/instances/_resize_details_help.html:13
 #: dashboards/syspanel/flavors/tables.py:42 usage/tables.py:22
 msgid "RAM"
-msgstr ""
+msgstr "内存"
 
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:26
 #: dashboards/nova/instances/templates/instances/_launch_details_help.html:9
@@ -1912,7 +1903,7 @@ msgstr ""
 #: dashboards/syspanel/flavors/tables.py:40
 #: dashboards/syspanel/projects/workflows.py:37 usage/tables.py:19
 msgid "VCPUs"
-msgstr ""
+msgstr "CPU个数"
 
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:27
 msgid "VCPU"
@@ -1921,7 +1912,7 @@ msgstr ""
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:28
 #: usage/tables.py:20
 msgid "Disk"
-msgstr ""
+msgstr "磁盘"
 
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:34
 msgid "IP Addresses"
@@ -2673,7 +2664,6 @@ msgid "Volumes"
 msgstr "云阵列"
 
 #: dashboards/nova/volumes/tables.py:45
-#, fuzzy, python-format
 msgid "Unable to delete volume \"%s\". One or more snapshots depend on it."
 msgstr "找不到卷组快照。"
 
@@ -2881,7 +2871,6 @@ msgid "Account Info"
 msgstr ""
 
 #: dashboards/settings/user/templates/user/_account_info.html:12
-#, fuzzy
 msgid "User Name:"
 msgstr "密钥对名字"
 
@@ -3447,7 +3436,7 @@ msgstr ""
 #: dashboards/syspanel/users/forms.py:114
 #: dashboards/syspanel/users/tables.py:107
 msgid "User Name"
-msgstr ""
+msgstr "用户名"
 
 #: dashboards/syspanel/users/forms.py:62
 #: dashboards/syspanel/users/forms.py:115
@@ -3635,9 +3624,8 @@ msgid "Menu"
 msgstr "菜单"
 
 #: templates/base.html:32
-#, fuzzy
 msgid "Position:"
-msgstr "位置"
+msgstr "位置: "
 
 #: templates/splash.html:6 templates/auth/login.html:6
 #: templates/horizon/splash.html:6
@@ -3672,7 +3660,7 @@ msgstr[0] ""
 
 #: templates/horizon/common/_quota_summary.html:4
 msgid "Quota Summary"
-msgstr "配额状况"
+msgstr "配额使用情况"
 
 #: templates/horizon/common/_quota_summary.html:5
 #: templates/horizon/common/_quota_summary.html:8
@@ -3684,20 +3672,19 @@ msgstr "使用"
 #: templates/horizon/common/_quota_summary.html:8
 #: templates/horizon/common/_quota_summary.html:11
 msgid "of"
-msgstr ""
+msgstr "/"
 
 #: templates/horizon/common/_quota_summary.html:5
-#, fuzzy
 msgid "Available Instances"
-msgstr "实例"
+msgstr "可用实例"
 
 #: templates/horizon/common/_quota_summary.html:8
 msgid "Available vCPUs"
-msgstr ""
+msgstr "可用CPU"
 
 #: templates/horizon/common/_quota_summary.html:11
 msgid "Available RAM"
-msgstr ""
+msgstr "可用内存"
 
 #: templates/horizon/common/_resource_browser.html:10
 #, python-format
@@ -3713,31 +3700,31 @@ msgstr[0] ""
 
 #: templates/horizon/common/_sidebar.html:14
 msgid "Current Project"
-msgstr ""
+msgstr "当前工程"
 
 #: templates/horizon/common/_usage_summary.html:5
 msgid "Select a month to query its usage"
-msgstr ""
+msgstr "选择需要查询的时间"
 
 #: templates/horizon/common/_usage_summary.html:9
 msgid "Submit"
-msgstr ""
+msgstr "提交"
 
 #: templates/horizon/common/_usage_summary.html:14
 msgid "Active Instances"
-msgstr ""
+msgstr "活动云主机"
 
 #: templates/horizon/common/_usage_summary.html:15
 msgid "Active RAM"
-msgstr ""
+msgstr "使用内存"
 
 #: templates/horizon/common/_usage_summary.html:16
 msgid "This Month's VCPU-Hours"
-msgstr ""
+msgstr "当月的CPU小时数"
 
 #: templates/horizon/common/_usage_summary.html:17
 msgid "This Month's GB-Hours"
-msgstr ""
+msgstr "当月的存储时间数"
 
 #: templatetags/branding.py:35
 msgid "Horizon"
@@ -3749,7 +3736,7 @@ msgstr ""
 
 #: templatetags/horizon.py:110 templatetags/horizon.py:112
 msgid "Available"
-msgstr ""
+msgstr "可用"
 
 #: templatetags/sizeformat.py:45
 #, python-format
@@ -3944,7 +3931,7 @@ msgstr "使用状况"
 
 #: usage/tables.py:60
 msgid "Uptime"
-msgstr ""
+msgstr "运行时间"
 
 #: utils/fields.py:46
 msgid "Incorrect format for IP address"

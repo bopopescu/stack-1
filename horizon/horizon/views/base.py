@@ -71,13 +71,15 @@ def get_md(request):
     if tstart == 'latest':
 	for id in qin:
 		temp = {}
-		iinfo = rediscli.get1byinstance(id, -1).split('$')
-		temp['cpu'] = iinfo[0]+"%"
-		temp['mem'] = round((string.atof(iinfo[2])-string.atof(iinfo[1]))/string.atof(iinfo[2])*100, 2)
-		temp['netin'] = string.atoi(iinfo[3].split(':')[1])/1024/1024
-		temp['netout'] = string.atoi(iinfo[4].split(':')[1])/1024/1024
-		temp['timestamp'] = time.localtime(string.atoi(iinfo[-1]))[0]
-		result[id] = temp
+		try:
+			iinfo = rediscli.get1byinstance(id, -1).split('$')
+			temp['cpu'] = iinfo[0]+"%"
+			temp['mem'] = round((string.atof(iinfo[2])-string.atof(iinfo[1]))/string.atof(iinfo[2])*100, 2)
+			temp['netin'] = string.atoi(iinfo[3].split(':')[1])/1024/1024
+			temp['netout'] = string.atoi(iinfo[4].split(':')[1])/1024/1024
+			result[id] = temp
+		except Exception,e:
+			result[id] = None
     else:
 	for id in qin:
 		result[id+"-cpu"] = []

@@ -265,7 +265,6 @@ cinder/volume/nexenta/__init__.py
 cinder/volume/nexenta/jsonrpc.py
 cinder/volume/nexenta/volume.py
 contrib/redhat-eventlet.patch
-doc/.gitignore
 doc/Makefile
 doc/README.rst
 doc/find_autodoc_modules.sh
@@ -276,13 +275,11 @@ doc/ext/cinder_todo.py
 doc/source/conf.py
 doc/source/index.rst
 doc/source/_ga/layout.html
-doc/source/_static/.gitignore
 doc/source/_static/.placeholder
 doc/source/_static/basic.css
 doc/source/_static/default.css
 doc/source/_static/jquery.tweet.js
 doc/source/_static/tweaks.css
-doc/source/_templates/.gitignore
 doc/source/_templates/.placeholder
 doc/source/_theme/layout.html
 doc/source/_theme/theme.conf

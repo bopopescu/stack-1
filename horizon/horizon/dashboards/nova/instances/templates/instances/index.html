@@ -19,11 +19,13 @@ function reload_usage(){
 			for ( ins in data){
 				$(".rsusage[value=" + ins + "]").html( "<B>CPU: </B>"+data[ins]['cpu']+"<br><B>MEM: </B>"+data[ins]['mem'] + "%<br><B>NetIn: </B>"+data[ins]['netin']+"M<br><B>NetOut: </B>"+data[ins]['netout']+"M<br>" );
 			}
+			window.setTimeout("reload_usage()", 4000);
 		},
 	});
 }
 
 window.setTimeout("reload_usage()", 4000);
+
 $(function(){
 	reload_usage();
 })

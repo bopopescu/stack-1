@@ -42,6 +42,13 @@ python_glanceclient.egg-info/dependency_links.txt
 python_glanceclient.egg-info/entry_points.txt
 python_glanceclient.egg-info/requires.txt
 python_glanceclient.egg-info/top_level.txt
+setuptools_git-0.4.2-py2.7.egg/setuptools_git.py
+setuptools_git-0.4.2-py2.7.egg/EGG-INFO/PKG-INFO
+setuptools_git-0.4.2-py2.7.egg/EGG-INFO/SOURCES.txt
+setuptools_git-0.4.2-py2.7.egg/EGG-INFO/dependency_links.txt
+setuptools_git-0.4.2-py2.7.egg/EGG-INFO/entry_points.txt
+setuptools_git-0.4.2-py2.7.egg/EGG-INFO/top_level.txt
+setuptools_git-0.4.2-py2.7.egg/EGG-INFO/zip-safe
 tests/__init__.py
 tests/test_exc.py
 tests/test_http.py
