@@ -552,7 +552,7 @@ class Dashboard(Registry, HorizonComponent):
 
 
 class Workflow(object):
-    def __init__(*args, **kwargs):
+    def __init__(self, *args, **kwargs):
         raise NotImplementedError()
 
 

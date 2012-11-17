@@ -661,6 +661,9 @@ horizon/templates/horizon/common/_tab_group.html
 horizon/templates/horizon/common/_usage_summary.html
 horizon/templates/horizon/common/_workflow.html
 horizon/templates/horizon/common/_workflow_step.html
+horizon/templates/tabs/__init__.py
+horizon/templates/tabs/base.py
+horizon/templates/tabs/views.py
 horizon/templatetags/__init__.py
 horizon/templatetags/branding.py
 horizon/templatetags/horizon.py

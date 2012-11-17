@@ -49,6 +49,10 @@ OPENSTACK_KEYSTONE_BACKEND = {
     'name': 'native',
     'can_edit_user': True
 }
+#AVAILABLE_REGIONS = [
+#    ('http://localhost:5000/v2.0', 'node'),
+#    ('http://cluster2.example.com:5000/v2.0', 'cluster2'),
+#]
 
 OPENSTACK_HOST = "127.0.0.1"
 OPENSTACK_KEYSTONE_URL = "http://%s:5000/v2.0" % OPENSTACK_HOST

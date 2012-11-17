@@ -21,6 +21,7 @@ from django.http import HttpResponse
 from django.utils import simplejson
 from ThRedisClient import *
 from captcha.fields import CaptchaField
+from django.utils.translation import ugettext as _
 import string, time, datetime
 
 
@@ -45,8 +46,10 @@ def get_user_home(user):
 def splash(request):
     if request.user.is_authenticated():
         return shortcuts.redirect(get_user_home(request.user))
+    
+    Login.base_fields['captcha'] = CaptchaField(help_text=_("CAPTCHA PLEASE"), error_messages=dict(invalid=_("CAPTCHA ERROR")))
     form = Login(request)
-    form.captcha = CaptchaField()
+
     if form.is_valid():
         human = True
     request.session.clear()
@@ -74,7 +77,8 @@ def get_md(request):
 		try:
 			iinfo = rediscli.get1byinstance(id, -1).split('$')
 			temp['cpu'] = iinfo[0]+"%"
-			temp['mem'] = round((string.atof(iinfo[2])-string.atof(iinfo[1]))/string.atof(iinfo[2])*100, 2)
+			mem_usage = round((string.atof(iinfo[2])-string.atof(iinfo[1]))/string.atof(iinfo[2])*100, 2)
+			temp['mem'] = mem_usage if mem_usage <= 100 else 100
 			temp['netin'] = string.atoi(iinfo[3].split(':')[1])/1024/1024
 			temp['netout'] = string.atoi(iinfo[4].split(':')[1])/1024/1024
 			result[id] = temp

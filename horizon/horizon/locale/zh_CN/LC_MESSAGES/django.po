@@ -1721,7 +1721,7 @@ msgstr ""
 
 #: dashboards/nova/instances/workflows.py:266
 msgid "Select Image"
-msgstr ""
+msgstr "选择云主机模板"
 
 #: dashboards/nova/instances/workflows.py:268
 msgid "No images available."
