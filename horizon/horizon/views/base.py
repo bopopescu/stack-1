@@ -47,7 +47,7 @@ def splash(request):
     if request.user.is_authenticated():
         return shortcuts.redirect(get_user_home(request.user))
     
-    Login.base_fields['captcha'] = CaptchaField(help_text=_("CAPTCHA PLEASE"), error_messages=dict(invalid=_("CAPTCHA ERROR")))
+    #Login.base_fields['captcha'] = CaptchaField(help_text=_("CAPTCHA PLEASE"), error_messages=dict(invalid=_("CAPTCHA ERROR")))
     form = Login(request)
 
     if form.is_valid():

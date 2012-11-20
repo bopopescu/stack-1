@@ -364,8 +364,8 @@ class InstancesTable(tables.DataTable):
                           verbose_name=_("Power"))
     usage = tables.Column(get_usage,
                           verbose_name=_("Usage"))
-    instance_url = tables.Column(get_instance_url,
-    			  verbose_name=_('Instance URL'))
+#    instance_url = tables.Column(get_instance_url,
+#    			  verbose_name=_('Instance URL'))
     
 
     class Meta:
