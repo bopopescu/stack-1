@@ -28,6 +28,10 @@ import sqlalchemy.interfaces
 import sqlalchemy.orm
 from sqlalchemy.pool import NullPool, StaticPool
 
+import nova.exception
+from nova.openstack.common import cfg
+import nova.openstack.common.log as logging
+
 opts = [
     cfg.StrOpt('baremetal_sql_connection',
                default='sqlite:///$state_path/baremetal_$sqlite_db',
@@ -48,12 +52,23 @@ def get_session(autocommit=True, expire_on_commit=False):
 
     if _MAKER is None:
         engine = get_engine()
-        _MAKER = nova_session.get_maker(engine, autocommit, expire_on_commit)
+	_MAKER = get_maker(engine, autocommit, expire_on_commit)
 
     session = _MAKER()
-    session = nova_session.wrap_session(session)
+    session = wrap_session(session)
     return session
 
+def wrap_session(session):
+    """Return a session whose exceptions are wrapped."""
+    session.query = nova.exception.wrap_db_error(session.query)
+    session.flush = nova.exception.wrap_db_error(session.flush)
+    return session
+
+def get_maker(engine, autocommit=True, expire_on_commit=False):
+    """Return a SQLAlchemy sessionmaker using the given engine."""
+    return sqlalchemy.orm.sessionmaker(bind=engine,
+                                       autocommit=autocommit,
+                                       expire_on_commit=expire_on_commit)
 
 def get_engine():
     """Return a SQLAlchemy engine."""
