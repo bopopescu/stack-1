@@ -25,7 +25,8 @@ SERVICE_PASSWORD=csdb123cnic
 ADMIN_PASSWORD=csdb123cnic
 SERVICE_TOKEN=csdb123cnic
 VOLUME_BACKING_FILE_SIZE=2048G
-IMAGE_URLS=http://uec-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64.tar.gz,http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
+IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
 EOF
+#IMAGE_URLS=http://uec-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64.tar.gz,http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
 
 ./stack.sh

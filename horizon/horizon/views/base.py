@@ -49,6 +49,7 @@ def splash(request):
     
     #Login.base_fields['captcha'] = CaptchaField(help_text=_("CAPTCHA PLEASE"), error_messages=dict(invalid=_("CAPTCHA ERROR")))
     form = Login(request)
+    #form.base_fields['captcha'] = CaptchaField(lable=_("hehe"),help_text=_("CAPTCHA PLEASE"), error_messages=dict(invalid=_("CAPTCHA ERROR")))
 
     if form.is_valid():
         human = True

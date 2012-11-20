@@ -758,7 +758,6 @@ openstack_dashboard/exceptions.py
 openstack_dashboard/settings.py
 openstack_dashboard/urls.py
 openstack_dashboard/local/__init__.py
-openstack_dashboard/local/dashboard_openstack.sqlite3
 openstack_dashboard/local/local_settings.py.example
 openstack_dashboard/locale/bg_BG/LC_MESSAGES/django.mo
 openstack_dashboard/locale/bg_BG/LC_MESSAGES/django.po
@@ -995,6 +994,7 @@ static/dashboard/js/176baabe0b2d.js
 static/dashboard/js/amcharts.js
 static/dashboard/js/d17288657b07.js
 static/dashboard/js/f4183b5c3b25.js
+static/dashboard/js/jquery.min.js
 tools/install_venv.py
 tools/pip-requires
 tools/rfc.sh

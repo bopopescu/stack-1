@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Horizon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-15 09:33+0800\n"
+"POT-Creation-Date: 2012-11-20 17:05+0800\n"
 "PO-Revision-Date: 2012-09-12 02:05+0000\n"
 "Last-Translator: QunShi Zhang <zhang.kris@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -554,7 +554,7 @@ msgstr "访问 &amp; 安全"
 
 #: dashboards/nova/access_and_security/templates/access_and_security/index.html:10
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/index.html:6
-#: dashboards/nova/instances/templates/instances/index.html:40
+#: dashboards/nova/instances/templates/instances/index.html:42
 #: dashboards/nova/overview/templates/overview/usage.html:6
 #: dashboards/nova/volumes/templates/volumes/index.html:10
 msgid "Projects:"
@@ -1431,9 +1431,9 @@ msgstr "不能更新实例"
 #: dashboards/nova/instances/tables.py:109
 #: dashboards/nova/instances/tables.py:138
 #: dashboards/nova/instances/tables.py:373
-#: dashboards/nova/instances/templates/instances/index.html:33
-#: dashboards/nova/instances/templates/instances/index.html:36
-#: dashboards/nova/instances/templates/instances/index.html:40
+#: dashboards/nova/instances/templates/instances/index.html:35
+#: dashboards/nova/instances/templates/instances/index.html:38
+#: dashboards/nova/instances/templates/instances/index.html:42
 #: dashboards/syspanel/instances/panel.py:28
 #: dashboards/syspanel/instances/tables.py:95
 #: dashboards/syspanel/instances/templates/instances/index.html:3
@@ -1545,10 +1545,6 @@ msgstr "电源状态"
 #: dashboards/syspanel/instances/tables.py:91
 msgid "Usage"
 msgstr ""
-
-#: dashboards/nova/instances/tables.py:368
-msgid "Instance URL"
-msgstr "实例"
 
 #: dashboards/nova/instances/tabs.py:35
 msgid "Log"
@@ -1848,6 +1844,7 @@ msgstr ""
 
 #: dashboards/nova/instances/workflows.py:587
 #: dashboards/nova/instances/workflows.py:651
+#, fuzzy, python-format
 msgid "Unable to Resize \"%(instance_id)s\" to \"%(flavor_id)s\"."
 msgstr "无法检索实例类型。"
 
@@ -2664,6 +2661,7 @@ msgid "Volumes"
 msgstr "云阵列"
 
 #: dashboards/nova/volumes/tables.py:45
+#, fuzzy, python-format
 msgid "Unable to delete volume \"%s\". One or more snapshots depend on it."
 msgstr "找不到卷组快照。"
 
@@ -3962,6 +3960,9 @@ msgstr ""
 #, python-format
 msgid "%s did not complete."
 msgstr ""
+
+#~ msgid "Instance URL"
+#~ msgstr "实例"
 
 #~ msgid "Object Store"
 #~ msgstr "块存储"

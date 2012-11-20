@@ -1314,6 +1314,17 @@ nova/virt/baremetal/driver.py
 nova/virt/baremetal/fake.py
 nova/virt/baremetal/nodes.py
 nova/virt/baremetal/tilera.py
+nova/virt/baremetal/db/__init__.py
+nova/virt/baremetal/db/api.py
+nova/virt/baremetal/db/migration.py
+nova/virt/baremetal/db/sqlalchemy/__init__.py
+nova/virt/baremetal/db/sqlalchemy/api.py
+nova/virt/baremetal/db/sqlalchemy/migration.py
+nova/virt/baremetal/db/sqlalchemy/models.py
+nova/virt/baremetal/db/sqlalchemy/session.py
+nova/virt/baremetal/db/sqlalchemy/migrate_repo/__init__.py
+nova/virt/baremetal/db/sqlalchemy/migrate_repo/versions/001_init.py
+nova/virt/baremetal/db/sqlalchemy/migrate_repo/versions/__init__.py
 nova/virt/disk/__init__.py
 nova/virt/disk/api.py
 nova/virt/disk/guestfs.py
