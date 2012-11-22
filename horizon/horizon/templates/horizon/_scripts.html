@@ -44,8 +44,8 @@ window.onload = function () {
      document.getElementById("vnc_console_frame").contentWindow.focus();
    var urlll = document.location.href;
    var new_url = urlll.substring(22,26);
-  // alert(new_url);
-   if(new_url=='nova')
+   alert(new_url);
+   if(new_url=='nova' or new_url == 'settings')
    {
      document.getElementById('nova').style.display="";
      document.getElementById('sysp').style.display="none";
@@ -55,6 +55,4 @@ window.onload = function () {
    }
 
 }
-
-
 </script>

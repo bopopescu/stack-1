@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Horizon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-20 17:05+0800\n"
+"POT-Creation-Date: 2012-11-22 10:48+0800\n"
 "PO-Revision-Date: 2012-09-12 02:05+0000\n"
 "Last-Translator: QunShi Zhang <zhang.kris@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -902,7 +902,7 @@ msgstr "创建文件夹"
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:26
 #: dashboards/syspanel/instances/tables.py:73
 msgid "Size"
-msgstr "大小"
+msgstr "配置"
 
 #: dashboards/nova/containers/views.py:52 dashboards/nova/messages/views.py:52
 #: dashboards/nova/monitor/views.py:52 dashboards/nova/sql/views.py:52
@@ -1320,7 +1320,7 @@ msgstr ""
 #: dashboards/nova/networks/templates/networks/ports/_detail_overview.html:15
 #: dashboards/syspanel/projects/tables.py:90
 msgid "Project ID"
-msgstr ""
+msgstr "项目ID"
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/images/_detail_overview.html:64
 msgid "Image Type"
@@ -1352,7 +1352,7 @@ msgstr ""
 #: dashboards/nova/instances/tables.py:209
 #: dashboards/nova/volumes/tables.py:75
 msgid "Create Snapshot"
-msgstr ""
+msgstr "创建快照"
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/snapshots/_create.html:18
 msgid "Snapshots preserve the disk state of a running instance."
@@ -1405,12 +1405,12 @@ msgstr "卷快照"
 #: dashboards/nova/volumes/templates/volumes/_create.html:8
 #: dashboards/nova/volumes/templates/volumes/_create.html:55
 msgid "Create Volume"
-msgstr ""
+msgstr "创建云阵列"
 
 #: dashboards/nova/images_and_snapshots/volume_snapshots/tables.py:79
 #: dashboards/nova/volumes/forms.py:26
 msgid "Volume Name"
-msgstr ""
+msgstr "Volume名称"
 
 #: dashboards/nova/images_and_snapshots/volume_snapshots/tabs.py:40
 msgid "Unable to retrieve snapshot details."
@@ -1475,7 +1475,7 @@ msgstr ""
 
 #: dashboards/nova/instances/tables.py:135
 msgid "Suspend"
-msgstr ""
+msgstr "挂起"
 
 #: dashboards/nova/instances/tables.py:135
 msgid "Resume"
@@ -1535,7 +1535,7 @@ msgstr ""
 #: dashboards/nova/instances/tables.py:357
 #: dashboards/syspanel/instances/tables.py:82
 msgid "Task"
-msgstr ""
+msgstr "任务"
 
 #: dashboards/nova/instances/tables.py:364
 msgid "Power"
@@ -1544,11 +1544,11 @@ msgstr "电源状态"
 #: dashboards/nova/instances/tables.py:366
 #: dashboards/syspanel/instances/tables.py:91
 msgid "Usage"
-msgstr ""
+msgstr "使用情况"
 
 #: dashboards/nova/instances/tabs.py:35
 msgid "Log"
-msgstr ""
+msgstr "日志"
 
 #: dashboards/nova/instances/tabs.py:47 dashboards/nova/instances/views.py:109
 #, python-format
@@ -1566,7 +1566,7 @@ msgstr ""
 
 #: dashboards/nova/instances/tabs.py:74 dashboards/nova/monitor/panel.py:28
 msgid "Monitor"
-msgstr ""
+msgstr "监控"
 
 #: dashboards/nova/instances/views.py:62
 msgid "Unable to retrieve instances."
@@ -1654,11 +1654,11 @@ msgstr ""
 
 #: dashboards/nova/instances/workflows.py:170
 msgid "Instance Source"
-msgstr ""
+msgstr "云主机来源"
 
 #: dashboards/nova/instances/workflows.py:173
 msgid "Instance Snapshot"
-msgstr ""
+msgstr "云主机快照"
 
 #: dashboards/nova/instances/workflows.py:175
 #: dashboards/syspanel/instances/tables.py:70 usage/tables.py:57
@@ -1679,17 +1679,17 @@ msgstr "建立的映像大小"
 
 #: dashboards/nova/instances/workflows.py:178
 msgid "Instance Count"
-msgstr "实例个数"
+msgstr "云主机个数"
 
 #: dashboards/nova/instances/workflows.py:181
 msgid "Number of instances to launch."
-msgstr "启动实例的个数"
+msgstr "启动云主机的个数"
 
 #: dashboards/nova/instances/workflows.py:184
 #: dashboards/nova/instances/workflows.py:518
 #: dashboards/nova/instances/workflows.py:608
 msgid "Details"
-msgstr ""
+msgstr "云主机信息"
 
 #: dashboards/nova/instances/workflows.py:197
 msgid ""
@@ -1936,7 +1936,7 @@ msgstr ""
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:38
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:45
 msgid "Attached To"
-msgstr ""
+msgstr "绑定到"
 
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:90
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:42
@@ -2715,11 +2715,11 @@ msgstr ""
 #: dashboards/nova/volumes/templates/volumes/_attach.html:9
 #: dashboards/nova/volumes/templates/volumes/attach.html:6
 msgid "Manage Volume Attachments"
-msgstr ""
+msgstr "管理云阵列"
 
 #: dashboards/nova/volumes/templates/volumes/_attach.html:13
 msgid "Attach To Instance"
-msgstr ""
+msgstr "挂载到云主机"
 
 #: dashboards/nova/volumes/templates/volumes/_attach.html:22
 msgid "Attach Volume"
@@ -2728,33 +2728,33 @@ msgstr ""
 #: dashboards/nova/volumes/templates/volumes/_create.html:20
 #: dashboards/nova/volumes/templates/volumes/_create_snapshot.html:18
 msgid "Volumes are block devices that can be attached to instances."
-msgstr ""
+msgstr "云阵列是一种可以挂载在云主机上的快存储"
 
 #: dashboards/nova/volumes/templates/volumes/_create.html:22
 msgid "Volume Quotas"
-msgstr ""
+msgstr "云阵列配额"
 
 #: dashboards/nova/volumes/templates/volumes/_create.html:25
 msgid "Total Gigabytes"
-msgstr ""
+msgstr "可用容量"
 
 #: dashboards/nova/volumes/templates/volumes/_create.html:34
 msgid "Number of Volumes"
-msgstr ""
+msgstr "云阵列个数"
 
 #: dashboards/nova/volumes/templates/volumes/_create_snapshot.html:8
 #: dashboards/nova/volumes/templates/volumes/_create_snapshot.html:23
 #: dashboards/nova/volumes/templates/volumes/create_snapshot.html:3
 msgid "Create Volume Snapshot"
-msgstr ""
+msgstr "创建云阵列快照"
 
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:3
 msgid "Volume Overview"
-msgstr ""
+msgstr "云阵列概览"
 
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:34
 msgid "Attachments"
-msgstr ""
+msgstr "挂载情况"
 
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:46
 msgid "Not attached"
@@ -2831,11 +2831,11 @@ msgstr ""
 
 #: dashboards/settings/project/tables.py:27
 msgid "Service Name"
-msgstr ""
+msgstr "服务名"
 
 #: dashboards/settings/project/tables.py:29
 msgid "Service Endpoint"
-msgstr ""
+msgstr "服务点"
 
 #: dashboards/settings/project/tables.py:33
 msgid "API Endpoints"
@@ -2997,7 +2997,7 @@ msgstr ""
 #: dashboards/syspanel/users/templates/users/index.html:11
 #: dashboards/syspanel/volumes/templates/volumes/index.html:6
 msgid "Syspanel"
-msgstr ""
+msgstr "系统面板"
 
 #: dashboards/syspanel/images/views.py:53
 msgid "Unable to retrieve image list."
@@ -3005,16 +3005,16 @@ msgstr ""
 
 #: dashboards/syspanel/instances/tables.py:59 usage/tables.py:30
 msgid "Project Name"
-msgstr ""
+msgstr "项目名称"
 
 #: dashboards/syspanel/instances/tables.py:66
 #: dashboards/syspanel/services/tables.py:40
 msgid "Host"
-msgstr ""
+msgstr "主机"
 
 #: dashboards/syspanel/instances/tables.py:89
 msgid "Power State"
-msgstr ""
+msgstr "电源情况"
 
 #: dashboards/syspanel/instances/views.py:60
 #: dashboards/syspanel/networks/views.py:48
@@ -3023,7 +3023,7 @@ msgstr ""
 
 #: dashboards/syspanel/instances/templates/instances/index.html:6
 msgid "All Instances"
-msgstr ""
+msgstr "云主机"
 
 #: dashboards/syspanel/networks/forms.py:45
 #: dashboards/syspanel/users/forms.py:41
@@ -3099,11 +3099,11 @@ msgstr ""
 
 #: dashboards/syspanel/overview/templates/overview/usage.html:3
 msgid "Usage Overview"
-msgstr ""
+msgstr "使用情况概览"
 
 #: dashboards/syspanel/overview/templates/overview/usage.html:12
 msgid "Monitoring"
-msgstr ""
+msgstr "监控"
 
 #: dashboards/syspanel/projects/panel.py:28
 #: dashboards/syspanel/projects/tables.py:66
@@ -3115,11 +3115,11 @@ msgstr "工程"
 
 #: dashboards/syspanel/projects/tables.py:19
 msgid "Modify Users"
-msgstr ""
+msgstr "修改用户"
 
 #: dashboards/syspanel/projects/tables.py:32
 msgid "View Usage"
-msgstr ""
+msgstr "查看使用"
 
 #: dashboards/syspanel/projects/tables.py:39
 #: dashboards/syspanel/projects/templates/projects/_create.html:8
@@ -3415,7 +3415,7 @@ msgstr ""
 #: dashboards/syspanel/services/panel.py:28
 #: dashboards/syspanel/services/tables.py:47
 msgid "Services"
-msgstr ""
+msgstr "服务"
 
 #: dashboards/syspanel/services/tables.py:37
 msgid "Id"
@@ -3424,7 +3424,7 @@ msgstr ""
 #: dashboards/syspanel/services/tables.py:39
 #: dashboards/syspanel/services/templates/services/index.html:6
 msgid "Service"
-msgstr ""
+msgstr "服务"
 
 #: dashboards/syspanel/users/forms.py:53
 msgid "Passwords do not match."
@@ -3590,11 +3590,11 @@ msgstr ""
 
 #: tables/base.py:727
 msgid "No items to display."
-msgstr ""
+msgstr "没有要显示的项目"
 
 #: tables/base.py:830
 msgid "Actions"
-msgstr ""
+msgstr "操作"
 
 #: tables/base.py:1008
 #, python-format
@@ -3651,10 +3651,10 @@ msgid "Summary"
 msgstr ""
 
 #: templates/horizon/common/_data_table.html:53
-#, python-format
+#, fuzzy, python-format
 msgid "Displaying %(counter)s item"
 msgid_plural "Displaying %(counter)s items"
-msgstr[0] ""
+msgstr[0] "显示 %(counter)s 项目"
 
 #: templates/horizon/common/_quota_summary.html:4
 msgid "Quota Summary"
@@ -3685,16 +3685,16 @@ msgid "Available RAM"
 msgstr "可用内存"
 
 #: templates/horizon/common/_resource_browser.html:10
-#, python-format
+#, fuzzy, python-format
 msgid "Displaying %(nav_items)s item"
 msgid_plural "Displaying %(nav_items)s items"
-msgstr[0] ""
+msgstr[0] " 显示 %(nav_items)s 项目"
 
 #: templates/horizon/common/_resource_browser.html:11
-#, python-format
+#, fuzzy, python-format
 msgid "Displaying %(content_items)s item"
 msgid_plural "Displaying %(content_items)s items"
-msgstr[0] ""
+msgstr[0] "显示 %(content_items)s 项目"
 
 #: templates/horizon/common/_sidebar.html:14
 msgid "Current Project"
@@ -3728,11 +3728,11 @@ msgstr "当月的存储时间数"
 msgid "Horizon"
 msgstr ""
 
-#: templatetags/horizon.py:108
+#: templatetags/horizon.py:111
 msgid "No Limit"
 msgstr ""
 
-#: templatetags/horizon.py:110 templatetags/horizon.py:112
+#: templatetags/horizon.py:113 templatetags/horizon.py:115
 msgid "Available"
 msgstr "可用"
 
@@ -3913,15 +3913,15 @@ msgstr ""
 
 #: usage/tables.py:11
 msgid "Download CSV Summary"
-msgstr ""
+msgstr "下载报表"
 
 #: usage/tables.py:25
 msgid "VCPU Hours"
-msgstr ""
+msgstr "CPU小时数"
 
 #: usage/tables.py:32
 msgid "Disk GB Hours"
-msgstr ""
+msgstr "磁盘使用小时"
 
 #: usage/tables.py:40 usage/tables.py:68
 msgid "Usage Summary"

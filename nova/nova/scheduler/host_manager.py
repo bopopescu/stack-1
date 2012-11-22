@@ -18,6 +18,7 @@ Manage hosts in the current zone.
 """
 
 import UserDict
+import pdb
 
 from nova import db
 from nova import exception
@@ -91,9 +92,10 @@ class HostState(object):
     previously used and lock down access.
     """
 
-    def __init__(self, host, topic, capabilities=None, service=None):
+    def __init__(self, host, topic, capabilities=None, service=None, node=None):
         self.host = host
         self.topic = topic
+        self.nodename = node
 
         # Read-only capability dicts
 
@@ -170,8 +172,8 @@ class HostState(object):
         return True
 
     def __repr__(self):
-        return ("host '%s': free_ram_mb:%s free_disk_mb:%s" %
-                (self.host, self.free_ram_mb, self.free_disk_mb))
+        return ("host '%s': {free_ram_mb:%s, free_disk_mb:%s, node:%s}" %
+                (self.host, self.free_ram_mb, self.free_disk_mb, self.nodename))
 
 
 class HostManager(object):

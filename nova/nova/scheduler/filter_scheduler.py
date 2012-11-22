@@ -20,6 +20,7 @@ Weighing Functions.
 """
 
 import operator
+import pdb
 
 from nova import exception
 from nova import flags
@@ -144,6 +145,10 @@ class FilterScheduler(driver.Scheduler):
 
         updated_instance = driver.instance_update_db(context,
                 instance_uuid, weighted_host.host_state.host)
+
+	#pdb.set_trace()
+        #driver.db_instance_node_set(context,
+        #        instance_uuid, weighted_host.host_state.nodename)
 
         self.compute_rpcapi.run_instance(context, instance=updated_instance,
                 host=weighted_host.host_state.host,

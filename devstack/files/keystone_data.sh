@@ -46,6 +46,7 @@ function get_id () {
 ADMIN_TENANT=$(get_id keystone tenant-create --name=admin)
 SERVICE_TENANT=$(get_id keystone tenant-create --name=$SERVICE_TENANT_NAME)
 KJW_TENANT=$(get_id keystone tenant-create --name=kjw)
+KJW_TENANT=$(get_id keystone tenant-create --name=test)
 
 
 # Users
@@ -57,6 +58,9 @@ ADMIN_USER=$(get_id keystone user-create --name=admin \
 KJW_USER=$(get_id keystone user-create --name=kjw \
                                         --pass="kjw" \
                                         --email=kjw@example.com)
+KJW_USER=$(get_id keystone user-create --name=test \
+                                        --pass="test" \
+                                        --email=test@example.com)
 
 # Roles
 # -----

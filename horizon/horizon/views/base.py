@@ -105,7 +105,8 @@ def get_md(request):
 			schips = s.split('$')
 			date_obj =str( datetime.datetime.fromtimestamp(string.atoi(schips[-1])))
 			cpu = schips[0]
-                        mem = round((string.atof(schips[2]) - string.atof(schips[1]))/string.atof(schips[1])*100, 2)
+                        t = round((string.atof(schips[2]) - string.atof(schips[1]))/string.atof(schips[2])*100, 2)
+			mem = t if t <=100 else 100
                         NetIn = round(total_IO(schips[3])/1024/102,2)
                         NetOut = round(total_IO(schips[4])/1024/1024,2)
                         DiskRead = round(total_IO(schips[5])/1024/1024,2)

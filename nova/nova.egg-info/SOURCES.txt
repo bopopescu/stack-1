@@ -19,6 +19,7 @@ bin/nova-api-ec2
 bin/nova-api-metadata
 bin/nova-api-os-compute
 bin/nova-api-os-volume
+bin/nova-baremetal-manage
 bin/nova-cert
 bin/nova-clear-rabbit-queues
 bin/nova-compute
@@ -583,6 +584,8 @@ nova/db/sqlalchemy/migrate_repo/versions/130_add_indexes_to_key_pairs.py
 nova/db/sqlalchemy/migrate_repo/versions/131_add_indexes_to_networks.py
 nova/db/sqlalchemy/migrate_repo/versions/132_add_instance_type_projects.py
 nova/db/sqlalchemy/migrate_repo/versions/133_aggregate_delete_fix.py
+nova/db/sqlalchemy/migrate_repo/versions/134_add_node_to_instances.py
+nova/db/sqlalchemy/migrate_repo/versions/135_add_index_to_instances.py
 nova/db/sqlalchemy/migrate_repo/versions/__init__.py
 nova/image/__init__.py
 nova/image/glance.py
@@ -1323,6 +1326,7 @@ nova/virt/baremetal/db/sqlalchemy/migration.py
 nova/virt/baremetal/db/sqlalchemy/models.py
 nova/virt/baremetal/db/sqlalchemy/session.py
 nova/virt/baremetal/db/sqlalchemy/migrate_repo/__init__.py
+nova/virt/baremetal/db/sqlalchemy/migrate_repo/migrate.cfg
 nova/virt/baremetal/db/sqlalchemy/migrate_repo/versions/001_init.py
 nova/virt/baremetal/db/sqlalchemy/migrate_repo/versions/__init__.py
 nova/virt/disk/__init__.py

@@ -1693,6 +1693,11 @@ def _instance_get_all_query(context, project_only=False):
 def instance_get_all_by_host(context, host):
     return _instance_get_all_query(context).filter_by(host=host).all()
 
+@require_admin_context
+def instance_get_all_by_host_and_node(context, host, node):
+    return _instance_get_all_query(context).filter_by(host=host).\
+                                            filter_by(node=node).all()
+
 
 @require_admin_context
 def instance_get_all_by_host_and_not_type(context, host, type_id=None):

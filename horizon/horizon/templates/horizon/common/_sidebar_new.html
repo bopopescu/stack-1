@@ -1,6 +1,7 @@
 {% load branding horizon i18n %}
 
-<div id="sysp" class="main">
+{% if request.user.username = 'admin'%}
+<div id="sysp" style="display:none" class="main">
       <div class="bg_div">
          <div class="bg_div2"><a href="/syspanel/"><img src="/static/dashboard/images/xtmb2.png"/></a></div>
          <div class="bg_div3"><a href="/nova/"><img src="/static/dashboard/images/gc2.png"/></a></div>
@@ -23,11 +24,11 @@
         </tr>
         <tr>
         <td  style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/jihuizong.png" height="16" width="16" /> </td>
-        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:syspanel:instances:index %}">实例</a></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:syspanel:instances:index %}">云主机</a></td>
         </tr>
         <tr>
         <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/ico4.gif"/></td>
-        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:syspanel:volumes:index %}">卷</a></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:syspanel:volumes:index %}">云阵列</a></td>
         </tr>
         <tr>
         <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/daiban.png" height="16" width="16" /></td>
@@ -59,7 +60,7 @@
      </div>
       
 </div>
-<div id="nova" style="display:none" class="main">
+<div id="nova" style="display:" class="main">
       <div class="bg_div">
          <div class="bg_div2"><a href="/syspanel/"><img src="/static/dashboard/images/xtmb.png"/></a></div>
          <div class="bg_div3"><a href="/nova/"><img src="/static/dashboard/images/gc.png"/></a></div>
@@ -71,7 +72,7 @@
          </tr>
         </table>
      </div>
-     	<div class="left_right_div">
+        <div class="left_right_div">
       <div class="bg-div"> </div>
       <div class="bg-div2">
      <div class="left_table">
@@ -82,11 +83,11 @@
         </tr>
         <tr>
         <td  style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/jihuizong.png" height="16" width="16" /> </td>
-        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:instances:index %}">实例</a></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:instances:index %}">云主机</a></td>
         </tr>
         <tr>
         <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/ico4.gif"/></td>
-        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:volumes:index %}">卷</a></td></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:volumes:index %}">云阵列</a></td></td>
         </tr>
         <tr>
         <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/daiban.png" height="16" width="16" /></td>
@@ -100,4 +101,51 @@
      </div>
      </div><div class="bg-div3"></div>
 </div>
+
 </div>
+
+{%else%}
+<div id="nova" style="display:" class="main">
+      <div class="bg_div">
+         <div class="bg_div3"><a href="/nova/"><img src="/static/dashboard/images/gc.png"/></a></div>
+     </div>
+     <div class="huadong">
+        <table cellpadding="0" cellspacing="0" border="0" class="xiahua">
+         <tr>
+           <td><img src="/static/dashboard/images/xiahua.png" height="48"  width="7" align="middle" /></td>
+         </tr>
+        </table>
+     </div>
+      <div class="left_right_div">
+      <div class="bg-div"> </div>
+      <div class="bg-div2">
+     <div class="left_table">
+      <table width="80" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+        <td width="30" style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/gif_57_016.gif" height="16" width="16" border="0"/></td>
+        <td width="125" style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:overview:index %}">概述</a></td>
+        </tr>
+        <tr>
+        <td  style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/jihuizong.png" height="16" width="16" /> </td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:instances:index %}">云主机</a></td>
+        </tr>
+        <tr>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/ico4.gif"/></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:volumes:index %}">云阵列</a></td></td>
+        </tr>
+        <tr>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/daiban.png" height="16" width="16" /></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:images_and_snapshots:index %}">镜像&快照</a></td>
+        </tr>
+         <tr>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><img src="/static/dashboard/images/ico7.gif" height="16" width="16" /></td>
+        <td style="border-bottom:dashed 1px; border-color:#000000;"><a href="{% url horizon:nova:access_and_security:index %}">访问&安全</a></td>
+        </tr>
+       </table>
+     </div>
+     </div><div class="bg-div3"></div>
+    </div>
+</div>
+
+{%endif%}
+

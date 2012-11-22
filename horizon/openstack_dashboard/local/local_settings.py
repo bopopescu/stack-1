@@ -63,6 +63,10 @@ OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 SWIFT_PAGINATE_LIMIT = 100
 
+ADMINS = (
+    ('yuanke wei', 'weiyuanke@cnic.cn'),
+)
+
 # If you have external monitoring links, eg:
 # EXTERNAL_MONITORING = [
 #     ['Nagios','http://foo.com'],

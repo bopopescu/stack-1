@@ -115,9 +115,10 @@ class ResourceTracker(object):
     are built and destroyed.
     """
 
-    def __init__(self, host, driver):
+    def __init__(self, host, driver, nodename=None):
         self.host = host
         self.driver = driver
+        self.nodename = nodename
         self.compute_node = None
         self.next_claim_id = 1
         self.claims = {}

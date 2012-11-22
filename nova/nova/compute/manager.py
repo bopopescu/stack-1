@@ -244,9 +244,19 @@ class ComputeManager(manager.SchedulerDependentManager):
 
         super(ComputeManager, self).__init__(service_name="compute",
                                              *args, **kwargs)
-
+        self._resource_tracker_dict = {}
+      
         self.resource_tracker = resource_tracker.ResourceTracker(self.host,
                 self.driver)
+	
+    def _get_resource_tracker(self, nodename):
+        rt = self._resource_tracker_dict.get(nodename)
+        if not rt:
+            rt = resource_tracker.ResourceTracker(self.host,
+                                                  self.driver,
+                                                  nodename)
+            self._resource_tracker_dict[nodename] = rt
+        return rt
 
     def _instance_update(self, context, instance_uuid, **kwargs):
         """Update an instance in the database using kwargs as value."""

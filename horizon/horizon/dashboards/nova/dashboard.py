@@ -44,7 +44,7 @@ class Analysis_Reports_Panels(horizon.PanelGroup):
 class Nova(horizon.Dashboard):
     name = _("Project")
     slug = "nova"
-    panels = (BasePanels, ObjectStorePanels, Analysis_Reports_Panels,)
+    panels = (BasePanels,)# ObjectStorePanels, Analysis_Reports_Panels,)
     default_panel = 'overview'
     supports_tenants = True
     nav = True

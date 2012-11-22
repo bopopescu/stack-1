@@ -252,6 +252,7 @@ class Instance(BASE, NovaBase):
 
     hostname = Column(String(255))
     host = Column(String(255))  # , ForeignKey('hosts.id'))
+    node = Column(String(255))
 
     # *not* flavor_id
     instance_type_id = Column(Integer)

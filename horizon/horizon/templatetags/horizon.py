@@ -34,6 +34,9 @@ def has_permissions(user, component):
     """
     return user.has_perms(getattr(component, 'permissions', set()))
 
+@register.filter
+def is_admin(user):
+    return user.name == 'admin'
 
 @register.filter
 def has_permissions_on_list(components, user):
