@@ -1,0 +1,26 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{font-family:Arial, Helvetica, sans-serif "宋体"; color:#000; margin:0; padding:0; margin:0 auto; top repeat-x;}
+div{ margin:0px; padding:0px;}
+img{ margin:0px; padding:0px; border:0px;}
+ul{ margin:0px; padding:0px; list-style-type:none;}
+li{ margin:0px; padding:0px; list-style-type:none;}
+.clear{clear:both;}
+
+.mian_div{margin:0px auto; width:708px; border-bottom:#999 1px dotted; padding-bottom:30px;}
+.head_div{ background:url(../images/tanchu01.png) repeat-x; height:39px;  }
+.table_div{font-size:16px; font-weight:bold; text-decoration:none; font-family:Arial, Helvetica, sans-serif; color:#FFFFFF; padding-left:20px; padding-top:8px; text-align:justify; color:#FFFFFF;}
+.con_div{font-size:14px; font-weight:bold ; margin-top:20px; padding-left:20px; color:#0a61ae;}
+.con_div2{font-size:14px; font-weight:bold ; margin-top:20px; padding-left:20px; color:#0a61ae;}
+.con_div3{font-size:12px; margin-top:20px; padding-left:63px; color:#333333; font-weight:bold; background:url(../images/bg-tanchu.png) repeat-x; border-collapse:collapse; font-family:Arial, Helvetica, sans-serif;}
+.con_div4{font-size:12px; margin-top:20px; padding-left:63px; color:#333333; text-align:left; font-weight:bold; background:url(../images/bg-tanchu.png) repeat-x; height:50px; border-collapse:collapse;font-family:Arial, Helvetica, sans-serif; }
+.con_div5{font-size:12px; margin-top:0px; padding-left:63px; color:#333333; font-weight:bold;height:50px; border-collapse:collapse;}
+.con_div6{font-size:12px; margin-top:20px; padding-left:63px; color:#333333;  height:50px;font-weight:bold;font-family:Arial, Helvetica, sans-serif; }
+.footer_div{width:208px; height:60px; padding-left:503px; padding-bottom:20px; margin:0px auto; background:#f3f4f4;}
+
+
+
+
+.table_div_input{ height:20px; width:80px; margin-left:60px}
+.table_div_input2{ margin-right:460px;}
