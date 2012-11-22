@@ -21,6 +21,7 @@
 import logging
 import os
 import sys
+import pdb
 
 from openstack_dashboard import exceptions
 
@@ -45,11 +46,8 @@ LOGOUT_URL = '/auth/logout/'
 # Do not set it to '/home/', as this will cause circular redirect loop
 LOGIN_REDIRECT_URL = '/'
 
-MEDIA_ROOT = os.path.abspath(os.path.join(ROOT_PATH, '..', 'media'))
-MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.abspath(os.path.join(ROOT_PATH, '..', 'static'))
 STATIC_URL = '/static/'
-ADMIN_MEDIA_PREFIX = '/static/admin/'
 
 ROOT_URLCONF = 'openstack_dashboard.urls'
 

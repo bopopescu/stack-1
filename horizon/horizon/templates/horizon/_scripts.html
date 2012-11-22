@@ -44,13 +44,17 @@ window.onload = function () {
      document.getElementById("vnc_console_frame").contentWindow.focus();
    var urlll = document.location.href;
    var new_url = urlll.substring(22,26);
-   alert(new_url);
-   if(new_url=='nova' or new_url == 'settings')
+   //alert(new_url);
+   if(new_url=='nova' || new_url == 'settings')
    {
+     if(document.getElementById("nova")!=null)
      document.getElementById('nova').style.display="";
+     if(document.getElementById("sysp")!=null)
      document.getElementById('sysp').style.display="none";
    }else{
+     if(document.getElementById("nova")!=null)
      document.getElementById('nova').style.display="none";
+     if(document.getElementById("sysp")!=null)
      document.getElementById('sysp').style.display="";
    }
 
