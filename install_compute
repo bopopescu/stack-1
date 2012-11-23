@@ -22,6 +22,8 @@ TOP_DIR=$(cd $(dirname "$0") && pwd)
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')
+t_size=$[size/1024-400]
+if [ $t_size  ]
 back_file_size=$[size/1024-400]
 
 #install openstack
@@ -71,22 +73,10 @@ fi
 cd $TOP_DIR
 cd kanyun/
 cat <<EOF >kanyun.conf
-[server]
-host: *
-port: 5551
-
-[mysql_db]
-host:127.0.0.1
-user:root
-passwd:$PASSWORD
-db:monitor
-cache_server:localhost
-cache_time_buffer:144000
-
 [worker]
 id: worker_$(hostname)
 worker_timeout: 60
-dataserver_host: 127.0.0.1
+dataserver_host: $CTRL_ADDRESS
 dataserver_port: 5551
 log: /tmp/kanyun-worker.log
 EOF
