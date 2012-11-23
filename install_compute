@@ -1,13 +1,15 @@
 #!/bin/bash
-if [ $# -ne 2 ];then
+if [ $# -ne 4 ];then
 	echo "Usage:"
-        echo "      `basename $0` -p password"
+        echo "      `basename $0` -p password -a controller_address"
 	exit 0
 fi
-while getopts 'p:' OPT; do
+while getopts 'p:a:' OPT; do
 case $OPT in
         p)
             PASSWORD="$OPTARG";;
+	a)
+	    CTRL_ADDRESS="$OPTARG";;
         ?)
             echo "Usage:"
             echo "      `basename $0` -p password"
@@ -16,11 +18,6 @@ esac
 done
 
 TOP_DIR=$(cd $(dirname "$0") && pwd)
-
-#install captcha
-cd $TOP_DIR
-cd django-simple-captcha-0.3.0
-sudo python setup.py install
 
 #get available space
 cd $TOP_DIR
@@ -44,9 +41,12 @@ RABBIT_PASSWORD=$PASSWORD
 SERVICE_PASSWORD=$PASSWORD
 ADMIN_PASSWORD=$PASSWORD
 SERVICE_TOKEN=$PASSWORD
-ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit
 VOLUME_BACKING_FILE_SIZE=$back_file_size
-IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
+MULTI_HOST=1
+MYSQL_HOST=$CTRL_ADDRESS
+RABBIT_HOST=$CTRL_ADDRESS
+GLANCE_HOSTPORT=${CTRL_ADDRESS}:9292
+ENABLED_SERVICES=n-cpu,n-net,n-api,n-novnc,cinder,c-vol
 EOF
 ./stack.sh
 
@@ -92,6 +92,5 @@ log: /tmp/kanyun-worker.log
 EOF
 sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9
 sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq
-nohup ./kanyun-server > .kanyun-server.nohup&
 nohup ./kanyun-worker >.kanyun-worker.nohup &
 cd ..

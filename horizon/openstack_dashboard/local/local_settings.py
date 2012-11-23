@@ -1,6 +1,6 @@
 import os
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 PROD = False
 USE_SSL = False
@@ -62,10 +62,6 @@ OPENSTACK_KEYSTONE_ADMIN_URL = "http://%s:35357/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 SWIFT_PAGINATE_LIMIT = 100
-
-ADMINS = (
-    ('yuanke wei', 'weiyuanke@cnic.cn'),
-)
 
 # If you have external monitoring links, eg:
 # EXTERNAL_MONITORING = [
