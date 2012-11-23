@@ -25,7 +25,7 @@ sudo python setup.py install
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')
-back_file_size=$[size/1024-400]
+back_file_size=$[size/1024]
 
 #install openstack
 FIXED_RANGE=10.0.0.0/20

@@ -22,9 +22,7 @@ TOP_DIR=$(cd $(dirname "$0") && pwd)
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')
-t_size=$[size/1024-400]
-if [ $t_size  ]
-back_file_size=$[size/1024-400]
+back_file_size=$[size/1024]
 
 #install openstack
 FIXED_RANGE=10.0.0.0/20
