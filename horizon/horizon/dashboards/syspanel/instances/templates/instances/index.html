@@ -1,5 +1,43 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% block myjs %}
+<script type="text/javascript" src="../../../static/dashboard/js/jquery.min.js"></script>
+<script >
+function reload_usage(){
+        var todo = []
+        $(".rsusage").each(function(i, o){
+                todo.push( $(o).attr("value")  );
+        });
+        
+        var ins = todo.join(",") ;
+
+        $.ajax({ 
+                url: "http://127.0.0.1/md",
+                data: { query : ins, stime: "latest" } ,
+                //type: "POST",
+                dataType: "json",
+                success: function(data){
+                        for ( ins in data){
+                                if (data[ins] != null)
+                                $(".rsusage[value=" + ins + "]").html( "<B>CPU: </B>"+data[ins]['cpu']+"<br><B>MEM: </B>"+data[ins]['mem'] + "%<br><B>NetIn: </B>"+data[ins]['netin']+"M<br><B>NetOut: </B>"+data[ins]['netout']+"M<br>" );
+                        }
+                        window.setTimeout("reload_usage()", 4000);
+                },
+                error:function(data){
+                        window.setTimeout("reload_usage()", 4000);
+                },
+        });
+}
+
+
+$(function(){
+        reload_usage();
+})
+window.setTimeout("reload_usage()", 1);
+</script>
+{%endblock%}
+
+
 {% block title %}{% trans "Instances" %}{% endblock %}
 
 {% block position_info %}
