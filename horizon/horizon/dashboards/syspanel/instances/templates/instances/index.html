@@ -12,7 +12,7 @@ function reload_usage(){
         var ins = todo.join(",") ;
 
         $.ajax({ 
-                url: "http://127.0.0.1/md",
+                url: "/md",
                 data: { query : ins, stime: "latest" } ,
                 //type: "POST",
                 dataType: "json",

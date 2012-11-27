@@ -200,11 +200,7 @@ if [[ $EUID -eq 0 ]]; then
     STACK_DIR="$DEST/${PWD##*/}"
     cp -r -f -T "$PWD" "$STACK_DIR"
     chown -R stack "$STACK_DIR"
-    if [[ "$SHELL_AFTER_RUN" != "no" ]]; then
-        exec su -c "set -e; cd $STACK_DIR; bash stack.sh; bash" stack
-    else
-        exec su -c "set -e; cd $STACK_DIR; bash stack.sh" stack
-    fi
+    exec su -c "set -e; cd $STACK_DIR; bash stack.sh" stack
     exit 1
 else
     # We're not **root**, make sure ``sudo`` is available

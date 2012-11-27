@@ -1,4 +1,6 @@
 #!/bin/bash
+TOP_DIR=$(cd $(dirname "$0") && pwd)
+
 if [ $# -ne 2 ];then
 	echo "Usage:"
         echo "      `basename $0` -p password"
@@ -15,40 +17,11 @@ case $OPT in
 esac
 done
 
-TOP_DIR=$(cd $(dirname "$0") && pwd)
 
 #install captcha
 cd $TOP_DIR
 cd django-simple-captcha-0.3.0
 sudo python setup.py install
-
-#get available space
-cd $TOP_DIR
-size=$(sudo df -m|grep '/$'|awk '{print $4}')
-back_file_size=$[size/1024]
-
-#install openstack
-FIXED_RANGE=10.0.0.0/20
-FLOATING_RANGE=192.168.136.1/24
-cd $TOP_DIR
-cd devstack
-sudo killall screen
-cat <<EOF >localrc
-FLAT_INTERFACE=eth0
-FIXED_RANGE=$FIXED_RANGE
-FIXED_NETWORK_SIZE=4096
-FLOATING_RANGE=$FLOATING_RANGE
-MULTI_HOST=1
-MYSQL_PASSWORD=$PASSWORD
-RABBIT_PASSWORD=$PASSWORD
-SERVICE_PASSWORD=$PASSWORD
-ADMIN_PASSWORD=$PASSWORD
-SERVICE_TOKEN=$PASSWORD
-ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit
-VOLUME_BACKING_FILE_SIZE=$back_file_size
-IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
-EOF
-./stack.sh
 
 #determine IP infor
 cd $TOP_DIR
@@ -95,3 +68,32 @@ sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server
 nohup ./kanyun-server > .kanyun-server.nohup&
 nohup ./kanyun-worker >.kanyun-worker.nohup &
 cd ..
+
+#get available space
+cd $TOP_DIR
+size=$(sudo df -m|grep '/$'|awk '{print $4}')
+back_file_size=$[size/1024]
+
+#install openstack
+FIXED_RANGE=10.0.0.0/20
+FLOATING_RANGE=192.168.136.1/24
+cd $TOP_DIR
+cd devstack
+sudo killall screen
+cat <<EOF >localrc
+FLAT_INTERFACE=eth0
+FIXED_RANGE=$FIXED_RANGE
+FIXED_NETWORK_SIZE=4096
+FLOATING_RANGE=$FLOATING_RANGE
+MULTI_HOST=1
+MYSQL_PASSWORD=csdb123cnic
+RABBIT_PASSWORD=$PASSWORD
+SERVICE_PASSWORD=$PASSWORD
+ADMIN_PASSWORD=$PASSWORD
+SERVICE_TOKEN=$PASSWORD
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit
+VOLUME_BACKING_FILE_SIZE=$back_file_size
+IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
+EOF
+./stack.sh
+
