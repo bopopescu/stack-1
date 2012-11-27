@@ -2,10 +2,20 @@
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 cd $TOP_DIR
 cd kanyun/
+echo "ending monitoring services"
 sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9
+echo "starting monitoring services"
 nohup ./kanyun-worker >.kanyun-worker.nohup  2>/dev/null&
 
+echo "restarting openstack services"
 killall screen
 cd $TOP_DIR
 cd devstack
-screen -dmS stack -c stack-screenrc
+if [ -f stack-screenrc ];then
+	screen -dmS stack -c stack-screenrc
+else
+	echo "Found no devstack/stack-screenrc files"
+	echo "ERROR!!!"
+	exit 1
+fi
+echo "Done"
