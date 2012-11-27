@@ -18,6 +18,7 @@ esac
 done
 
 TOP_DIR=$(cd $(dirname "$0") && pwd)
+rm $TOP_DIR/devstack/stack-screenrc
 
 #determine IP infor
 cd $TOP_DIR
