@@ -275,6 +275,7 @@ if [ -z "$HOST_IP" -o "$HOST_IP" == "dhcp" ]; then
             HOST_IP=$IP
             break;
         fi
+	HOST_IP=$IP
     done
     if [ "$HOST_IP" == "" ]; then
         echo "Could not determine host ip address."
