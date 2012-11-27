@@ -173,7 +173,7 @@ VERBOSE=$(trueorfalse True $VERBOSE)
 # sudo privileges and runs as that user.
 
 if [[ $EUID -eq 0 ]]; then
-    ROOTSLEEP=${ROOTSLEEP:-10}
+    ROOTSLEEP=${ROOTSLEEP:-5}
     echo "You are running this script as root."
     echo "In $ROOTSLEEP seconds, we will create a user 'stack' and run as that user"
     sleep $ROOTSLEEP

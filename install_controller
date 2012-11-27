@@ -1,6 +1,11 @@
 #!/bin/bash
 TOP_DIR=$(cd $(dirname "$0") && pwd)
-rm $TOP_DIR/devstack/stack-screenrc
+if [[ $UID -ne 0 ]]; then
+	echo "only root can execute this script"
+	exit 1
+fi
+
+rm -f $TOP_DIR/devstack/stack-screenrc
 
 if [ $# -ne 2 ];then
 	echo "Usage:"
