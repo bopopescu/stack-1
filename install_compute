@@ -42,22 +42,6 @@ for IP in $HOST_IPS; do
         exit 1
 fi
 
-#install monitor related package and start services
-cd $TOP_DIR
-cd kanyun/
-cat <<EOF >kanyun.conf
-[worker]
-id: worker_$(hostname)
-worker_timeout: 60
-dataserver_host: $CTRL_ADDRESS
-dataserver_port: 5551
-log: /tmp/kanyun-worker.log
-EOF
-sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9
-sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq
-nohup ./kanyun-worker >.kanyun-worker.nohup &
-cd ..
-
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')
@@ -88,4 +72,19 @@ GLANCE_HOSTPORT=${CTRL_ADDRESS}:9292
 ENABLED_SERVICES=n-cpu,n-net,n-api,n-novnc,cinder,c-vol
 EOF
 ./stack.sh
+
+#install monitor related package and start services
+cd $TOP_DIR
+cd kanyun/
+su -c "cat <<EOF >kanyun.conf
+[worker]
+id: worker_$(hostname)
+worker_timeout: 60
+dataserver_host: $CTRL_ADDRESS
+dataserver_port: 5551
+log: /tmp/kanyun-worker.log
+EOF" stack
+sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9 1>/dev/null 2>&1
+sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq 1>/dev/null 2>&1
+su -c "nohup ./kanyun-worker >.kanyun-worker.nohup 2>/dev/null&" stack
 

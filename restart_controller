@@ -1,22 +1,29 @@
 #!/bin/bash
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 cd $TOP_DIR
+if [[ $UID -ne 0 ]]; then
+        echo "only root can execute this script"
+        exit 1
+fi
+
 cd kanyun/
 echo "ending monitoring services"
 sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9
 echo "starting monitoring services"
-nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&
-nohup ./kanyun-worker >.kanyun-worker.nohup  2>/dev/null&
+su -c " nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
+su -c " nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
 
 echo "restarting openstack services"
-killall screen
+sudo killall screen
 cd $TOP_DIR
 cd devstack
 if [ -f stack-screenrc ];then
-	screen -dmS stack -c stack-screenrc
+	su -c "screen -dmS stack -c stack-screenrc&" stack
 else
 	echo "Found no devstack/stack-screenrc files"
 	echo "ERROR!!!"
 	exit 1
 fi
 echo "Done"
+
+sudo service apache2 restart

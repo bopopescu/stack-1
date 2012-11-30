@@ -59,6 +59,7 @@ def splash(request):
     #return shortcuts.render(request, 'splash.html', {'form': form})
     return shortcuts.render(request, 'auth/login.html', {'form': form})
 
+
 def get_md(request):
     def total_IO(s):
         total = 0
@@ -127,11 +128,16 @@ def get_md(request):
 
     return HttpResponse(simplejson.dumps(result))
 
+def freshcap(request):
+    captcha = CaptchaField()
+    rethtml = captcha.widget.render("captcha", None, None)
+    imagestr = str(captcha.widget.image_and_audio).split('/')[3]
+    return HttpResponse(imagestr)
 
 class APIView(generic.TemplateView):
     """ A quick class-based view for putting API data into a template.
 
-    Subclasses must define one method, ``get_data``, and a template name
+    Subclasses must define one method, ``get_data``, and a template name:
     via the ``template_name`` attribute on the class.
 
     Errors within the ``get_data`` function are automatically caught by

@@ -49,7 +49,7 @@ class CaptchaTextInput(MultiWidget):
         key = store.hashkey
         value = [key, u'']
         
-        self.image_and_audio = '<img src="%s" alt="captcha" class="captcha" />' %reverse('captcha-image',kwargs=dict(key=key))
+        self.image_and_audio = '<img src="%s" alt="captcha" class="captcha" id="captcha_img" onclick="loadnewcaptcha()/>' %reverse('captcha-image',kwargs=dict(key=key))
         if settings.CAPTCHA_FLITE_PATH:
             self.image_and_audio = '<a href="%s" title="%s">%s</a>' %( reverse('captcha-audio', kwargs=dict(key=key)), unicode(_('Play captcha as audio file')), self.image_and_audio)
         
