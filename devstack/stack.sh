@@ -413,7 +413,6 @@ SWIFT_CONFIG_DIR=${SWIFT_CONFIG_DIR:-/etc/swift}
 # working with each item separately or the entire cluster all at once.
 # By default we define 9 for the partition count (which mean 512).
 SWIFT_PARTITION_POWER_SIZE=${SWIFT_PARTITION_POWER_SIZE:-9}
-SWIFT_REPLICAS=${SWIFT_REPLICAS:-3}
 
 if is_service_enabled swift; then
     # If we are using swift3, we can default the s3 port to swift instead
@@ -1153,33 +1152,30 @@ EOF
 
     # This is where we create three different rings for swift with
     # different object servers binding on different ports.
+    SWIFT_REPLICAS=${SWIFT_REPLICAS:-1}
     pushd ${SWIFT_CONFIG_DIR} >/dev/null && {
 
         rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
 
         port_number=6010
         swift-ring-builder object.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        #swift-ring-builder object.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
-        #swift-ring-builder object.builder rebalance
+        swift-ring-builder object.builder add z1-127.0.0.1:${port_number}/sdb1 1
+        swift-ring-builder object.builder rebalance
 
         port_number=6011
         swift-ring-builder container.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        #swift-ring-builder container.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
-        #swift-ring-builder container.builder rebalance
+        swift-ring-builder container.builder add z1-127.0.0.1:${port_number}/sdb1 1
+        swift-ring-builder container.builder rebalance
 
         port_number=6012
         swift-ring-builder account.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        #swift-ring-builder account.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
-        #swift-ring-builder account.builder rebalance
+        swift-ring-builder account.builder add z1-127.0.0.1:${port_number}/sdb1 1
+        swift-ring-builder account.builder rebalance
 
     } && popd >/dev/null
 
    # Start rsync
-    if [[ "$os_PACKAGE" = "deb" ]]; then
-        sudo /etc/init.d/rsync restart || :
-    else
-        sudo systemctl start xinetd.service
-    fi
+   sudo /etc/init.d/rsync restart || :
 
    # First spawn all the swift services then kill the
    # proxy service so we can run it in foreground in screen.
@@ -1209,30 +1205,12 @@ if is_service_enabled nova; then
 fi
 
 # Additional Nova configuration that is dependent on other services
-if is_service_enabled quantum; then
-    add_nova_opt "network_api_class=nova.network.quantumv2.api.API"
-    add_nova_opt "quantum_admin_username=$Q_ADMIN_USERNAME"
-    add_nova_opt "quantum_admin_password=$SERVICE_PASSWORD"
-    add_nova_opt "quantum_admin_auth_url=$KEYSTONE_SERVICE_PROTOCOL://$KEYSTONE_SERVICE_HOST:$KEYSTONE_AUTH_PORT/v2.0"
-    add_nova_opt "quantum_auth_strategy=$Q_AUTH_STRATEGY"
-    add_nova_opt "quantum_admin_tenant_name=$SERVICE_TENANT_NAME"
-    add_nova_opt "quantum_url=http://$Q_HOST:$Q_PORT"
-
-    if [[ "$Q_PLUGIN" = "openvswitch" ]]; then
-        NOVA_VIF_DRIVER="nova.virt.libvirt.vif.LibvirtHybridOVSBridgeDriver"
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-        NOVA_VIF_DRIVER="nova.virt.libvirt.vif.QuantumLinuxBridgeVIFDriver"
-    fi
-    add_nova_opt "libvirt_vif_driver=$NOVA_VIF_DRIVER"
-    add_nova_opt "linuxnet_interface_driver=$LINUXNET_VIF_DRIVER"
-else
-    add_nova_opt "network_manager=nova.network.manager.$NET_MAN"
-    add_nova_opt "public_interface=$PUBLIC_INTERFACE"
-    add_nova_opt "vlan_interface=$VLAN_INTERFACE"
-    add_nova_opt "flat_network_bridge=$FLAT_NETWORK_BRIDGE"
-    if [ -n "$FLAT_INTERFACE" ]; then
-        add_nova_opt "flat_interface=$FLAT_INTERFACE"
-    fi
+add_nova_opt "network_manager=nova.network.manager.$NET_MAN"
+add_nova_opt "public_interface=$PUBLIC_INTERFACE"
+add_nova_opt "vlan_interface=$VLAN_INTERFACE"
+add_nova_opt "flat_network_bridge=$FLAT_NETWORK_BRIDGE"
+if [ -n "$FLAT_INTERFACE" ]; then
+    add_nova_opt "flat_interface=$FLAT_INTERFACE"
 fi
 # All nova-compute workers need to know the vnc configuration options
 # These settings don't hurt anything if n-xvnc and n-novnc are disabled
@@ -1253,38 +1231,16 @@ VNCSERVER_LISTEN=${VNCSERVER_LISTEN=127.0.0.1}
 add_nova_opt "vncserver_listen=$VNCSERVER_LISTEN"
 add_nova_opt "vncserver_proxyclient_address=$VNCSERVER_PROXYCLIENT_ADDRESS"
 add_nova_opt "ec2_dmz_host=$EC2_DMZ_HOST"
-if is_service_enabled zeromq; then
-    add_nova_opt "rpc_backend=nova.openstack.common.rpc.impl_zmq"
-elif is_service_enabled qpid; then
-    add_nova_opt "rpc_backend=nova.rpc.impl_qpid"
-elif [ -n "$RABBIT_HOST" ] &&  [ -n "$RABBIT_PASSWORD" ]; then
+if [ -n "$RABBIT_HOST" ] &&  [ -n "$RABBIT_PASSWORD" ]; then
     add_nova_opt "rabbit_host=$RABBIT_HOST"
     add_nova_opt "rabbit_password=$RABBIT_PASSWORD"
 fi
 add_nova_opt "glance_api_servers=$GLANCE_HOSTPORT"
 
-# XenServer
-# ---------
-
-if [ "$VIRT_DRIVER" = 'xenserver' ]; then
-    echo_summary "Using XenServer virtualization driver"
-    read_password XENAPI_PASSWORD "ENTER A PASSWORD TO USE FOR XEN."
-    add_nova_opt "compute_driver=xenapi.XenAPIDriver"
-    XENAPI_CONNECTION_URL=${XENAPI_CONNECTION_URL:-"http://169.254.0.1"}
-    XENAPI_USER=${XENAPI_USER:-"root"}
-    add_nova_opt "xenapi_connection_url=$XENAPI_CONNECTION_URL"
-    add_nova_opt "xenapi_connection_username=$XENAPI_USER"
-    add_nova_opt "xenapi_connection_password=$XENAPI_PASSWORD"
-    add_nova_opt "flat_injected=False"
-    # Need to avoid crash due to new firewall support
-    XEN_FIREWALL_DRIVER=${XEN_FIREWALL_DRIVER:-"nova.virt.firewall.IptablesFirewallDriver"}
-    add_nova_opt "firewall_driver=$XEN_FIREWALL_DRIVER"
-else
-    echo_summary "Using libvirt virtualization driver"
-    add_nova_opt "compute_driver=libvirt.LibvirtDriver"
-    LIBVIRT_FIREWALL_DRIVER=${LIBVIRT_FIREWALL_DRIVER:-"nova.virt.libvirt.firewall.IptablesFirewallDriver"}
-    add_nova_opt "firewall_driver=$LIBVIRT_FIREWALL_DRIVER"
-fi
+echo_summary "Using libvirt virtualization driver"
+add_nova_opt "compute_driver=libvirt.LibvirtDriver"
+LIBVIRT_FIREWALL_DRIVER=${LIBVIRT_FIREWALL_DRIVER:-"nova.virt.libvirt.firewall.IptablesFirewallDriver"}
+add_nova_opt "firewall_driver=$LIBVIRT_FIREWALL_DRIVER"
 
 
 # Heat
@@ -1378,25 +1334,9 @@ fi
 
 # Install Images
 # ==============
-
-# Upload an image to glance.
-#
-# The default image is cirros, a small testing image which lets you login as **root**
-# cirros also uses ``cloud-init``, supporting login via keypair and sending scripts as
-# userdata.  See https://help.ubuntu.com/community/CloudInit for more on cloud-init
-#
-# Override ``IMAGE_URLS`` with a comma-separated list of UEC images.
-#  * **oneiric**: http://uec-images.ubuntu.com/oneiric/current/oneiric-server-cloudimg-amd64.tar.gz
-#  * **precise**: http://uec-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64.tar.gz
-
 if is_service_enabled g-reg; then
     echo_summary "Uploading images"
     TOKEN=$(keystone  token-get | grep ' id ' | get_field 2)
-
-    # Option to upload legacy ami-tty, which works with xenserver
-    if [[ -n "$UPLOAD_LEGACY_TTY" ]]; then
-        IMAGE_URLS="${IMAGE_URLS:+${IMAGE_URLS},}http://images.ansolabs.com/tty.tgz"
-    fi
 
     for image_url in ${IMAGE_URLS//,/ }; do
         upload_image $image_url $TOKEN
@@ -1422,26 +1362,17 @@ fi
 # Using the cloud
 # ---------------
 
-echo ""
-echo ""
-echo ""
+echo -e "\n\n"
 
-# If you installed Horizon on this server you should be able
-# to access the site using your browser.
 if is_service_enabled horizon; then
-    echo "Horizon is now available at http://$SERVICE_HOST/"
+    echo "Openstack is now available at http://$SERVICE_HOST/"
 fi
 
 # If Keystone is present you can point ``nova`` cli to this server
 if is_service_enabled key; then
-    echo "Keystone is serving at $KEYSTONE_AUTH_PROTOCOL://$SERVICE_HOST:$KEYSTONE_API_PORT/v2.0/"
-    echo "Examples on using novaclient command line is in exercise.sh"
-    echo "The default users are: admin and demo"
-    echo "The password: $ADMIN_PASSWORD"
+    echo "The default users are: admin and test"
+    echo "The password: $ADMIN_PASSWORD" and "test"
 fi
-
-# Echo ``HOST_IP`` - useful for ``build_uec.sh``, which uses dhcp to give the instance an address
-echo "This is your host ip: $HOST_IP"
 
 # Warn that ``EXTRA_FLAGS`` needs to be converted to ``EXTRA_OPTS``
 if [[ -n "$EXTRA_FLAGS" ]]; then
