@@ -278,25 +278,6 @@ NOVNC_DIR=$DEST/noVNC
 SWIFT_DIR=$DEST/swift
 SWIFT3_DIR=$DEST/swift3
 SWIFTCLIENT_DIR=$DEST/python-swiftclient
-QUANTUM_DIR=$DEST/quantum
-QUANTUM_CLIENT_DIR=$DEST/python-quantumclient
-
-# Default Quantum Plugin
-Q_PLUGIN=${Q_PLUGIN:-openvswitch}
-# Default Quantum Port
-Q_PORT=${Q_PORT:-9696}
-# Default Quantum Host
-Q_HOST=${Q_HOST:-localhost}
-# Which Quantum API nova should use
-# Default admin username
-Q_ADMIN_USERNAME=${Q_ADMIN_USERNAME:-quantum}
-# Default auth strategy
-Q_AUTH_STRATEGY=${Q_AUTH_STRATEGY:-keystone}
-# Use namespace or not
-Q_USE_NAMESPACE=${Q_USE_NAMESPACE:-True}
-Q_USE_ROOTWRAP=${Q_USE_ROOTWRAP=:-True}
-# Meta data IP
-Q_META_DATA_IP=${Q_META_DATA_IP:-$HOST_IP}
 
 # Name of the LVM volume group to use/create for iscsi volumes
 VOLUME_GROUP=${VOLUME_GROUP:-stack-volumes}
@@ -448,9 +429,6 @@ SERVICE_TENANT_NAME=${SERVICE_TENANT_NAME:-service}
 
 # Horizon
 # -------
-
-# Allow overriding the default Apache user and group, default both to
-# current user.
 APACHE_USER=${APACHE_USER:-$USER}
 APACHE_GROUP=${APACHE_GROUP:-$APACHE_USER}
 
@@ -639,13 +617,8 @@ EOF
 fi
 
 if is_service_enabled horizon; then
-    if [[ "$os_PACKAGE" = "deb" ]]; then
-        # Install apache2, which is NOPRIME'd
-        install_package apache2 libapache2-mod-wsgi
-    else
-        sudo rm -f /etc/httpd/conf.d/000-*
-        install_package httpd mod_wsgi
-    fi
+    # Install apache2, which is NOPRIME'd
+    install_package apache2 libapache2-mod-wsgi
 fi
 
 if is_service_enabled swift; then
@@ -734,7 +707,6 @@ fi
 
 # Initialization
 # ==============
-
 echo_summary "Configuring OpenStack projects"
 
 # Set up our checkouts so they are installed into python path
@@ -822,9 +794,6 @@ if is_service_enabled rabbit; then
     fi
     # change the rabbit password since the default is "guest"
     sudo rabbitmqctl change_password guest $RABBIT_PASSWORD
-elif is_service_enabled qpid; then
-    echo_summary "Starting qpid"
-    restart_service qpidd
 fi
 
 
@@ -1006,9 +975,6 @@ fi
 if is_service_enabled swift; then
     swift-init all stop || true
 
-    # First do a bit of setup by creating the directories and
-    # changing the permissions so we can run it as our user.
-
     USER_GROUP=$(id -g)
     sudo mkdir -p ${SWIFT_DATA_DIR}
     sudo chown -R $USER:${USER_GROUP} ${SWIFT_DATA_DIR}
@@ -1137,24 +1103,22 @@ EOF
     }
 
     generate_swift_configuration object 6010 2
-    generate_swift_configuration container 6011 2
-    generate_swift_configuration account 6012 2
+    generate_swift_configuration container 6011 3
+    generate_swift_configuration account 6012 4
 
     # Specific configuration for swift for rsyslog. See
     # ``/etc/rsyslog.d/10-swift.conf`` for more info.
     swift_log_dir=${SWIFT_DATA_DIR}/logs
     rm -rf ${swift_log_dir}
-    mkdir -p ${swift_log_dir}/hourly
+    sudo mkdir -p ${swift_log_dir}
     sudo chown -R $USER:adm ${swift_log_dir}
-    sed "s,%SWIFT_LOGDIR%,${swift_log_dir}," $FILES/swift/rsyslog.conf | sudo \
-        tee /etc/rsyslog.d/10-swift.conf
+    sed "s,%SWIFT_LOGDIR%,${swift_log_dir}," $FILES/swift/rsyslog.conf | sudo tee /etc/rsyslog.d/10-swift.conf
     restart_service rsyslog
 
     # This is where we create three different rings for swift with
     # different object servers binding on different ports.
     SWIFT_REPLICAS=${SWIFT_REPLICAS:-1}
     pushd ${SWIFT_CONFIG_DIR} >/dev/null && {
-
         rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
 
         port_number=6010
@@ -1245,7 +1209,6 @@ add_nova_opt "firewall_driver=$LIBVIRT_FIREWALL_DRIVER"
 
 # Heat
 # ----
-
 if is_service_enabled heat; then
     echo_summary "Configuring Heat"
     init_heat

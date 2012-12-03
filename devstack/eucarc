@@ -18,8 +18,10 @@ RC_DIR=$(cd $(dirname "$BASH_SOURCE") && pwd)
 # Get user configuration
 source $RC_DIR/openrc
 
+
 # Set the ec2 url so euca2ools works
 export EC2_URL=$(keystone catalog --service ec2 | awk '/ publicURL / { print $4 }')
+echo "!!!!!!!!!!!!!!"
 
 # Create EC2 credentials for the current user
 CREDS=$(keystone ec2-credentials-create)
