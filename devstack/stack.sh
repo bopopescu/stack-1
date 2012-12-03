@@ -1,25 +1,6 @@
 #!/usr/bin/env bash
 
-# ``stack.sh`` is an opinionated OpenStack developer installation.  It
-# installs and configures various combinations of **Ceilometer**, **Cinder**,
-# **Glance**, **Heat**, **Horizon**, **Keystone**, **Nova**, **Quantum**
-# and **Swift**
-
-# This script allows you to specify configuration options of what git
-# repositories to use, enabled services, network configuration and various
-# passwords.  If you are crafty you can run the script on multiple nodes using
-# shared settings for common resources (mysql, rabbitmq) and build a multi-node
-# developer install.
-
-# To keep this script simple we assume you are running on a recent **Ubuntu**
-# (11.10 Oneiric or 12.04 Precise) or **Fedora** (F16 or F17) machine.  It
-# should work in a VM or physical server.  Additionally we put the list of
-# ``apt`` and ``rpm`` dependencies and other configuration files in this repo.
-
-# Learn more and get the most recent version at http://devstack.org
-
-killall screen
-
+killall screen 1>/dev/null 2>&1
 # Keep track of the devstack directory
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 
@@ -34,28 +15,6 @@ GetDistro
 
 # Settings
 # ========
-
-# ``stack.sh`` is customizable through setting environment variables.  If you
-# want to override a setting you can set and export it::
-#
-#     export MYSQL_PASSWORD=anothersecret
-#     ./stack.sh
-#
-# You can also pass options on a single line ``MYSQL_PASSWORD=simple ./stack.sh``
-#
-# Additionally, you can put any local variables into a ``localrc`` file::
-#
-#     MYSQL_PASSWORD=anothersecret
-#     MYSQL_USER=hellaroot
-#
-# We try to have sensible defaults, so you should be able to run ``./stack.sh``
-# in most cases.  ``localrc`` is not distributed with DevStack and will never
-# be overwritten by a DevStack update.
-#
-# DevStack distributes ``stackrc`` which contains locations for the OpenStack
-# repositories and branches to configure.  ``stackrc`` sources ``localrc`` to
-# allow you to safely override those settings.
-
 if [[ ! -r $TOP_DIR/stackrc ]]; then
     echo "ERROR: missing $TOP_DIR/stackrc - did you grab more than just stack.sh?"
     exit 1
@@ -389,20 +348,9 @@ function read_password {
 
 # Nova Network Configuration
 # --------------------------
-
-# FIXME: more documentation about why these are important options.  Also
-# we should make sure we use the same variable names as the option names.
-
-if [ "$VIRT_DRIVER" = 'xenserver' ]; then
-    PUBLIC_INTERFACE_DEFAULT=eth3
-    # Allow ``build_domU.sh`` to specify the flat network bridge via kernel args
-    FLAT_NETWORK_BRIDGE_DEFAULT=$(grep -o 'flat_network_bridge=[[:alnum:]]*' /proc/cmdline | cut -d= -f 2 | sort -u)
-    GUEST_INTERFACE_DEFAULT=eth1
-else
-    PUBLIC_INTERFACE_DEFAULT=br100
-    FLAT_NETWORK_BRIDGE_DEFAULT=br100
-    GUEST_INTERFACE_DEFAULT=eth0
-fi
+PUBLIC_INTERFACE_DEFAULT=br100
+FLAT_NETWORK_BRIDGE_DEFAULT=br100
+GUEST_INTERFACE_DEFAULT=eth0
 
 PUBLIC_INTERFACE=${PUBLIC_INTERFACE:-$PUBLIC_INTERFACE_DEFAULT}
 NET_MAN=${NET_MAN:-FlatDHCPManager}
@@ -437,36 +385,6 @@ FLAT_INTERFACE=${FLAT_INTERFACE-$GUEST_INTERFACE_DEFAULT}
 
 ## FIXME(ja): should/can we check that FLAT_INTERFACE is sane?
 
-# Using Quantum networking:
-#
-# Make sure that quantum is enabled in ENABLED_SERVICES.  If you want
-# to run Quantum on this host, make sure that q-svc is also in
-# ENABLED_SERVICES.
-#
-# If you're planning to use the Quantum openvswitch plugin, set
-# Q_PLUGIN to "openvswitch" and make sure the q-agt service is enabled
-# in ENABLED_SERVICES.  If you're planning to use the Quantum
-# linuxbridge plugin, set Q_PLUGIN to "linuxbridge" and make sure the
-# q-agt service is enabled in ENABLED_SERVICES.
-#
-# See "Quantum Network Configuration" below for additional variables
-# that must be set in localrc for connectivity across hosts with
-# Quantum.
-#
-# With Quantum networking the NET_MAN variable is ignored.
-
-
-# MySQL & (RabbitMQ or Qpid)
-# --------------------------
-
-# We configure Nova, Horizon, Glance and Keystone to use MySQL as their
-# database server.  While they share a single server, each has their own
-# database and tables.
-
-# By default this script will install and configure MySQL.  If you want to
-# use an existing server, you can pass in the user/password/host parameters.
-# You will need to send the same ``MYSQL_PASSWORD`` to every host if you are doing
-# a multi-node DevStack installation.
 MYSQL_HOST=${MYSQL_HOST:-localhost}
 MYSQL_USER=${MYSQL_USER:-root}
 read_password MYSQL_PASSWORD "ENTER A PASSWORD TO USE FOR MYSQL."
@@ -482,22 +400,9 @@ fi
 
 
 # Swift
-# -----
-
-# TODO: add logging to different location.
-
-# Set ``SWIFT_DATA_DIR`` to the location of swift drives and objects.
-# Default is the common DevStack data directory.
 SWIFT_DATA_DIR=${SWIFT_DATA_DIR:-${DEST}/data/swift}
-
-# Set ``SWIFT_CONFIG_DIR`` to the location of the configuration files.
-# Default is ``/etc/swift``.
 SWIFT_CONFIG_DIR=${SWIFT_CONFIG_DIR:-/etc/swift}
-
-# DevStack will create a loop-back disk formatted as XFS to store the
-# swift data. Set ``SWIFT_LOOPBACK_DISK_SIZE`` to the disk size in bytes.
-# Default is 1 gigabyte.
-SWIFT_LOOPBACK_DISK_SIZE=${SWIFT_LOOPBACK_DISK_SIZE:-1000000}
+#SWIFT_LOOPBACK_DISK_SIZE=${SWIFT_LOOPBACK_DISK_SIZE:-1000000}#1G
 
 # The ring uses a configurable number of bits from a path’s MD5 hash as
 # a partition index that designates a device. The number of bits kept
@@ -508,11 +413,6 @@ SWIFT_LOOPBACK_DISK_SIZE=${SWIFT_LOOPBACK_DISK_SIZE:-1000000}
 # working with each item separately or the entire cluster all at once.
 # By default we define 9 for the partition count (which mean 512).
 SWIFT_PARTITION_POWER_SIZE=${SWIFT_PARTITION_POWER_SIZE:-9}
-
-# Set ``SWIFT_REPLICAS`` to configure how many replicas are to be
-# configured for your Swift cluster.  By default the three replicas would need a
-# bit of IO and Memory on a VM you may want to lower that to 1 if you want to do
-# only some quick testing.
 SWIFT_REPLICAS=${SWIFT_REPLICAS:-3}
 
 if is_service_enabled swift; then
@@ -695,16 +595,8 @@ set -o xtrace
 
 # Install Packages
 # ================
-
-# OpenStack uses a fair number of other projects.
-
-# Install package requirements
 echo_summary "Installing package prerequisites"
-if [[ "$os_PACKAGE" = "deb" ]]; then
-    install_package $(get_packages $FILES/apts)
-else
-    install_package $(get_packages $FILES/rpms)
-fi
+install_package $(get_packages $FILES/apts)
 
 if [[ $SYSLOG != "False" ]]; then
     install_package rsyslog-relp
@@ -717,18 +609,6 @@ if is_service_enabled rabbit; then
     install_package rabbitmq-server > "$tfile" 2>&1
     cat "$tfile"
     rm -f "$tfile"
-elif is_service_enabled qpid; then
-    if [[ "$os_PACKAGE" = "rpm" ]]; then
-        install_package qpid-cpp-server-daemon
-    else
-        install_package qpidd
-    fi
-elif is_service_enabled zeromq; then
-    if [[ "$os_PACKAGE" = "rpm" ]]; then
-        install_package zeromq python-zmq
-    else
-        install_package libzmq1 python-zmq
-    fi
 fi
 
 if is_service_enabled mysql; then
@@ -766,24 +646,6 @@ if is_service_enabled horizon; then
     else
         sudo rm -f /etc/httpd/conf.d/000-*
         install_package httpd mod_wsgi
-    fi
-fi
-
-if is_service_enabled q-agt; then
-    if [[ "$Q_PLUGIN" = "openvswitch" ]]; then
-        # Install deps
-        # FIXME add to files/apts/quantum, but don't install if not needed!
-        if [[ "$os_PACKAGE" = "deb" ]]; then
-            kernel_version=`cat /proc/version | cut -d " " -f3`
-            install_package make fakeroot dkms openvswitch-switch openvswitch-datapath-dkms linux-headers-$kernel_version
-        else
-            ### FIXME(dtroyer): Find RPMs for OpenVSwitch
-            echo "OpenVSwitch packages need to be located"
-            # Fedora does not started OVS by default
-            restart_service openvswitch
-        fi
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-       install_package bridge-utils
     fi
 fi
 
@@ -1112,335 +974,17 @@ if is_service_enabled g-reg; then
     init_glance
 
     # Store the images in swift if enabled.
-    if is_service_enabled swift; then
-        iniset $GLANCE_API_CONF DEFAULT default_store swift
-        iniset $GLANCE_API_CONF DEFAULT swift_store_auth_address $KEYSTONE_SERVICE_PROTOCOL://$KEYSTONE_SERVICE_HOST:$KEYSTONE_SERVICE_PORT/v2.0/
-        iniset $GLANCE_API_CONF DEFAULT swift_store_user $SERVICE_TENANT_NAME:glance
-        iniset $GLANCE_API_CONF DEFAULT swift_store_key $SERVICE_PASSWORD
-        iniset $GLANCE_API_CONF DEFAULT swift_store_create_container_on_put True
-    fi
-fi
-
-
-# Quantum
-# -------
-
-if is_service_enabled quantum; then
-    echo_summary "Configuring Quantum"
-    #
-    # Quantum Network Configuration
-    #
-    # The following variables control the Quantum openvswitch and
-    # linuxbridge plugins' allocation of tenant networks and
-    # availability of provider networks. If these are not configured
-    # in localrc, tenant networks will be local to the host (with no
-    # remote connectivity), and no physical resources will be
-    # available for the allocation of provider networks.
-
-    # To use GRE tunnels for tenant networks, set to True in
-    # localrc. GRE tunnels are only supported by the openvswitch
-    # plugin, and currently only on Ubuntu.
-    ENABLE_TENANT_TUNNELS=${ENABLE_TENANT_TUNNELS:-False}
-
-    # If using GRE tunnels for tenant networks, specify the range of
-    # tunnel IDs from which tenant networks are allocated. Can be
-    # overriden in localrc in necesssary.
-    TENANT_TUNNEL_RANGES=${TENANT_TUNNEL_RANGE:-1:1000}
-
-    # To use VLANs for tenant networks, set to True in localrc. VLANs
-    # are supported by the openvswitch and linuxbridge plugins, each
-    # requiring additional configuration described below.
-    ENABLE_TENANT_VLANS=${ENABLE_TENANT_VLANS:-False}
-
-    # If using VLANs for tenant networks, set in localrc to specify
-    # the range of VLAN VIDs from which tenant networks are
-    # allocated. An external network switch must be configured to
-    # trunk these VLANs between hosts for multi-host connectivity.
-    #
-    # Example: TENANT_VLAN_RANGE=1000:1999
-    TENANT_VLAN_RANGE=${TENANT_VLAN_RANGE:-}
-
-    # If using VLANs for tenant networks, or if using flat or VLAN
-    # provider networks, set in localrc to the name of the physical
-    # network, and also configure OVS_PHYSICAL_BRIDGE for the
-    # openvswitch agent or LB_PHYSICAL_INTERFACE for the linuxbridge
-    # agent, as described below.
-    #
-    # Example: PHYSICAL_NETWORK=default
-    PHYSICAL_NETWORK=${PHYSICAL_NETWORK:-}
-
-    # With the openvswitch plugin, if using VLANs for tenant networks,
-    # or if using flat or VLAN provider networks, set in localrc to
-    # the name of the OVS bridge to use for the physical network. The
-    # bridge will be created if it does not already exist, but a
-    # physical interface must be manually added to the bridge as a
-    # port for external connectivity.
-    #
-    # Example: OVS_PHYSICAL_BRIDGE=br-eth1
-    OVS_PHYSICAL_BRIDGE=${OVS_PHYSICAL_BRIDGE:-}
-
-    # With the linuxbridge plugin, if using VLANs for tenant networks,
-    # or if using flat or VLAN provider networks, set in localrc to
-    # the name of the network interface to use for the physical
-    # network.
-    #
-    # Example: LB_PHYSICAL_INTERFACE=eth1
-    LB_PHYSICAL_INTERFACE=${LB_PHYSICAL_INTERFACE:-}
-
-    # With the openvswitch plugin, set to True in localrc to enable
-    # provider GRE tunnels when ENABLE_TENANT_TUNNELS is False.
-    #
-    # Example: OVS_ENABLE_TUNNELING=True
-    OVS_ENABLE_TUNNELING=${OVS_ENABLE_TUNNELING:-$ENABLE_TENANT_TUNNELS}
-
-    # Put config files in ``/etc/quantum`` for everyone to find
-    if [[ ! -d /etc/quantum ]]; then
-        sudo mkdir -p /etc/quantum
-    fi
-    sudo chown `whoami` /etc/quantum
-
-    if [[ "$Q_PLUGIN" = "openvswitch" ]]; then
-        Q_PLUGIN_CONF_PATH=etc/quantum/plugins/openvswitch
-        Q_PLUGIN_CONF_FILENAME=ovs_quantum_plugin.ini
-        Q_DB_NAME="ovs_quantum"
-        Q_PLUGIN_CLASS="quantum.plugins.openvswitch.ovs_quantum_plugin.OVSQuantumPluginV2"
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-        Q_PLUGIN_CONF_PATH=etc/quantum/plugins/linuxbridge
-        Q_PLUGIN_CONF_FILENAME=linuxbridge_conf.ini
-        Q_DB_NAME="quantum_linux_bridge"
-        Q_PLUGIN_CLASS="quantum.plugins.linuxbridge.lb_quantum_plugin.LinuxBridgePluginV2"
-    else
-        echo "Unknown Quantum plugin '$Q_PLUGIN'.. exiting"
-        exit 1
-    fi
-
-    # If needed, move config file from ``$QUANTUM_DIR/etc/quantum`` to ``/etc/quantum``
-    mkdir -p /$Q_PLUGIN_CONF_PATH
-    Q_PLUGIN_CONF_FILE=$Q_PLUGIN_CONF_PATH/$Q_PLUGIN_CONF_FILENAME
-    cp $QUANTUM_DIR/$Q_PLUGIN_CONF_FILE /$Q_PLUGIN_CONF_FILE
-
-    iniset /$Q_PLUGIN_CONF_FILE DATABASE sql_connection mysql:\/\/$MYSQL_USER:$MYSQL_PASSWORD@$MYSQL_HOST\/$Q_DB_NAME?charset=utf8
-
-    Q_CONF_FILE=/etc/quantum/quantum.conf
-    cp $QUANTUM_DIR/etc/quantum.conf $Q_CONF_FILE
-    Q_RR_CONF_FILE=/etc/quantum/rootwrap.conf
-    if [[ "$Q_USE_ROOTWRAP" == "False" ]]; then
-        Q_RR_COMMAND="sudo"
-    else
-        Q_RR_COMMAND="sudo $QUANTUM_DIR/bin/quantum-rootwrap $Q_RR_CONF_FILE"
-    fi
-    cp -p $QUANTUM_DIR/etc/rootwrap.conf $Q_RR_CONF_FILE
-
-    # Copy over the config and filter bits
-    Q_CONF_ROOTWRAP_D=/etc/quantum/rootwrap.d
-    mkdir -p $Q_CONF_ROOTWRAP_D
-    cp -pr $QUANTUM_DIR/etc/quantum/rootwrap.d/* $Q_CONF_ROOTWRAP_D/
-fi
-
-# Quantum service (for controller node)
-if is_service_enabled q-svc; then
-    Q_API_PASTE_FILE=/etc/quantum/api-paste.ini
-    Q_POLICY_FILE=/etc/quantum/policy.json
-
-    cp $QUANTUM_DIR/etc/api-paste.ini $Q_API_PASTE_FILE
-    cp $QUANTUM_DIR/etc/policy.json $Q_POLICY_FILE
-
-    if is_service_enabled mysql; then
-            mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e "DROP DATABASE IF EXISTS $Q_DB_NAME;"
-            mysql -u$MYSQL_USER -p$MYSQL_PASSWORD -e "CREATE DATABASE IF NOT EXISTS $Q_DB_NAME CHARACTER SET utf8;"
-        else
-            echo "mysql must be enabled in order to use the $Q_PLUGIN Quantum plugin."
-            exit 1
-    fi
-
-    # Update either configuration file with plugin
-    iniset $Q_CONF_FILE DEFAULT core_plugin $Q_PLUGIN_CLASS
-
-    iniset $Q_CONF_FILE DEFAULT auth_strategy $Q_AUTH_STRATEGY
-    quantum_setup_keystone $Q_API_PASTE_FILE filter:authtoken
-
-    # Configure plugin
-    if [[ "$Q_PLUGIN" = "openvswitch" ]]; then
-        if [[ "$ENABLE_TENANT_TUNNELS" = "True" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE OVS tenant_network_type gre
-            iniset /$Q_PLUGIN_CONF_FILE OVS tunnel_id_ranges $TENANT_TUNNEL_RANGES
-        elif [[ "$ENABLE_TENANT_VLANS" = "True" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE OVS tenant_network_type vlan
-        else
-            echo "WARNING - The openvswitch plugin is using local tenant networks, with no connectivity between hosts."
-        fi
-
-        # Override OVS_VLAN_RANGES and OVS_BRIDGE_MAPPINGS in localrc
-        # for more complex physical network configurations.
-        if [[ "$OVS_VLAN_RANGES" = "" ]] && [[ "$PHYSICAL_NETWORK" != "" ]]; then
-            OVS_VLAN_RANGES=$PHYSICAL_NETWORK
-            if [[ "$TENANT_VLAN_RANGE" != "" ]]; then
-                OVS_VLAN_RANGES=$OVS_VLAN_RANGES:$TENANT_VLAN_RANGE
-            fi
-        fi
-        if [[ "$OVS_VLAN_RANGES" != "" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE OVS network_vlan_ranges $OVS_VLAN_RANGES
-        fi
-
-        # Enable tunnel networks if selected
-        if [[ $OVS_ENABLE_TUNNELING = "True" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE OVS enable_tunneling True
-        fi
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-        if [[ "$ENABLE_TENANT_VLANS" = "True" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE VLANS tenant_network_type vlan
-        else
-            echo "WARNING - The linuxbridge plugin is using local tenant networks, with no connectivity between hosts."
-        fi
-
-        # Override LB_VLAN_RANGES and LB_INTERFACE_MAPPINGS in localrc
-        # for more complex physical network configurations.
-        if [[ "$LB_VLAN_RANGES" = "" ]] && [[ "$PHYSICAL_NETWORK" != "" ]]; then
-            LB_VLAN_RANGES=$PHYSICAL_NETWORK
-            if [[ "$TENANT_VLAN_RANGE" != "" ]]; then
-                LB_VLAN_RANGES=$LB_VLAN_RANGES:$TENANT_VLAN_RANGE
-            fi
-        fi
-        if [[ "$LB_VLAN_RANGES" != "" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE VLANS network_vlan_ranges $LB_VLAN_RANGES
-        fi
-    fi
-fi
-
-# Quantum agent (for compute nodes)
-if is_service_enabled q-agt; then
-    # Configure agent for plugin
-    if [[ "$Q_PLUGIN" = "openvswitch" ]]; then
-        # Setup integration bridge
-        OVS_BRIDGE=${OVS_BRIDGE:-br-int}
-        quantum_setup_ovs_bridge $OVS_BRIDGE
-
-        # Setup agent for tunneling
-        if [[ "$OVS_ENABLE_TUNNELING" = "True" ]]; then
-            # Verify tunnels are supported
-            # REVISIT - also check kernel module support for GRE and patch ports
-            OVS_VERSION=`ovs-vsctl --version | head -n 1 | awk '{print $4;}'`
-            if [ $OVS_VERSION \< "1.4" ] && ! is_service_enabled q-svc ; then
-                echo "You are running OVS version $OVS_VERSION."
-                echo "OVS 1.4+ is required for tunneling between multiple hosts."
-                exit 1
-            fi
-            iniset /$Q_PLUGIN_CONF_FILE OVS enable_tunneling True
-            iniset /$Q_PLUGIN_CONF_FILE OVS local_ip $HOST_IP
-        fi
-
-        # Setup physical network bridge mappings.  Override
-        # OVS_VLAN_RANGES and OVS_BRIDGE_MAPPINGS in localrc for more
-        # complex physical network configurations.
-        if [[ "$OVS_BRIDGE_MAPPINGS" = "" ]] && [[ "$PHYSICAL_NETWORK" != "" ]] && [[ "$OVS_PHYSICAL_BRIDGE" != "" ]]; then
-            OVS_BRIDGE_MAPPINGS=$PHYSICAL_NETWORK:$OVS_PHYSICAL_BRIDGE
-
-            # Configure bridge manually with physical interface as port for multi-node
-            sudo ovs-vsctl --no-wait -- --may-exist add-br $OVS_PHYSICAL_BRIDGE
-        fi
-        if [[ "$OVS_BRIDGE_MAPPINGS" != "" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE OVS bridge_mappings $OVS_BRIDGE_MAPPINGS
-        fi
-        AGENT_BINARY="$QUANTUM_DIR/bin/quantum-openvswitch-agent"
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-        # Setup physical network interface mappings.  Override
-        # LB_VLAN_RANGES and LB_INTERFACE_MAPPINGS in localrc for more
-        # complex physical network configurations.
-        if [[ "$LB_INTERFACE_MAPPINGS" = "" ]] && [[ "$PHYSICAL_NETWORK" != "" ]] && [[ "$LB_PHYSICAL_INTERFACE" != "" ]]; then
-            LB_INTERFACE_MAPPINGS=$PHYSICAL_NETWORK:$LB_PHYSICAL_INTERFACE
-        fi
-        if [[ "$LB_INTERFACE_MAPPINGS" != "" ]]; then
-            iniset /$Q_PLUGIN_CONF_FILE LINUX_BRIDGE physical_interface_mappings $LB_INTERFACE_MAPPINGS
-        fi
-        AGENT_BINARY="$QUANTUM_DIR/bin/quantum-linuxbridge-agent"
-    fi
-    # Update config w/rootwrap
-    iniset /$Q_PLUGIN_CONF_FILE AGENT root_helper "$Q_RR_COMMAND"
-fi
-
-# Quantum DHCP
-if is_service_enabled q-dhcp; then
-    AGENT_DHCP_BINARY="$QUANTUM_DIR/bin/quantum-dhcp-agent"
-
-    Q_DHCP_CONF_FILE=/etc/quantum/dhcp_agent.ini
-
-    cp $QUANTUM_DIR/etc/dhcp_agent.ini $Q_DHCP_CONF_FILE
-
-    # Set verbose
-    iniset $Q_DHCP_CONF_FILE DEFAULT verbose True
-    # Set debug
-    iniset $Q_DHCP_CONF_FILE DEFAULT debug True
-    iniset $Q_DHCP_CONF_FILE DEFAULT use_namespaces $Q_USE_NAMESPACE
-
-    quantum_setup_keystone $Q_DHCP_CONF_FILE DEFAULT set_auth_url
-
-    # Update config w/rootwrap
-    iniset $Q_DHCP_CONF_FILE DEFAULT root_helper "$Q_RR_COMMAND"
-
-    if [[ "$Q_PLUGIN" = "openvswitch" ]]; then
-        iniset $Q_DHCP_CONF_FILE DEFAULT interface_driver quantum.agent.linux.interface.OVSInterfaceDriver
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-        iniset $Q_DHCP_CONF_FILE DEFAULT interface_driver quantum.agent.linux.interface.BridgeInterfaceDriver
-    fi
-fi
-
-# Quantum L3
-if is_service_enabled q-l3; then
-    AGENT_L3_BINARY="$QUANTUM_DIR/bin/quantum-l3-agent"
-    PUBLIC_BRIDGE=${PUBLIC_BRIDGE:-br-ex}
-    Q_L3_CONF_FILE=/etc/quantum/l3_agent.ini
-
-    cp $QUANTUM_DIR/etc/l3_agent.ini $Q_L3_CONF_FILE
-
-    # Set verbose
-    iniset $Q_L3_CONF_FILE DEFAULT verbose True
-    # Set debug
-    iniset $Q_L3_CONF_FILE DEFAULT debug True
-
-    iniset $Q_L3_CONF_FILE DEFAULT metadata_ip $Q_META_DATA_IP
-    iniset $Q_L3_CONF_FILE DEFAULT use_namespaces $Q_USE_NAMESPACE
-
-    iniset $Q_L3_CONF_FILE DEFAULT root_helper "$Q_RR_COMMAND"
-
-    quantum_setup_keystone $Q_L3_CONF_FILE DEFAULT set_auth_url
-    if [[ "$Q_PLUGIN" == "openvswitch" ]]; then
-        iniset $Q_L3_CONF_FILE DEFAULT interface_driver quantum.agent.linux.interface.OVSInterfaceDriver
-        iniset $Q_L3_CONF_FILE DEFAULT external_network_bridge $PUBLIC_BRIDGE
-        # Set up external bridge
-        # Create it if it does not exist
-        sudo ovs-vsctl --no-wait -- --may-exist add-br $PUBLIC_BRIDGE
-        # remove internal ports
-        for PORT in `sudo ovs-vsctl --no-wait list-ports $PUBLIC_BRIDGE`; do
-            TYPE=$(sudo ovs-vsctl get interface $PORT type)
-            if [[ "$TYPE" == "internal" ]]; then
-                echo `sudo ip link delete $PORT` > /dev/null
-                sudo ovs-vsctl --no-wait del-port $bridge $PORT
-            fi
-        done
-        # ensure no IP is configured on the public bridge
-        sudo ip addr flush dev $PUBLIC_BRIDGE
-    elif [[ "$Q_PLUGIN" = "linuxbridge" ]]; then
-        iniset $Q_L3_CONF_FILE DEFAULT interface_driver quantum.agent.linux.interface.BridgeInterfaceDriver
-        iniset $Q_L3_CONF_FILE DEFAULT external_network_bridge ''
-    fi
-fi
-
-# Quantum RPC support - must be updated prior to starting any of the services
-if is_service_enabled quantum; then
-    iniset $Q_CONF_FILE DEFAULT control_exchange quantum
-    if is_service_enabled qpid ; then
-        iniset $Q_CONF_FILE DEFAULT rpc_backend quantum.openstack.common.rpc.impl_qpid
-    elif is_service_enabled zeromq; then
-        iniset $Q_CONF_FILE DEFAULT rpc_backend quantum.openstack.common.rpc.impl_zmq
-    elif [ -n "$RABBIT_HOST" ] &&  [ -n "$RABBIT_PASSWORD" ]; then
-        iniset $Q_CONF_FILE DEFAULT rabbit_host $RABBIT_HOST
-        iniset $Q_CONF_FILE DEFAULT rabbit_password $RABBIT_PASSWORD
-    fi
+    #if is_service_enabled swift; then
+        #iniset $GLANCE_API_CONF DEFAULT default_store swift
+        #iniset $GLANCE_API_CONF DEFAULT swift_store_auth_address $KEYSTONE_SERVICE_PROTOCOL://$KEYSTONE_SERVICE_HOST:$KEYSTONE_SERVICE_PORT/v2.0/
+        #iniset $GLANCE_API_CONF DEFAULT swift_store_user $SERVICE_TENANT_NAME:glance
+        #iniset $GLANCE_API_CONF DEFAULT swift_store_key $SERVICE_PASSWORD
+        #iniset $GLANCE_API_CONF DEFAULT swift_store_create_container_on_put True
+    #fi
 fi
 
 # Nova
 # ----
-
 if is_service_enabled nova; then
     echo_summary "Configuring Nova"
     configure_nova
@@ -1460,68 +1004,21 @@ fi
 
 # Storage Service
 # ---------------
-
 if is_service_enabled swift; then
-    echo_summary "Configuring Swift"
-
-    # Make sure to kill all swift processes first
     swift-init all stop || true
 
     # First do a bit of setup by creating the directories and
     # changing the permissions so we can run it as our user.
 
     USER_GROUP=$(id -g)
-    sudo mkdir -p ${SWIFT_DATA_DIR}/drives
+    sudo mkdir -p ${SWIFT_DATA_DIR}
     sudo chown -R $USER:${USER_GROUP} ${SWIFT_DATA_DIR}
+    mkdir -p  ${SWIFT_DATA_DIR}/node
+    mkdir -p  ${SWIFT_DATA_DIR}/node/sdb1
+    sudo chown -R $USER:${USER_GROUP} ${SWIFT_DATA_DIR}/node
 
-    # Create a loopback disk and format it to XFS.
-    if [[ -e ${SWIFT_DATA_DIR}/drives/images/swift.img ]]; then
-        if egrep -q ${SWIFT_DATA_DIR}/drives/sdb1 /proc/mounts; then
-            sudo umount ${SWIFT_DATA_DIR}/drives/sdb1
-        fi
-    else
-        mkdir -p  ${SWIFT_DATA_DIR}/drives/images
-        sudo touch  ${SWIFT_DATA_DIR}/drives/images/swift.img
-        sudo chown $USER: ${SWIFT_DATA_DIR}/drives/images/swift.img
-
-        dd if=/dev/zero of=${SWIFT_DATA_DIR}/drives/images/swift.img \
-            bs=1024 count=0 seek=${SWIFT_LOOPBACK_DISK_SIZE}
-    fi
-
-    # Make a fresh XFS filesystem
-    mkfs.xfs -f -i size=1024  ${SWIFT_DATA_DIR}/drives/images/swift.img
-
-    # Mount the disk with mount options to make it as efficient as possible
-    mkdir -p ${SWIFT_DATA_DIR}/drives/sdb1
-    if ! egrep -q ${SWIFT_DATA_DIR}/drives/sdb1 /proc/mounts; then
-        sudo mount -t xfs -o loop,noatime,nodiratime,nobarrier,logbufs=8  \
-            ${SWIFT_DATA_DIR}/drives/images/swift.img ${SWIFT_DATA_DIR}/drives/sdb1
-    fi
-
-    # Create a link to the above mount
-    for x in $(seq ${SWIFT_REPLICAS}); do
-        sudo ln -sf ${SWIFT_DATA_DIR}/drives/sdb1/$x ${SWIFT_DATA_DIR}/$x; done
-
-    # Create all of the directories needed to emulate a few different servers
-    for x in $(seq ${SWIFT_REPLICAS}); do
-            drive=${SWIFT_DATA_DIR}/drives/sdb1/${x}
-            node=${SWIFT_DATA_DIR}/${x}/node
-            node_device=${node}/sdb1
-            [[ -d $node ]] && continue
-            [[ -d $drive ]] && continue
-            sudo install -o ${USER} -g $USER_GROUP -d $drive
-            sudo install -o ${USER} -g $USER_GROUP -d $node_device
-            sudo chown -R $USER: ${node}
-    done
-
-   sudo mkdir -p ${SWIFT_CONFIG_DIR}/{object,container,account}-server /var/run/swift
-   sudo chown -R $USER: ${SWIFT_CONFIG_DIR} /var/run/swift
-
-    if [[ "$SWIFT_CONFIG_DIR" != "/etc/swift" ]]; then
-        # Some swift tools are hard-coded to use ``/etc/swift`` and are apparently not going to be fixed.
-        # Create a symlink if the config dir is moved
-        sudo ln -sf ${SWIFT_CONFIG_DIR} /etc/swift
-    fi
+    sudo mkdir -p ${SWIFT_CONFIG_DIR} /var/run/swift
+    sudo chown -R $USER: ${SWIFT_CONFIG_DIR} /var/run/swift
 
     # Swift use rsync to synchronize between all the different
     # partitions (which make more sense when you have a multi-node
@@ -1531,11 +1028,7 @@ if is_service_enabled swift; then
         s/%USER%/$USER/;
         s,%SWIFT_DATA_DIR%,$SWIFT_DATA_DIR,;
     " $FILES/swift/rsyncd.conf | sudo tee /etc/rsyncd.conf
-    if [[ "$os_PACKAGE" = "deb" ]]; then
-        sudo sed -i '/^RSYNC_ENABLE=false/ { s/false/true/ }' /etc/default/rsync
-    else
-        sudo sed -i '/disable *= *yes/ { s/yes/no/ }' /etc/xinetd.d/rsync
-    fi
+    sudo sed -i '/^RSYNC_ENABLE=false/ { s/false/true/ }' /etc/default/rsync
 
     if is_service_enabled swift3;then
         swift_auth_server="s3token "
@@ -1590,7 +1083,7 @@ if is_service_enabled swift; then
     iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles "Member, admin"
 
     if is_service_enabled swift3;then
-        cat <<EOF>>${SWIFT_CONFIG_PROXY_SERVER}
+        cat <<EOF >>${SWIFT_CONFIG_PROXY_SERVER}
 # NOTE(chmou): s3token middleware is not updated yet to use only
 # username and password.
 [filter:s3token]
@@ -1615,40 +1108,35 @@ EOF
         local server_type=$1
         local bind_port=$2
         local log_facility=$3
-        local node_number
         local swift_node_config
 
-        for node_number in $(seq ${SWIFT_REPLICAS}); do
-            node_path=${SWIFT_DATA_DIR}/${node_number}
-            swift_node_config=${SWIFT_CONFIG_DIR}/${server_type}-server/${node_number}.conf
+        node_path=${SWIFT_DATA_DIR}/node
+        swift_node_config=${SWIFT_CONFIG_DIR}/${server_type}-server.conf
 
-            cp ${SWIFT_DIR}/etc/${server_type}-server.conf-sample ${swift_node_config}
+        cp ${SWIFT_DIR}/etc/${server_type}-server.conf-sample ${swift_node_config}
 
-            iniuncomment ${swift_node_config} DEFAULT user
-            iniset ${swift_node_config} DEFAULT user ${USER}
+        iniuncomment ${swift_node_config} DEFAULT user
+        iniset ${swift_node_config} DEFAULT user ${USER}
 
-            iniuncomment ${swift_node_config} DEFAULT bind_port
-            iniset ${swift_node_config} DEFAULT bind_port ${bind_port}
+        iniuncomment ${swift_node_config} DEFAULT bind_port
+        iniset ${swift_node_config} DEFAULT bind_port ${bind_port}
 
-            iniuncomment ${swift_node_config} DEFAULT swift_dir
-            iniset ${swift_node_config} DEFAULT swift_dir ${SWIFT_CONFIG_DIR}
+        iniuncomment ${swift_node_config} DEFAULT swift_dir
+        iniset ${swift_node_config} DEFAULT swift_dir ${SWIFT_CONFIG_DIR}
 
-            iniuncomment ${swift_node_config} DEFAULT devices
-            iniset ${swift_node_config} DEFAULT devices ${node_path}
+        iniuncomment ${swift_node_config} DEFAULT devices
+        iniset ${swift_node_config} DEFAULT devices ${node_path}
 
-            iniuncomment ${swift_node_config} DEFAULT log_facility
-            iniset ${swift_node_config} DEFAULT log_facility LOG_LOCAL${log_facility}
+        iniuncomment ${swift_node_config} DEFAULT log_facility
+        iniset ${swift_node_config} DEFAULT log_facility LOG_LOCAL${log_facility}
 
-            iniuncomment ${swift_node_config} DEFAULT mount_check
-            iniset ${swift_node_config} DEFAULT mount_check false
+        iniuncomment ${swift_node_config} DEFAULT mount_check
+        iniset ${swift_node_config} DEFAULT mount_check false
 
-            iniuncomment ${swift_node_config} ${server_type}-replicator vm_test_mode
-            iniset ${swift_node_config} ${server_type}-replicator vm_test_mode yes
-
-            bind_port=$(( ${bind_port} + 10 ))
-            log_facility=$(( ${log_facility} + 1 ))
-        done
+        iniuncomment ${swift_node_config} ${server_type}-replicator vm_test_mode
+        iniset ${swift_node_config} ${server_type}-replicator vm_test_mode yes
     }
+
     generate_swift_configuration object 6010 2
     generate_swift_configuration container 6011 2
     generate_swift_configuration account 6012 2
@@ -1671,27 +1159,18 @@ EOF
 
         port_number=6010
         swift-ring-builder object.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        for x in $(seq ${SWIFT_REPLICAS}); do
-            swift-ring-builder object.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
-            port_number=$[port_number + 10]
-        done
-        swift-ring-builder object.builder rebalance
+        #swift-ring-builder object.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
+        #swift-ring-builder object.builder rebalance
 
         port_number=6011
         swift-ring-builder container.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        for x in $(seq ${SWIFT_REPLICAS}); do
-            swift-ring-builder container.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
-            port_number=$[port_number + 10]
-        done
-        swift-ring-builder container.builder rebalance
+        #swift-ring-builder container.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
+        #swift-ring-builder container.builder rebalance
 
         port_number=6012
         swift-ring-builder account.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        for x in $(seq ${SWIFT_REPLICAS}); do
-            swift-ring-builder account.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
-            port_number=$[port_number + 10]
-        done
-        swift-ring-builder account.builder rebalance
+        #swift-ring-builder account.builder add z${x}-127.0.0.1:${port_number}/sdb1 1
+        #swift-ring-builder account.builder rebalance
 
     } && popd >/dev/null
 
@@ -1800,14 +1279,6 @@ if [ "$VIRT_DRIVER" = 'xenserver' ]; then
     # Need to avoid crash due to new firewall support
     XEN_FIREWALL_DRIVER=${XEN_FIREWALL_DRIVER:-"nova.virt.firewall.IptablesFirewallDriver"}
     add_nova_opt "firewall_driver=$XEN_FIREWALL_DRIVER"
-elif [ "$VIRT_DRIVER" = 'openvz' ]; then
-    echo_summary "Using OpenVZ virtualization driver"
-    # TODO(deva): OpenVZ driver does not yet work if compute_driver is set here.
-    #             Replace connection_type when this is fixed.
-    #             add_nova_opt "compute_driver=openvz.connection.OpenVzConnection"
-    add_nova_opt "connection_type=openvz"
-    LIBVIRT_FIREWALL_DRIVER=${LIBVIRT_FIREWALL_DRIVER:-"nova.virt.libvirt.firewall.IptablesFirewallDriver"}
-    add_nova_opt "firewall_driver=$LIBVIRT_FIREWALL_DRIVER"
 else
     echo_summary "Using libvirt virtualization driver"
     add_nova_opt "compute_driver=libvirt.LibvirtDriver"
@@ -1861,48 +1332,7 @@ if is_service_enabled n-api; then
     fi
 fi
 
-if is_service_enabled q-svc; then
-    echo_summary "Starting Quantum"
-    # Start the Quantum service
-    screen_it q-svc "cd $QUANTUM_DIR && python $QUANTUM_DIR/bin/quantum-server --config-file $Q_CONF_FILE --config-file /$Q_PLUGIN_CONF_FILE"
-    echo "Waiting for Quantum to start..."
-    if ! timeout $SERVICE_TIMEOUT sh -c "while ! http_proxy= wget -q -O- http://127.0.0.1:9696; do sleep 1; done"; then
-      echo "Quantum did not start"
-      exit 1
-    fi
-
-    # Configure Quantum elements
-    # Configure internal network & subnet
-
-    TENANT_ID=$(keystone tenant-list | grep " demo " | get_field 1)
-
-    # Create a small network
-    # Since quantum command is executed in admin context at this point,
-    # ``--tenant_id`` needs to be specified.
-    NET_ID=$(quantum net-create --tenant_id $TENANT_ID net1 | grep ' id ' | get_field 2)
-    SUBNET_ID=$(quantum subnet-create --tenant_id $TENANT_ID --ip_version 4 --gateway $NETWORK_GATEWAY $NET_ID $FIXED_RANGE | grep ' id ' | get_field 2)
-    if is_service_enabled q-l3; then
-        # Create a router, and add the private subnet as one of its interfaces
-        ROUTER_ID=$(quantum router-create --tenant_id $TENANT_ID router1 | grep ' id ' | get_field 2)
-        quantum router-interface-add $ROUTER_ID $SUBNET_ID
-        # Create an external network, and a subnet. Configure the external network as router gw
-        EXT_NET_ID=$(quantum net-create ext_net -- --router:external=True | grep ' id ' | get_field 2)
-        EXT_GW_IP=$(quantum subnet-create --ip_version 4 $EXT_NET_ID $FLOATING_RANGE -- --enable_dhcp=False | grep 'gateway_ip' | get_field 2)
-        quantum router-gateway-set $ROUTER_ID $EXT_NET_ID
-        if [[ "$Q_PLUGIN" = "openvswitch" ]] && [[ "$Q_USE_NAMESPACE" = "True" ]]; then
-            CIDR_LEN=${FLOATING_RANGE#*/}
-            sudo ip addr add $EXT_GW_IP/$CIDR_LEN dev $PUBLIC_BRIDGE
-            sudo ip link set $PUBLIC_BRIDGE up
-            ROUTER_GW_IP=`quantum port-list -c fixed_ips -c device_owner | grep router_gateway | awk -F '"' '{ print $8; }'`
-            sudo route add -net $FIXED_RANGE gw $ROUTER_GW_IP
-        fi
-        if [[ "$Q_USE_NAMESPACE" == "False" ]]; then
-            # Explicitly set router id in l3 agent configuration
-            iniset $Q_L3_CONF_FILE DEFAULT router_id $ROUTER_ID
-        fi
-   fi
-
-elif is_service_enabled mysql && is_service_enabled nova; then
+if is_service_enabled mysql && is_service_enabled nova; then
     # Create a small network
     $NOVA_BIN_DIR/nova-manage network create private $FIXED_RANGE 1 $FIXED_NETWORK_SIZE $NETWORK_CREATE_ARGS
 
@@ -1912,11 +1342,6 @@ elif is_service_enabled mysql && is_service_enabled nova; then
     # Create a second pool
     $NOVA_BIN_DIR/nova-manage floating create --ip_range=$TEST_FLOATING_RANGE --pool=$TEST_FLOATING_POOL
 fi
-
-# Start up the quantum agents if enabled
-screen_it q-agt "python $AGENT_BINARY --config-file $Q_CONF_FILE --config-file /$Q_PLUGIN_CONF_FILE"
-screen_it q-dhcp "python $AGENT_DHCP_BINARY --config-file $Q_CONF_FILE --config-file=$Q_DHCP_CONF_FILE"
-screen_it q-l3 "python $AGENT_L3_BINARY --config-file $Q_CONF_FILE --config-file=$Q_L3_CONF_FILE"
 
 if is_service_enabled nova; then
     echo_summary "Starting Nova"
@@ -1976,16 +1401,6 @@ if is_service_enabled g-reg; then
     for image_url in ${IMAGE_URLS//,/ }; do
         upload_image $image_url $TOKEN
     done
-fi
-
-
-# Run local script
-# ================
-
-# Run ``local.sh`` if it exists to perform user-managed tasks
-if [[ -x $TOP_DIR/local.sh ]]; then
-    echo "Running user script $TOP_DIR/local.sh"
-    $TOP_DIR/local.sh
 fi
 
 

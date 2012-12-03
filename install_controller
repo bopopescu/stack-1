@@ -27,7 +27,7 @@ done
 #install captcha
 cd $TOP_DIR
 cd django-simple-captcha-0.3.0
-sudo python setup.py install
+sudo python setup.py install 1>/dev/null 2>&1
 
 #determine IP infor
 cd $TOP_DIR
@@ -56,7 +56,7 @@ FIXED_RANGE=10.0.0.0/20
 FLOATING_RANGE=192.168.136.1/24
 cd $TOP_DIR
 cd devstack
-sudo killall screen
+sudo killall screen 1>/dev/null 2>&1
 cat <<EOF >localrc
 FLAT_INTERFACE=eth0
 FIXED_RANGE=$FIXED_RANGE
@@ -68,7 +68,8 @@ RABBIT_PASSWORD=$PASSWORD
 SERVICE_PASSWORD=$PASSWORD
 ADMIN_PASSWORD=$PASSWORD
 SERVICE_TOKEN=$PASSWORD
-ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit
+SWIFT_HASH=$PASSWORD
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit,swift
 VOLUME_BACKING_FILE_SIZE=$back_file_size
 IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz
 EOF
