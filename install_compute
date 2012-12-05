@@ -25,23 +25,6 @@ done
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 rm -f $TOP_DIR/devstack/stack-screenrc
 
-#determine IP infor
-cd $TOP_DIR
-. devstack/functions
-HOST_IP_IFACE=${HOST_IP_IFACE:-$(ip route | sed -n '/^default/{ s/.*dev \(\w\+\)\s\+.*/\1/; p; }')}
-HOST_IP=""
-HOST_IPS=`LC_ALL=C ip -f inet addr show ${HOST_IP_IFACE} | awk '/inet/ {split($2,parts,"/");  print parts[1]}'`
-for IP in $HOST_IPS; do
-        if ! (address_in_net $IP $FIXED_RANGE || address_in_net $IP $FLOATING_RANGE); then
-            HOST_IP=$IP
-            break;
-        fi
-    done
-    if [ "$HOST_IP" == "" ]; then
-        echo "Could not determine host ip address."
-        exit 1
-fi
-
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')
