@@ -148,7 +148,7 @@ class VolumeDriver(object):
         # zero out old volumes to prevent data leaking between users
         # TODO(ja): reclaiming space should be done lazy and low priority
         #self._copy_volume('/dev/zero', self.local_path(volume), size_in_g)
-        self._copy_volume('/dev/zero', self.local_path(volume), 2)
+        self._copy_volume('/dev/zero', self.local_path(volume), 1)
         dev_path = self.local_path(volume)
         if os.path.exists(dev_path):
             self._try_execute('dmsetup', 'remove', '-f', dev_path,
