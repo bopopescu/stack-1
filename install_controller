@@ -69,8 +69,8 @@ SERVICE_PASSWORD=$PASSWORD
 ADMIN_PASSWORD=$PASSWORD
 SERVICE_TOKEN=$PASSWORD
 SWIFT_HASH=$PASSWORD
-ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit,swift
-VOLUME_BACKING_FILE_SIZE=$back_file_size
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit
+VOLUME_BACKING_FILE_SIZE=${back_file_size}
 IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz,http://uec-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64.tar.gz,http://uec-images.ubuntu.com/oneiric/current/oneiric-server-cloudimg-amd64.tar.gz
 EOF
 ./stack.sh
