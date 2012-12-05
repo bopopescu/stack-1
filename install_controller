@@ -86,7 +86,7 @@ port: 5551
 [mysql_db]
 host:127.0.0.1
 user:root
-passwd:$PASSWORD
+passwd:csdb123cnic
 db:monitor
 cache_server:localhost
 cache_time_buffer:144000
