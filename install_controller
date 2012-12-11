@@ -23,7 +23,6 @@ case $OPT in
 esac
 done
 
-
 #install captcha
 cd $TOP_DIR
 cd django-simple-captcha-0.3.0
@@ -56,7 +55,7 @@ ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-ap
 VOLUME_BACKING_FILE_SIZE=${back_file_size}G
 IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz,http://uec-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64.tar.gz,http://uec-images.ubuntu.com/oneiric/current/oneiric-server-cloudimg-amd64.tar.gz
 EOF
-./stack.sh
+./stack.sh controller
 
 #install monitor related package and start services
 cd $TOP_DIR

@@ -55,7 +55,7 @@ RABBIT_HOST=$CTRL_ADDRESS
 GLANCE_HOSTPORT=${CTRL_ADDRESS}:9292
 ENABLED_SERVICES=n-cpu,n-net,n-api,n-novnc,cinder,c-vol
 EOF
-./stack.sh
+./stack.sh compute
 
 #install monitor related package and start services
 cd $TOP_DIR

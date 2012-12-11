@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-
+CALLER=$1
 killall screen 1>/dev/null 2>&1
 # Keep track of the devstack directory
 TOP_DIR=$(cd $(dirname "$0") && pwd)
@@ -159,7 +159,7 @@ if [[ $EUID -eq 0 ]]; then
     STACK_DIR="$DEST/${PWD##*/}"
     cp -r -f -T "$PWD" "$STACK_DIR"
     chown -R stack "$STACK_DIR"
-    exec su -c "set -e; cd $STACK_DIR; bash stack.sh" stack
+    exec su -c "set -e; cd $STACK_DIR; bash stack.sh $CALLER" stack
     exit 1
 else
     # We're not **root**, make sure ``sudo`` is available
@@ -969,7 +969,6 @@ if is_service_enabled n-net q-dhcp; then
     sudo sysctl -w net.ipv4.ip_forward=1
 fi
 
-
 # Storage Service
 # ---------------
 if is_service_enabled swift; then
@@ -1008,44 +1007,46 @@ if is_service_enabled swift; then
         swift_auth_server=tempauth
     fi
 
-    SWIFT_CONFIG_PROXY_SERVER=${SWIFT_CONFIG_DIR}/proxy-server.conf
-    cp ${SWIFT_DIR}/etc/proxy-server.conf-sample ${SWIFT_CONFIG_PROXY_SERVER}
+    if [ "$CALLER"x = "controller"x];then
+        SWIFT_CONFIG_PROXY_SERVER=${SWIFT_CONFIG_DIR}/proxy-server.conf
+        cp ${SWIFT_DIR}/etc/proxy-server.conf-sample ${SWIFT_CONFIG_PROXY_SERVER}
 
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT user
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT user ${USER}
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT user
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT user ${USER}
 
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT swift_dir
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT swift_dir ${SWIFT_CONFIG_DIR}
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT swift_dir
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT swift_dir ${SWIFT_CONFIG_DIR}
 
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers 1
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers 1
 
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level DEBUG
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level DEBUG
 
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT bind_port
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT bind_port ${SWIFT_DEFAULT_BIND_PORT:-8080}
-
-    # Only enable Swift3 if we have it enabled in ENABLED_SERVICES
-    is_service_enabled swift3 && swift3=swift3 || swift3=""
-
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} pipeline:main pipeline "catch_errors healthcheck cache ratelimit ${swift3} ${swift_auth_server} proxy-logging proxy-server"
-
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} app:proxy-server account_autocreate true
-
-    # Configure Keystone
-    sed -i '/^# \[filter:authtoken\]/,/^# \[filter:keystoneauth\]$/ s/^#[ \t]*//' ${SWIFT_CONFIG_PROXY_SERVER}
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_host $KEYSTONE_AUTH_HOST
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_port $KEYSTONE_AUTH_PORT
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_protocol $KEYSTONE_AUTH_PROTOCOL
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_uri $KEYSTONE_SERVICE_PROTOCOL://$KEYSTONE_SERVICE_HOST:$KEYSTONE_SERVICE_PORT/
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken admin_tenant_name $SERVICE_TENANT_NAME
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken admin_user swift
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken admin_password $SERVICE_PASSWORD
-
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth use
-    iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles
-    iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles "Member, admin"
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT bind_port
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT bind_port ${SWIFT_DEFAULT_BIND_PORT:-8080}
+    
+        # Only enable Swift3 if we have it enabled in ENABLED_SERVICES
+        is_service_enabled swift3 && swift3=swift3 || swift3=""
+    
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} pipeline:main pipeline "catch_errors healthcheck cache ratelimit ${swift3} ${swift_auth_server} proxy-logging proxy-server"
+    
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} app:proxy-server account_autocreate true
+    
+        # Configure Keystone
+        sed -i '/^# \[filter:authtoken\]/,/^# \[filter:keystoneauth\]$/ s/^#[ \t]*//' ${SWIFT_CONFIG_PROXY_SERVER}
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_host $KEYSTONE_AUTH_HOST
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_port $KEYSTONE_AUTH_PORT
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_protocol $KEYSTONE_AUTH_PROTOCOL
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken auth_uri $KEYSTONE_SERVICE_PROTOCOL://$KEYSTONE_SERVICE_HOST:$KEYSTONE_SERVICE_PORT/
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken admin_tenant_name $SERVICE_TENANT_NAME
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken admin_user swift
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:authtoken admin_password $SERVICE_PASSWORD
+    
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth use
+        iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles "Member, admin"
+    fi
 
     if is_service_enabled swift3;then
         cat <<EOF >>${SWIFT_CONFIG_PROXY_SERVER}
@@ -1281,7 +1282,9 @@ if is_service_enabled ceilometer; then
     start_ceilometer
 fi
 screen_it horizon "cd $HORIZON_DIR && sudo tail -f /var/log/$APACHE_NAME/horizon_error.log"
-screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
+if [ "$CALLER"x = "controller"x ];then
+    screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
+fi
 
 # Starting the nova-objectstore only if swift3 service is not enabled.
 # Swift will act as s3 objectstore.

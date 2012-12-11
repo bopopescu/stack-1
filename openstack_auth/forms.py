@@ -1,29 +1,23 @@
+import sys
+import os
 from django import forms
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext as _
 from django.views.decorators.debug import sensitive_variables
-from captcha.fields import CaptchaField
 
 from .exceptions import KeystoneAuthException
-
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '../django_simple_captcha-0.3.0-py2.7.egg'))
+from captcha.fields import CaptchaField
 
 class Login(AuthenticationForm):
-    """ Form used for logging in a user.
-
-    Handles authentication with Keystone, choosing a tenant, and fetching
-    a scoped token token for that tenant.
-
-    Inherits from the base ``django.contrib.auth.forms.AuthenticationForm``
-    class for added security features.
-    """
     region = forms.ChoiceField(label=_("Region"), required=False)
     username = forms.CharField(label=_("User Name"))
     password = forms.CharField(label=_("Password"),
                                widget=forms.PasswordInput(render_value=False))
     
-    #captcha = CaptchaField(label=_("Captcha"))
+    captcha = CaptchaField(label=_("Captcha"))
     
     tenant = forms.CharField(required=False, widget=forms.HiddenInput())
 
@@ -64,3 +58,4 @@ class Login(AuthenticationForm):
             raise forms.ValidationError(exc)
         self.check_for_test_cookie()
         return self.cleaned_data
+

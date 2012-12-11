@@ -182,6 +182,7 @@ tests/legacy_diablo.sqlite
 tests/legacy_essex.mysql
 tests/legacy_essex.sqlite
 tests/policy.json
+tests/test.db.pristine
 tests/test_auth_token_middleware.py
 tests/test_backend.py
 tests/test_backend_kvs.py
