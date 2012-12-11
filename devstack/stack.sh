@@ -55,23 +55,6 @@ DEST=${DEST:-/opt/stack}
 # calling disable_service().
 disable_negated_services
 
-# Warn users who aren't on an explicitly supported distro, but allow them to
-# override check and attempt installation with ``FORCE=yes ./stack``
-if [[ ! ${DISTRO} =~ (oneiric|precise|quantal|f16|f17) ]]; then
-    echo "WARNING: this script has not been tested on $DISTRO"
-    if [[ "$FORCE" != "yes" ]]; then
-        echo "If you wish to run this script anyway run with FORCE=yes"
-        exit 1
-    fi
-fi
-
-# Disallow qpid on oneiric
-if [ "${DISTRO}" = "oneiric" ] && is_service_enabled qpid ; then
-    # Qpid was introduced in precise
-    echo "You must use Ubuntu Precise or newer for Qpid support."
-    exit 1
-fi
-
 # ``stack.sh`` keeps function libraries here
 # Make sure ``$TOP_DIR/lib`` directory is present
 if [ ! -d $TOP_DIR/lib ]; then
@@ -96,23 +79,6 @@ if type -p screen >/dev/null && screen -ls | egrep -q "[0-9].$SCREEN_NAME"; then
     exit 1
 fi
 
-# Make sure we only have one rpc backend enabled.
-rpc_backend_cnt=0
-for svc in qpid zeromq rabbit; do
-    is_service_enabled $svc &&
-        ((rpc_backend_cnt++))
-done
-if [ "$rpc_backend_cnt" -gt 1 ]; then
-    echo "ERROR: only one rpc backend may be enabled,"
-    echo "       set only one of 'rabbit', 'qpid', 'zeromq'"
-    echo "       via ENABLED_SERVICES."
-elif [ "$rpc_backend_cnt" == 0 ]; then
-    echo "ERROR: at least one rpc backend must be enabled,"
-    echo "       set one of 'rabbit', 'qpid', 'zeromq'"
-    echo "       via ENABLED_SERVICES."
-fi
-unset rpc_backend_cnt
-
 # Make sure we only have one volume service enabled.
 if is_service_enabled cinder && is_service_enabled n-vol; then
     echo "ERROR: n-vol and cinder must not be enabled at the same time"
@@ -125,12 +91,6 @@ VERBOSE=$(trueorfalse True $VERBOSE)
 
 # root Access
 # -----------
-
-# OpenStack is designed to be run as a non-root user; Horizon will fail to run
-# as **root** since Apache will not serve content from **root** user).  If
-# ``stack.sh`` is run as **root**, it automatically creates a **stack** user with
-# sudo privileges and runs as that user.
-
 if [[ $EUID -eq 0 ]]; then
     ROOTSLEEP=${ROOTSLEEP:-5}
     echo "You are running this script as root."
@@ -1007,7 +967,7 @@ if is_service_enabled swift; then
         swift_auth_server=tempauth
     fi
 
-    if [ "$CALLER"x = "controller"x];then
+    if [ "$CALLER"x = "controller"x ];then
         SWIFT_CONFIG_PROXY_SERVER=${SWIFT_CONFIG_DIR}/proxy-server.conf
         cp ${SWIFT_DIR}/etc/proxy-server.conf-sample ${SWIFT_CONFIG_PROXY_SERVER}
 
