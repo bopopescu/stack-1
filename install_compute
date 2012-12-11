@@ -53,7 +53,7 @@ MULTI_HOST=1
 MYSQL_HOST=$CTRL_ADDRESS
 RABBIT_HOST=$CTRL_ADDRESS
 GLANCE_HOSTPORT=${CTRL_ADDRESS}:9292
-ENABLED_SERVICES=n-cpu,n-net,n-api,n-novnc,cinder,c-vol
+ENABLED_SERVICES=n-cpu,n-net,n-api,n-novnc,cinder,c-vol,swift
 EOF
 ./stack.sh compute
 

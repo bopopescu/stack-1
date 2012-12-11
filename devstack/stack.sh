@@ -935,6 +935,7 @@ if is_service_enabled swift; then
     swift-init all stop || true
 
     USER_GROUP=$(id -g)
+    sudo rm -r -f ${SWIFT_DATA_DIR}
     sudo mkdir -p ${SWIFT_DATA_DIR}
     sudo chown -R $USER:${USER_GROUP} ${SWIFT_DATA_DIR}
     mkdir -p  ${SWIFT_DATA_DIR}/node
