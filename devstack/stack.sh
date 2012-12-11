@@ -1081,8 +1081,8 @@ EOF
     # This is where we create three different rings for swift with
     # different object servers binding on different ports.
     #SWIFT_REPLICAS=${SWIFT_REPLICAS:-1}
-    #pushd ${SWIFT_CONFIG_DIR} >/dev/null && {
-    #    rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
+    pushd ${SWIFT_CONFIG_DIR} >/dev/null && {
+        rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
 
     #    port_number=6010
     #    swift-ring-builder object.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
@@ -1099,18 +1099,10 @@ EOF
     #    swift-ring-builder account.builder add z1-127.0.0.1:${port_number}/sdb1 1
     #    swift-ring-builder account.builder rebalance
 
-    #} && popd >/dev/null
+    } && popd >/dev/null
 
    # Start rsync
    sudo /etc/init.d/rsync restart || :
-
-   # First spawn all the swift services then kill the
-   # proxy service so we can run it in foreground in screen.
-   # ``swift-init ... {stop|restart}`` exits with '1' if no servers are running,
-   # ignore it just in case
-   #swift-init all restart || true
-   #swift-init proxy stop || true
-
    unset s swift_hash swift_auth_server
 fi
 

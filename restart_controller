@@ -6,15 +6,23 @@ if [[ $UID -ne 0 ]]; then
         exit 1
 fi
 
+ROLE_LINE=$(grep MY_ROLE devstack/localrc)
+ROLE=${ROLE_LINE##MY_ROLE=}
+if [ "$ROLE"x != "controller"x ];then
+	echo "you are restarting a \"$ROLE\" with \"restart_controller\" script"
+	echo "please recheck!!!"
+	exit 1
+fi
+
 cd kanyun/
 echo "ending monitoring services"
-sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9
+ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9
 echo "starting monitoring services"
 su -c " nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
 su -c " nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
 
 echo "restarting openstack services"
-sudo killall screen
+killall screen
 cd $TOP_DIR
 cd devstack
 if [ -f stack-screenrc ];then
@@ -26,4 +34,10 @@ else
 fi
 echo "Done"
 
-sudo service apache2 restart
+#restart swift related services
+swift-init all stop 1>/dev/null 2>&1
+su -c "swift-init all start&" stack
+
+/etc/init.d/rabbitmq-server restart
+
+service apache2 restart
