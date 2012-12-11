@@ -950,6 +950,7 @@ if is_service_enabled swift; then
     sed -e "
         s/%GROUP%/${USER_GROUP}/;
         s/%USER%/$USER/;
+        s/%IP%/$HOST_IP/;
         s,%SWIFT_DATA_DIR%,$SWIFT_DATA_DIR,;
     " $FILES/swift/rsyncd.conf | sudo tee /etc/rsyncd.conf
     sudo sed -i '/^RSYNC_ENABLE=false/ { s/false/true/ }' /etc/default/rsync
@@ -1078,26 +1079,26 @@ EOF
 
     # This is where we create three different rings for swift with
     # different object servers binding on different ports.
-    SWIFT_REPLICAS=${SWIFT_REPLICAS:-1}
-    pushd ${SWIFT_CONFIG_DIR} >/dev/null && {
-        rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
+    #SWIFT_REPLICAS=${SWIFT_REPLICAS:-1}
+    #pushd ${SWIFT_CONFIG_DIR} >/dev/null && {
+    #    rm -f *.builder *.ring.gz backups/*.builder backups/*.ring.gz
 
-        port_number=6010
-        swift-ring-builder object.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        swift-ring-builder object.builder add z1-127.0.0.1:${port_number}/sdb1 1
-        swift-ring-builder object.builder rebalance
+    #    port_number=6010
+    #    swift-ring-builder object.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
+    #    swift-ring-builder object.builder add z1-127.0.0.1:${port_number}/sdb1 1
+    #    swift-ring-builder object.builder rebalance
 
-        port_number=6011
-        swift-ring-builder container.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        swift-ring-builder container.builder add z1-127.0.0.1:${port_number}/sdb1 1
-        swift-ring-builder container.builder rebalance
+    #    port_number=6011
+    #    swift-ring-builder container.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
+    #    swift-ring-builder container.builder add z1-127.0.0.1:${port_number}/sdb1 1
+    #    swift-ring-builder container.builder rebalance
 
-        port_number=6012
-        swift-ring-builder account.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        swift-ring-builder account.builder add z1-127.0.0.1:${port_number}/sdb1 1
-        swift-ring-builder account.builder rebalance
+    #    port_number=6012
+    #    swift-ring-builder account.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
+    #    swift-ring-builder account.builder add z1-127.0.0.1:${port_number}/sdb1 1
+    #    swift-ring-builder account.builder rebalance
 
-    } && popd >/dev/null
+    #} && popd >/dev/null
 
    # Start rsync
    sudo /etc/init.d/rsync restart || :
@@ -1106,8 +1107,8 @@ EOF
    # proxy service so we can run it in foreground in screen.
    # ``swift-init ... {stop|restart}`` exits with '1' if no servers are running,
    # ignore it just in case
-   swift-init all restart || true
-   swift-init proxy stop || true
+   #swift-init all restart || true
+   #swift-init proxy stop || true
 
    unset s swift_hash swift_auth_server
 fi
@@ -1242,9 +1243,9 @@ if is_service_enabled ceilometer; then
     start_ceilometer
 fi
 screen_it horizon "cd $HORIZON_DIR && sudo tail -f /var/log/$APACHE_NAME/horizon_error.log"
-if [ "$CALLER"x = "controller"x ];then
-    screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
-fi
+#if [ "$CALLER"x = "controller"x ];then
+#    screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
+#fi
 
 # Starting the nova-objectstore only if swift3 service is not enabled.
 # Swift will act as s3 objectstore.

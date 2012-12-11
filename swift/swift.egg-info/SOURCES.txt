@@ -1,8 +1,4 @@
-.coveragerc
 .functests
-.gitignore
-.gitreview
-.mailmap
 .probetests
 .unittests
 AUTHORS

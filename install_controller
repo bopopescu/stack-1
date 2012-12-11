@@ -88,3 +88,10 @@ sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server
 su -c "nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
 su -c "nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
 
+#upload image
+cd $TOP_DIR
+IMAGE_NAME='windows2008.img'
+TOKEN=$(keystone --os_tenant_name admin --os_username admin --os_password $PASSWORD --os_auth_url http://127.0.0.1:5000/v2.0 token-get | grep ' id ' |awk '{print $4}')
+echo "uploading image:"$IMAGE_NAME
+glance --os-auth-token $TOKEN --os-image-url http://127.0.0.1:9292 image-create --name "$IMAGE_NAME" --public --container-format=bare --disk-format qcow2 < devstack/files/windows2008.img
+echo "upload finished"
