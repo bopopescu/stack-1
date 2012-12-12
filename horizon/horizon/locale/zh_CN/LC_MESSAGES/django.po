@@ -1417,7 +1417,7 @@ msgstr "创建云阵列"
 #: dashboards/nova/images_and_snapshots/volume_snapshots/tables.py:79
 #: dashboards/nova/volumes/forms.py:26
 msgid "Volume Name"
-msgstr "Volume名称"
+msgstr "云列阵名称"
 
 #: dashboards/nova/images_and_snapshots/volume_snapshots/tabs.py:40
 msgid "Unable to retrieve snapshot details."
@@ -1569,7 +1569,7 @@ msgstr "VNC"
 #: dashboards/nova/instances/tabs.py:69 dashboards/nova/instances/views.py:125
 #, python-format
 msgid "Unable to get VNC console for instance \"%s\"."
-msgstr "无法获取实例的VNC控制界面"
+msgstr "无法获取实例 \"%s\" 的VNC控制界面"
 
 #: dashboards/nova/instances/tabs.py:74 dashboards/nova/monitor/panel.py:28
 msgid "Monitor"
@@ -1863,7 +1863,7 @@ msgstr "确认调整结果"
 #: dashboards/nova/instances/workflows.py:650
 #, python-format
 msgid "Resizing instance \"%(instance_id)s\" is confirmed."
-msgstr "调整实例已确认"
+msgstr "调整实例 \"%(instance_id)s\" 已确认"
 
 #: dashboards/nova/instances/templates/instances/_confirm_resize_help.html:3
 msgid "Choose resized instance "
@@ -2087,7 +2087,7 @@ msgstr "网络"
 #: dashboards/syspanel/networks/tables.py:41
 #, python-format
 msgid "Failed to delete network %s"
-msgstr "无法删除网络"
+msgstr "无法删除网络 %s "
 
 #: dashboards/nova/networks/tables.py:66
 #: dashboards/nova/networks/workflows.py:110
