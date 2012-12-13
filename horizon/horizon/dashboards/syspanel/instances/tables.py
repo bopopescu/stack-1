@@ -25,7 +25,7 @@ from horizon import tables
 from horizon.dashboards.nova.instances.tables import (TerminateInstance,
         EditInstance, ConsoleLink, LogLink, CreateSnapshot,
         TogglePause, ToggleSuspend, RebootInstance, get_size, UpdateRow,
-        get_ips, get_power_state, get_usage)
+        get_ips, get_power_state, get_usage, get_iname)
 from horizon.utils.filters import replace_underscores
 
 LOG = logging.getLogger(__name__)
@@ -73,6 +73,8 @@ class SyspanelInstancesTable(tables.DataTable):
                          verbose_name=_("Size"),
                          classes=('nowrap-col',),
                          attrs={'data-type': 'size'})
+    iname = tables.Column(get_iname,
+                          verbose_name=_("Image Name"))
     status = tables.Column("status",
                            filters=(title, replace_underscores),
                            verbose_name=_("Status"),

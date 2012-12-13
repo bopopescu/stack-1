@@ -345,8 +345,8 @@ class InstancesTable(tables.DataTable):
     size = tables.Column(get_size,
                          verbose_name=_("Size"),
                          attrs={'data-type': 'size'})
-    #iname = tables.Column(get_iname,
-    #                      verbose_name=_("Image Name"))
+    iname = tables.Column(get_iname,
+                          verbose_name=_("Image Name"))
     keypair = tables.Column(get_keyname, verbose_name=_("Keypair"))
     status = tables.Column("status",
                            filters=(title, replace_underscores),

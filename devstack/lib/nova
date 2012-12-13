@@ -288,7 +288,7 @@ function init_nova() {
     add_nova_opt "api_paste_config=$NOVA_API_PASTE_INI"
     add_nova_opt "rootwrap_config=$NOVA_CONF_DIR/rootwrap.conf"
     add_nova_opt "compute_scheduler_driver=$SCHEDULER"
-    add_nova_opt "compute_fill_first_cost_fn_weight=1.0"
+#    add_nova_opt "compute_fill_first_cost_fn_weight=1.0"
     add_nova_opt "dhcpbridge_flagfile=$NOVA_CONF"
     add_nova_opt "force_dhcp_release=True"
     add_nova_opt "fixed_range=$FIXED_RANGE"
