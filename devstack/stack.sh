@@ -145,9 +145,7 @@ fi
 
 # Create the destination directory and ensure it is writable by the user
 sudo mkdir -p $DEST
-if [ ! -w $DEST ]; then
-    sudo chown `whoami` $DEST
-fi
+sudo chown -R  `whoami` $DEST
 
 # Set ``OFFLINE`` to ``True`` to configure ``stack.sh`` to run cleanly without
 # Internet access. ``stack.sh`` must have been previously run with Internet
