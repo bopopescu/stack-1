@@ -932,6 +932,7 @@ if is_service_enabled swift; then
     mkdir -p  ${SWIFT_DATA_DIR}/node/sdb1
     sudo chown -R $USER:${USER_GROUP} ${SWIFT_DATA_DIR}/node
 
+    sudo rm -r -f ${SWIFT_CONFIG_DIR} /var/run/swift
     sudo mkdir -p ${SWIFT_CONFIG_DIR} /var/run/swift
     sudo chown -R $USER: ${SWIFT_CONFIG_DIR} /var/run/swift
 
