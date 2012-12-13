@@ -92,10 +92,6 @@ VERBOSE=$(trueorfalse True $VERBOSE)
 # root Access
 # -----------
 if [[ $EUID -eq 0 ]]; then
-    ROOTSLEEP=${ROOTSLEEP:-5}
-    echo "In $ROOTSLEEP seconds, we will create a user 'stack' and run as that user"
-    sleep $ROOTSLEEP
-
     # Give the non-root user the ability to run as **root** via ``sudo``
     is_package_installed sudo || install_package sudo
     if ! getent group stack >/dev/null; then
@@ -107,13 +103,13 @@ if [[ $EUID -eq 0 ]]; then
         useradd -g stack -s /bin/bash -d $DEST -m stack
     fi
 
-    echo "Giving stack user passwordless sudo privileges"
     # UEC images ``/etc/sudoers`` does not have a ``#includedir``, add one
     grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
         echo "#includedir /etc/sudoers.d" >> /etc/sudoers
     ( umask 226 && echo "stack ALL=(ALL) NOPASSWD:ALL" \
         > /etc/sudoers.d/50_stack_sh )
 
+    STACK_DIR="$DEST/${PWD##*/}"
     chown -R stack "$STACK_DIR"
     exec su -c "set -e; cd $STACK_DIR; bash stack.sh $CALLER" stack
     exit 1
