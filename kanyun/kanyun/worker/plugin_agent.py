@@ -68,7 +68,7 @@ class LibvirtMonitor(object):
         """
     def __get_pid_of_instances(self):
         from os import popen;
-        cmd='''ps ax|fgrep '/usr/bin/kvm'|fgrep -v 'fgrep'|awk '{
+        cmd='''ps ax|egrep  '(/usr/bin/kvm|/usr/bin/qemu)'|grep -v 'egrep'|awk '{
     pid=$1;
     for(i=2;i<NF;i++){
         if($i=="-name" && match($(i+1),/instance-[a-z0-9]+/))
