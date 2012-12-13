@@ -80,7 +80,7 @@ SERVICE_TOKEN=$PASSWORD
 SWIFT_HASH=$PASSWORD
 ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,n-cpu,n-net,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit,swift
 VOLUME_BACKING_FILE_SIZE=${back_file_size}G
-IMAGE_URLS=http://stackops.s3.amazonaws.com/images/centos-6.2-x86_64.img.tar.gz,http://uec-images.ubuntu.com/precise/current/precise-server-cloudimg-amd64.tar.gz,http://uec-images.ubuntu.com/oneiric/current/oneiric-server-cloudimg-amd64.tar.gz
+IMAGE_URLS=http://159.226.50.227/share/centos-6.2-x86_64.img.tar.gz,http://159.226.50.227/share/precise-server-cloudimg-amd64.tar.gz,http://159.226.50.227/share/oneiric-server-cloudimg-amd64.tar.gz
 MY_ROLE=controller
 EOF
 ./stack.sh controller
@@ -117,9 +117,10 @@ su -c "nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
 su -c "nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
 
 #upload image
-#cd $TOP_DIR
-#IMAGE_NAME='windows2008.img'
-#TOKEN=$(keystone --os_tenant_name admin --os_username admin --os_password $PASSWORD --os_auth_url http://127.0.0.1:5000/v2.0 token-get | grep ' id ' |awk '{print $4}')
-#echo "uploading image:"$IMAGE_NAME
-#glance --os-auth-token $TOKEN --os-image-url http://127.0.0.1:9292 image-create --name "$IMAGE_NAME" --public --container-format=bare --disk-format qcow2 < devstack/files/windows2008.img
-#echo "upload finished"
+cd $TOP_DIR
+IMAGE_NAME='windows2008.img'
+TOKEN=$(keystone --os_tenant_name admin --os_username admin --os_password $PASSWORD --os_auth_url http://127.0.0.1:5000/v2.0 token-get | grep ' id ' |awk '{print $4}')
+wget -c http://159.226.50.227/share/windows2008.img -O devstack/files/windows2008.img
+echo "uploading image:"$IMAGE_NAME
+glance --os-auth-token $TOKEN --os-image-url http://127.0.0.1:9292 image-create --name "$IMAGE_NAME" --public --container-format=bare --disk-format qcow2 < devstack/files/windows2008.img
+echo "upload finished"
