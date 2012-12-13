@@ -20,56 +20,56 @@ msgstr ""
 
 #: static/horizon/js/horizon.forms.js:58
 msgid "Additional information here..."
-msgstr ""
+msgstr "附加信息……"
 
 #: static/horizon/js/horizon.forms.js:64
 #: static/horizon/js/horizon.projects.js:12
 msgid "Filter"
-msgstr ""
+msgstr "搜索"
 
 #: static/horizon/js/horizon.instances.js:28
 msgid "There was a problem communicating with the server, please try again."
-msgstr ""
+msgstr "于服务器断开连接，请重试"
 
 #: static/horizon/js/horizon.modals.js:125
 msgid "There was an error submitting the form. Please try again."
-msgstr ""
+msgstr "表单提交出错，请重试"
 
 #: static/horizon/js/horizon.modals.js:159 static/horizon/js/horizon.tabs.js:9
 msgid "Loading"
-msgstr ""
+msgstr "载入中"
 
 #: static/horizon/js/horizon.modals.js:178
 msgid "An error occurred. Please try again."
-msgstr ""
+msgstr "发生错误。请重试"
 
 #: static/horizon/js/horizon.projects.js:9
 msgid "This project currently has no members."
-msgstr ""
+msgstr "工程当前没有成员"
 
 #: static/horizon/js/horizon.projects.js:10
 msgid "No more available users to add."
-msgstr ""
+msgstr "不能添加更多的用户"
 
 #: static/horizon/js/horizon.projects.js:11
 msgid "No users found."
-msgstr ""
+msgstr "没有发现用户"
 
 #: static/horizon/js/horizon.tables.js:47
 msgid "An error occurred while updating."
-msgstr ""
+msgstr "更新出错"
 
 #: static/horizon/js/horizon.tables.js:126
 msgid "Confirm "
-msgstr ""
+msgstr "确定"
 
 #: static/horizon/js/horizon.tables.js:127
 msgid "Please confirm your selection. This action cannot be undone."
-msgstr ""
+msgstr "请确认你的选择。这个动作无法回复"
 
 #: static/horizon/js/horizon.tables.js:141
 msgid "Working"
-msgstr ""
+msgstr "工作中"
 
 #: static/horizon/js/horizon.tables.js:184
 #, c-format

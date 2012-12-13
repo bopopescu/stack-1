@@ -8,7 +8,7 @@ fi
 
 ROLE_LINE=$(grep MY_ROLE devstack/localrc)
 ROLE=${ROLE_LINE##MY_ROLE=}
-if [ "$ROLE"x != "controller"x ];then
+if [ "$ROLE"x != "compute"x ];then
         echo "you are restarting a \"$ROLE\" with \"restart_controller\" script"
         echo "please recheck!!!"
         exit 1
