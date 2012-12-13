@@ -25,6 +25,26 @@ done
 TOP_DIR=$(cd $(dirname "$0") && pwd)
 rm -f $TOP_DIR/devstack/stack-screenrc
 
+#create stack user
+source $TOP_DIR/devstack/functions
+is_package_installed sudo || install_package sudo
+if ! getent group stack >/dev/null; then
+    echo "Creating a group called stack"
+    groupadd stack
+fi
+if ! getent passwd stack >/dev/null; then
+    echo "Creating a user called stack"
+    useradd -g stack -s /bin/bash -d $DEST -m stack
+fi
+echo "Giving stack user passwordless sudo privileges"
+# UEC images ``/etc/sudoers`` does not have a ``#includedir``, add one
+grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
+    echo "#includedir /etc/sudoers.d" >> /etc/sudoers
+( umask 226 && echo "stack ALL=(ALL) NOPASSWD:ALL" \
+    > /etc/sudoers.d/50_stack_sh )
+chown -R stack:stack $TOP_DIR
+
+
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')

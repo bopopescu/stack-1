@@ -23,6 +23,27 @@ case $OPT in
 esac
 done
 
+
+#create stack user
+source $TOP_DIR/devstack/functions
+is_package_installed sudo || install_package sudo
+if ! getent group stack >/dev/null; then
+    echo "Creating a group called stack"
+    groupadd stack
+fi
+if ! getent passwd stack >/dev/null; then
+    echo "Creating a user called stack"
+    useradd -g stack -s /bin/bash -d $DEST -m stack
+fi
+echo "Giving stack user passwordless sudo privileges"
+# UEC images ``/etc/sudoers`` does not have a ``#includedir``, add one
+grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
+    echo "#includedir /etc/sudoers.d" >> /etc/sudoers
+( umask 226 && echo "stack ALL=(ALL) NOPASSWD:ALL" \
+    > /etc/sudoers.d/50_stack_sh )
+chown -R stack:stack $TOP_DIR
+
+
 #install captcha
 cd $TOP_DIR
 cd django-simple-captcha-0.3.0
@@ -96,9 +117,9 @@ su -c "nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
 su -c "nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
 
 #upload image
-cd $TOP_DIR
-IMAGE_NAME='windows2008.img'
-TOKEN=$(keystone --os_tenant_name admin --os_username admin --os_password $PASSWORD --os_auth_url http://127.0.0.1:5000/v2.0 token-get | grep ' id ' |awk '{print $4}')
-echo "uploading image:"$IMAGE_NAME
-glance --os-auth-token $TOKEN --os-image-url http://127.0.0.1:9292 image-create --name "$IMAGE_NAME" --public --container-format=bare --disk-format qcow2 < devstack/files/windows2008.img
-echo "upload finished"
+#cd $TOP_DIR
+#IMAGE_NAME='windows2008.img'
+#TOKEN=$(keystone --os_tenant_name admin --os_username admin --os_password $PASSWORD --os_auth_url http://127.0.0.1:5000/v2.0 token-get | grep ' id ' |awk '{print $4}')
+#echo "uploading image:"$IMAGE_NAME
+#glance --os-auth-token $TOKEN --os-image-url http://127.0.0.1:9292 image-create --name "$IMAGE_NAME" --public --container-format=bare --disk-format qcow2 < devstack/files/windows2008.img
+#echo "upload finished"

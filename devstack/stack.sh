@@ -93,7 +93,6 @@ VERBOSE=$(trueorfalse True $VERBOSE)
 # -----------
 if [[ $EUID -eq 0 ]]; then
     ROOTSLEEP=${ROOTSLEEP:-5}
-    echo "You are running this script as root."
     echo "In $ROOTSLEEP seconds, we will create a user 'stack' and run as that user"
     sleep $ROOTSLEEP
 
@@ -115,9 +114,6 @@ if [[ $EUID -eq 0 ]]; then
     ( umask 226 && echo "stack ALL=(ALL) NOPASSWD:ALL" \
         > /etc/sudoers.d/50_stack_sh )
 
-    echo "Copying files to stack user"
-    STACK_DIR="$DEST/${PWD##*/}"
-    cp -r -f -T "$PWD" "$STACK_DIR"
     chown -R stack "$STACK_DIR"
     exec su -c "set -e; cd $STACK_DIR; bash stack.sh $CALLER" stack
     exit 1
