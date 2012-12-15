@@ -1135,12 +1135,13 @@ fi
 if [ "$VIRT_DRIVER" = 'xenserver' ]; then
     VNCSERVER_PROXYCLIENT_ADDRESS=${VNCSERVER_PROXYCLIENT_ADDRESS=169.254.0.1}
 else
-    VNCSERVER_PROXYCLIENT_ADDRESS=${VNCSERVER_PROXYCLIENT_ADDRESS=127.0.0.1}
+    #VNCSERVER_PROXYCLIENT_ADDRESS=${VNCSERVER_PROXYCLIENT_ADDRESS=127.0.0.1}
+    VNCSERVER_PROXYCLIENT_ADDRESS=$SERVICE_HOST
 fi
 # Address on which instance vncservers will listen on compute hosts.
 # For multi-host, this should be the management ip of the compute host.
 VNCSERVER_LISTEN=${VNCSERVER_LISTEN=127.0.0.1}
-add_nova_opt "vncserver_listen=$VNCSERVER_LISTEN"
+add_nova_opt "vncserver_listen=$SERVICE_HOST"
 add_nova_opt "vncserver_proxyclient_address=$VNCSERVER_PROXYCLIENT_ADDRESS"
 add_nova_opt "ec2_dmz_host=$EC2_DMZ_HOST"
 if [ -n "$RABBIT_HOST" ] &&  [ -n "$RABBIT_PASSWORD" ]; then
