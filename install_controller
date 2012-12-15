@@ -69,7 +69,7 @@ cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')
 ava_size=$[size/1024]
 if [ $ava_size -gt 300 ];then
-        back_file_size=$[ava_size-500]
+        back_file_size=$[ava_size-300]
 else
         back_file_size=5
 fi
