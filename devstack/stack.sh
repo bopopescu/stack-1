@@ -1128,9 +1128,6 @@ if [ -n "$FLAT_INTERFACE" ]; then
 fi
 # All nova-compute workers need to know the vnc configuration options
 # These settings don't hurt anything if n-xvnc and n-novnc are disabled
-if [ "$CALLER"x = "compute"x ];then
-	
-fi
 if is_service_enabled n-cpu; then
     if [ "$CALLER"x = "compute"x ];then
         NOVNCPROXY_URL=${NOVNCPROXY_URL:-"http://$CONTROLLER_ADDRESS:6080/vnc_auto.html"}
