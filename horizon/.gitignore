@@ -1,1 +1,4 @@
 *.pyc
+.secret_key_store
+dashboard_openstack.sqlite3
+static/dashboard/css/*.css

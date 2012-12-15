@@ -2,3 +2,5 @@
 *.gz
 *.img
 files/images/*
+localrc
+stack-screenrc
