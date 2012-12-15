@@ -2,3 +2,4 @@
 .cinderclient/
 data/
 .novaclient/
+*txt

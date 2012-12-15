@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 CALLER=$1
+CONTROLLER_ADDRESS=$2
+
 killall screen 1>/dev/null 2>&1
 # Keep track of the devstack directory
 TOP_DIR=$(cd $(dirname "$0") && pwd)
@@ -111,7 +113,7 @@ if [[ $EUID -eq 0 ]]; then
 
     STACK_DIR="$DEST/${PWD##*/}"
     chown -R stack "$STACK_DIR"
-    exec su -c "set -e; cd $STACK_DIR; bash stack.sh $CALLER" stack
+    exec su -c "set -e; cd $STACK_DIR; bash stack.sh $CALLER $CONTROLLER_ADDRESS" stack
     exit 1
 else
     # We're not **root**, make sure ``sudo`` is available
@@ -1126,11 +1128,21 @@ if [ -n "$FLAT_INTERFACE" ]; then
 fi
 # All nova-compute workers need to know the vnc configuration options
 # These settings don't hurt anything if n-xvnc and n-novnc are disabled
+if [ "$CALLER"x = "compute"x ];then
+	
+fi
 if is_service_enabled n-cpu; then
-    NOVNCPROXY_URL=${NOVNCPROXY_URL:-"http://$SERVICE_HOST:6080/vnc_auto.html"}
-    add_nova_opt "novncproxy_base_url=$NOVNCPROXY_URL"
-    XVPVNCPROXY_URL=${XVPVNCPROXY_URL:-"http://$SERVICE_HOST:6081/console"}
-    add_nova_opt "xvpvncproxy_base_url=$XVPVNCPROXY_URL"
+    if [ "$CALLER"x = "compute"x ];then
+        NOVNCPROXY_URL=${NOVNCPROXY_URL:-"http://$CONTROLLER_ADDRESS:6080/vnc_auto.html"}
+        add_nova_opt "novncproxy_base_url=$NOVNCPROXY_URL"
+        XVPVNCPROXY_URL=${XVPVNCPROXY_URL:-"http://$CONTROLLER_ADDRESS:6081/console"}
+        add_nova_opt "xvpvncproxy_base_url=$XVPVNCPROXY_URL"
+    else
+        NOVNCPROXY_URL=${NOVNCPROXY_URL:-"http://$SERVICE_HOST:6080/vnc_auto.html"}
+        add_nova_opt "novncproxy_base_url=$NOVNCPROXY_URL"
+        XVPVNCPROXY_URL=${XVPVNCPROXY_URL:-"http://$SERVICE_HOST:6081/console"}
+        add_nova_opt "xvpvncproxy_base_url=$XVPVNCPROXY_URL"
+    fi
 fi
 if [ "$VIRT_DRIVER" = 'xenserver' ]; then
     VNCSERVER_PROXYCLIENT_ADDRESS=${VNCSERVER_PROXYCLIENT_ADDRESS=169.254.0.1}

@@ -23,6 +23,21 @@ case $OPT in
 esac
 done
 
+#add 163 repository
+cat << EOF  > /etc/apt/sources.list
+deb http://mirrors.163.com/ubuntu/ precise main universe restricted multiverse
+deb-src http://mirrors.163.com/ubuntu/ precise main universe restricted multiverse
+deb http://mirrors.163.com/ubuntu/ precise-security universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-security universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ precise-updates universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ precise-proposed universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-proposed universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ precise-backports universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-backports universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-updates universe main multiverse restricted
+
+EOF
+
 
 #create stack user
 source $TOP_DIR/devstack/functions
@@ -83,7 +98,7 @@ VOLUME_BACKING_FILE_SIZE=${back_file_size}G
 IMAGE_URLS=http://159.226.50.227/share/centos-6.2-x86_64.img.tar.gz,http://159.226.50.227/share/precise-server-cloudimg-amd64.tar.gz,http://159.226.50.227/share/oneiric-server-cloudimg-amd64.tar.gz,http://159.226.50.227/share/windows2008.img
 MY_ROLE=controller
 EOF
-./stack.sh controller
+./stack.sh controller xxxxxxxxx
 
 #install monitor related package and start services
 cd $TOP_DIR
