@@ -17,9 +17,10 @@ fi
 
 #restart swift related services
 swift-init all stop 1>/dev/null 2>&1
-su -c "swift-init all start&" stack
+su -c "sudo swift-init all start&" stack
 
 /etc/init.d/rabbitmq-server restart
+sleep 2
 
 cd kanyun/
 echo "ending monitoring services"
