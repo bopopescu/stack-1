@@ -77,7 +77,7 @@ fi
 
 #install openstack
 FIXED_RANGE=10.0.0.0/20
-FLOATING_RANGE=192.168.136.1/24
+FLOATING_RANGE=192.168.136.192/26
 cd $TOP_DIR
 cd devstack
 sudo killall screen 1>/dev/null 2>&1
