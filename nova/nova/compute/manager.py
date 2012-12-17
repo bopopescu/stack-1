@@ -2686,7 +2686,7 @@ class ComputeManager(manager.SchedulerDependentManager):
                         # Note(maoy): here we call the API instead of
                         # brutally updating the vm_state in the database
                         # to allow all the hooks and checks to be performed.
-                        #self.compute_api.stop(context, db_instance)
+                        self.compute_api.stop(context, db_instance)
 			pass
                     except Exception:
                         # Note(maoy): there is no need to propagate the error
@@ -2703,6 +2703,7 @@ class ComputeManager(manager.SchedulerDependentManager):
                                "the stop API."), instance=db_instance)
                     try:
                         self.compute_api.stop(context, db_instance)
+			pass
                     except Exception:
                         LOG.exception(_("error during stop() in "
                                         "sync_power_state."),
