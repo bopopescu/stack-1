@@ -1,18 +1,19 @@
 #/bin/bash
-IP_LIST="159.226.50.227 119.78.2.14 192.168.136.79"
+IP_LIST="159.226.50.227"
+
+echo "stoping swift"
+for ip in ${IP_LIST};do
+        ssh stack@${ip} swift-init all stop
+done
+
 cd /etc/swift
 rm -r -f /etc/swift/*.builder
 rm -r -f /etc/swift/*.ring.gz
 
-echo "stoping swift"
-for ip in ${IP_LIST};do
-	ssh root@${ip} swift-init all stop
-done
-
 echo "creating rings"
-su -c "cd /etc/swift;swift-ring-builder account.builder create 18 3 1" stack
-su -c "cd /etc/swift;swift-ring-builder container.builder create 18 3 1" stack
-su -c "cd /etc/swift;swift-ring-builder object.builder create 18 3 1" stack
+su -c "cd /etc/swift;swift-ring-builder account.builder create 18 1 1" stack
+su -c "cd /etc/swift;swift-ring-builder container.builder create 18 1 1" stack
+su -c "cd /etc/swift;swift-ring-builder object.builder create 18 1 1" stack
 
 echo "adding services"
 zone=1
@@ -30,5 +31,5 @@ su -c "cd /etc/swift;swift-ring-builder account.builder rebalance" stack
 
 echo "starting swift"
 for ip in ${IP_LIST};do
-	ssh root@${ip} swift-init all restart
+	ssh stack@${ip} swift-init all restart
 done

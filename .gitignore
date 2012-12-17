@@ -4,3 +4,5 @@ data/
 .novaclient/
 *txt
 .bash*
+.cache
+.ssh
