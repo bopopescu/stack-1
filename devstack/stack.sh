@@ -934,7 +934,7 @@ if is_service_enabled swift; then
     mkdir -p  ${SWIFT_DATA_DIR}/node/sdb1
     sudo chown -R $USER:${USER_GROUP} ${SWIFT_DATA_DIR}/node
 
-    sudo rm -r -f ${SWIFT_CONFIG_DIR} /var/run/swift
+    sudo rm -r -f ${SWIFT_CONFIG_DIR}/* /var/run/swift
     sudo mkdir -p ${SWIFT_CONFIG_DIR} /var/run/swift
     sudo chown -R $USER: ${SWIFT_CONFIG_DIR} /var/run/swift
 
@@ -962,7 +962,6 @@ if is_service_enabled swift; then
         swift_auth_server=tempauth
     fi
 
-    if [ "$CALLER"x = "controller"x ];then
         SWIFT_CONFIG_PROXY_SERVER=${SWIFT_CONFIG_DIR}/proxy-server.conf
         cp ${SWIFT_DIR}/etc/proxy-server.conf-sample ${SWIFT_CONFIG_PROXY_SERVER}
 
@@ -1001,7 +1000,6 @@ if is_service_enabled swift; then
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth use
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles
         iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles "Member, admin"
-    fi
 
     if is_service_enabled swift3;then
         cat <<EOF >>${SWIFT_CONFIG_PROXY_SERVER}
@@ -1239,9 +1237,7 @@ if is_service_enabled ceilometer; then
     start_ceilometer
 fi
 screen_it horizon "cd $HORIZON_DIR && sudo tail -f /var/log/$APACHE_NAME/horizon_error.log"
-if [ "$CALLER"x = "controller"x ];then
-    screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
-fi
+screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
 
 # Starting the nova-objectstore only if swift3 service is not enabled.
 # Swift will act as s3 objectstore.
