@@ -1095,7 +1095,7 @@ EOF
    # Start rsync
    sudo /etc/init.d/rsync restart || :
    swift-init all restart || true
-   swift-init proxy stop || true
+   #swift-init proxy stop || true
    unset s swift_hash swift_auth_server
 fi
 
@@ -1148,7 +1148,7 @@ fi
 # Address on which instance vncservers will listen on compute hosts.
 # For multi-host, this should be the management ip of the compute host.
 VNCSERVER_LISTEN=${VNCSERVER_LISTEN=127.0.0.1}
-add_nova_opt "vncserver_listen=$SERVICE_HOST"
+add_nova_opt "vncserver_listen=0.0.0.0"
 add_nova_opt "vncserver_proxyclient_address=$VNCSERVER_PROXYCLIENT_ADDRESS"
 add_nova_opt "ec2_dmz_host=$EC2_DMZ_HOST"
 if [ -n "$RABBIT_HOST" ] &&  [ -n "$RABBIT_PASSWORD" ]; then
@@ -1237,7 +1237,7 @@ if is_service_enabled ceilometer; then
     start_ceilometer
 fi
 screen_it horizon "cd $HORIZON_DIR && sudo tail -f /var/log/$APACHE_NAME/horizon_error.log"
-screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
+#screen_it swift "cd $SWIFT_DIR && $SWIFT_DIR/bin/swift-proxy-server ${SWIFT_CONFIG_DIR}/proxy-server.conf -v"
 
 # Starting the nova-objectstore only if swift3 service is not enabled.
 # Swift will act as s3 objectstore.
