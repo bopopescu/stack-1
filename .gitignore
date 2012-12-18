@@ -6,3 +6,4 @@ data/
 .bash*
 .cache
 .ssh
+.vim*
