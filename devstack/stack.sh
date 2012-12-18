@@ -345,7 +345,7 @@ SWIFT_CONFIG_DIR=${SWIFT_CONFIG_DIR:-/etc/swift}
 # once which ends up either more efficient or at least less complex than
 # working with each item separately or the entire cluster all at once.
 # By default we define 9 for the partition count (which mean 512).
-SWIFT_PARTITION_POWER_SIZE=${SWIFT_PARTITION_POWER_SIZE:-9}
+SWIFT_PARTITION_POWER_SIZE=${SWIFT_PARTITION_POWER_SIZE:-18}
 
 if is_service_enabled swift; then
     # If we are using swift3, we can default the s3 port to swift instead
@@ -1077,17 +1077,17 @@ EOF
 
         port_number=6010
         swift-ring-builder object.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        swift-ring-builder object.builder add z1-127.0.0.1:${port_number}/sdb1 1
+        swift-ring-builder object.builder add z1-${HOST_IP}:${port_number}/sdb1 1
         swift-ring-builder object.builder rebalance
 
         port_number=6011
         swift-ring-builder container.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        swift-ring-builder container.builder add z1-127.0.0.1:${port_number}/sdb1 1
+        swift-ring-builder container.builder add z1-${HOST_IP}:${port_number}/sdb1 1
         swift-ring-builder container.builder rebalance
 
         port_number=6012
         swift-ring-builder account.builder create ${SWIFT_PARTITION_POWER_SIZE} ${SWIFT_REPLICAS} 1
-        swift-ring-builder account.builder add z1-127.0.0.1:${port_number}/sdb1 1
+        swift-ring-builder account.builder add z1-${HOST_IP}:${port_number}/sdb1 1
         swift-ring-builder account.builder rebalance
 
     } && popd >/dev/null
