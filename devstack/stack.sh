@@ -974,6 +974,9 @@ if is_service_enabled swift; then
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers
         iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers 1
 
+	iniuncomment ${swift_node_config} DEFAULT log_facility
+        iniset ${swift_node_config} DEFAULT log_facility LOG_LOCAL1
+
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level
         iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level DEBUG
 
