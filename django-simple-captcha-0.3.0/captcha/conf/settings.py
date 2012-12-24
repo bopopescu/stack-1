@@ -22,6 +22,13 @@ if CAPTCHA_IMAGE_BEFORE_FIELD:
 else:
     CAPTCHA_OUTPUT_FORMAT = getattr(settings,'CAPTCHA_OUTPUT_FORMAT', u'%(hidden_field)s %(text_field)s %(image)s')
 
+LANGUAGES = (
+    ('fr',gettext_noop('Traditional Chinest')),
+)
+LANGUAGE_CODE = 'zh-cn'
+USE_I18N = True
+USE_L10N = True
+USE_TZ True
 
 # Failsafe
 if CAPTCHA_DICTIONARY_MIN_LENGTH > CAPTCHA_DICTIONARY_MAX_LENGTH:
