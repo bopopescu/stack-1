@@ -23,6 +23,16 @@ import logging
 from horizon import api
 from horizon import tables
 from .tables import ServicesTable
+from nova import context
+import nova.flags as flags
+from nova import db
+from cinder import db as cinder_db
+import cinder.flags as cinder_flags
+
+#FLAGS = flags.FLAGS
+#flags.parse_args([])
+FLAGS=cinder_flags.FLAGS
+cinder_flags.parse_args([])
 
 
 LOG = logging.getLogger(__name__)
@@ -33,8 +43,18 @@ class IndexView(tables.DataTableView):
     template_name = 'syspanel/services/index.html'
 
     def get_data(self):
+        ctxt = context.get_admin_context()
+        db_services=db.service_get_all(ctxt)
+        db_cinder_services=cinder_db.service_get_all(ctxt)
+
         services = []
-        for i, service in enumerate(self.request.user.service_catalog):
+        #for i, service in enumerate(self.request.user.service_catalog):
+        for i, service in enumerate(db_services):
             service['id'] = i
-            services.append(api.keystone.Service(service))
+            #services.append(api.keystone.Service(service))
+            services.append(service)
+        for i, service in enumerate(db_cinder_services):
+            service['id'] = i
+            #services.append(api.keystone.Service(service))
+            services.append(service)
         return services

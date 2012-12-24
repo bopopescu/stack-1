@@ -938,9 +938,6 @@ if is_service_enabled swift; then
     sudo mkdir -p ${SWIFT_CONFIG_DIR} /var/run/swift
     sudo chown -R $USER: ${SWIFT_CONFIG_DIR} /var/run/swift
 
-    # Swift use rsync to synchronize between all the different
-    # partitions (which make more sense when you have a multi-node
-    # setup) we configure it with our version of rsync.
     sed -e "
         s/%GROUP%/${USER_GROUP}/;
         s/%USER%/$USER/;
@@ -949,18 +946,7 @@ if is_service_enabled swift; then
     " $FILES/swift/rsyncd.conf | sudo tee /etc/rsyncd.conf
     sudo sed -i '/^RSYNC_ENABLE=false/ { s/false/true/ }' /etc/default/rsync
 
-    if is_service_enabled swift3;then
-        swift_auth_server="s3token "
-    fi
-
-    # By default Swift will be installed with the tempauth middleware
-    # which has some default username and password if you have
-    # configured keystone it will checkout the directory.
-    if is_service_enabled key; then
         swift_auth_server+="authtoken keystoneauth"
-    else
-        swift_auth_server=tempauth
-    fi
 
         SWIFT_CONFIG_PROXY_SERVER=${SWIFT_CONFIG_DIR}/proxy-server.conf
         cp ${SWIFT_DIR}/etc/proxy-server.conf-sample ${SWIFT_CONFIG_PROXY_SERVER}
@@ -974,8 +960,8 @@ if is_service_enabled swift; then
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers
         iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT workers 1
 
-	iniuncomment ${swift_node_config} DEFAULT log_facility
-        iniset ${swift_node_config} DEFAULT log_facility LOG_LOCAL1
+	iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_facility
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_facility LOG_LOCAL1
 
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level
         iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT log_level DEBUG
@@ -983,10 +969,7 @@ if is_service_enabled swift; then
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT bind_port
         iniset ${SWIFT_CONFIG_PROXY_SERVER} DEFAULT bind_port ${SWIFT_DEFAULT_BIND_PORT:-8080}
     
-        # Only enable Swift3 if we have it enabled in ENABLED_SERVICES
-        is_service_enabled swift3 && swift3=swift3 || swift3=""
-    
-        iniset ${SWIFT_CONFIG_PROXY_SERVER} pipeline:main pipeline "catch_errors healthcheck cache ratelimit ${swift3} ${swift_auth_server} proxy-logging proxy-server"
+        iniset ${SWIFT_CONFIG_PROXY_SERVER} pipeline:main pipeline "catch_errors healthcheck cache ratelimit ${swift_auth_server} proxy-logging proxy-server"
     
         iniset ${SWIFT_CONFIG_PROXY_SERVER} app:proxy-server account_autocreate true
     
@@ -1004,28 +987,9 @@ if is_service_enabled swift; then
         iniuncomment ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles
         iniset ${SWIFT_CONFIG_PROXY_SERVER} filter:keystoneauth operator_roles "Member, admin"
 
-    if is_service_enabled swift3;then
-        cat <<EOF >>${SWIFT_CONFIG_PROXY_SERVER}
-# NOTE(chmou): s3token middleware is not updated yet to use only
-# username and password.
-[filter:s3token]
-paste.filter_factory = keystone.middleware.s3_token:filter_factory
-auth_port = ${KEYSTONE_AUTH_PORT}
-auth_host = ${KEYSTONE_AUTH_HOST}
-auth_protocol = ${KEYSTONE_AUTH_PROTOCOL}
-auth_token = ${SERVICE_TOKEN}
-admin_token = ${SERVICE_TOKEN}
-
-[filter:swift3]
-use = egg:swift3#swift3
-EOF
-    fi
-
     cp ${SWIFT_DIR}/etc/swift.conf-sample ${SWIFT_CONFIG_DIR}/swift.conf
     iniset ${SWIFT_CONFIG_DIR}/swift.conf swift-hash swift_hash_path_suffix ${SWIFT_HASH}
 
-    # This function generates an object/account/proxy configuration
-    # emulating 4 nodes on different ports
     function generate_swift_configuration() {
         local server_type=$1
         local bind_port=$2

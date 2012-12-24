@@ -173,6 +173,7 @@ class SetInstanceDetailsAction(workflows.Action):
     instance_snapshot_id = forms.ChoiceField(label=_("Instance Snapshot"),
                                              required=False)
     name = forms.CharField(max_length=80, label=_("Instance Name"))
+    password = forms.CharField(max_length=80, label=_("Password for root"),help_text=_("only for linux OS"))
     flavor = forms.ChoiceField(label=_("Flavor"),
                                help_text=_("Size of image to launch."))
     count = forms.IntegerField(label=_("Instance Count"),
@@ -184,7 +185,7 @@ class SetInstanceDetailsAction(workflows.Action):
         name = _("Details")
         help_text_template = ("nova/instances/"
                               "_launch_details_help.html")
-
+    
     def clean(self):
         cleaned_data = super(SetInstanceDetailsAction, self).clean()
 
@@ -306,7 +307,7 @@ class SetInstanceDetailsAction(workflows.Action):
 
 class SetInstanceDetails(workflows.Step):
     action_class = SetInstanceDetailsAction
-    contributes = ("source_type", "source_id", "name", "count", "flavor")
+    contributes = ("source_type", "source_id", "name", "count", "flavor", "password",)
 
     def prepare_action_context(self, request, context):
         if 'source_type' in context and 'source_id' in context:
@@ -492,7 +493,7 @@ class LaunchInstance(workflows.Workflow):
                     for netid in netids]
         else:
             nics = None
-
+	custom_script = custom_script + "\n" + "passwd root << EOF\n"+context['password']+"\n"+context['password']+"\nEOF"
         try:
             api.nova.server_create(request,
                                    context['name'],

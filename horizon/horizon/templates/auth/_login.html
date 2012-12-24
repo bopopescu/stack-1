@@ -8,14 +8,15 @@
 {% block modal-body %}
       
       {% if next %}
-	<tr><td><input type="hidden" name="{{ redirect_field_name }}" value="{{ next }}" />
-	</td></tr>
+	<tr>
+          <td><input type="hidden" name="{{ redirect_field_name }}" value="{{ next }}" /></td>
+        </tr>
       	<tr>
-      	<td height="10"></td>
-      	<td width="10"></td>
-      	<td></td>
+      	 <td height="10"></td>
+      	 <td width="10"></td>
+      	 <td></td>
       	</tr>
-	{% endif %}
+      {% endif %}
       
       
       <tr>
@@ -26,10 +27,9 @@
 	</td>
       </tr>
 
-      <tr>
-	<td><ins id="captcha_tip">看不清？点击图片更换验证码</ins></td>
-      </tr>
-
+      <tr> 
+	<td>&nbsp;<ins style='font-size:11px' id="captcha_tip">看不清？点击图片更换验证码</ins></td>
+      </tr> 
 
       <tr>
 		<!--<td>
@@ -44,8 +44,10 @@
 		</div>
 		</td>-->
 
-	<td><button type="submit" class="btn btn-primary pull-right">登陆</button></td>
-	<td><button type="button" disabled="disabled">注册</button></td>		
+	<td>
+          &nbsp;<button type="submit" class="btn btn-primary pull-right">登陆</button>
+	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button type="button" disabled="disabled">注册</button>
+        </td>		
 
 
 

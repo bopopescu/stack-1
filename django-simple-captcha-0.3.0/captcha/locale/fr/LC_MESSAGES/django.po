@@ -23,7 +23,7 @@ msgstr "Jouer en tant que fichier audio"
 
 #: .\fields.py:71 .\fields.py:96 .\tests\__init__.py:70
 msgid "Invalid CAPTCHA"
-msgstr "Réponse invalide"
+msgstr "验证码错误"
 
 #: .\tests\__init__.py:97
 msgid "This field is required."

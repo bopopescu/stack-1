@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Horizon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-22 10:48+0800\n"
+"POT-Creation-Date: 2012-12-20 09:39+0800\n"
 "PO-Revision-Date: 2012-09-12 02:05+0000\n"
 "Last-Translator: QunShi Zhang <zhang.kris@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,7 +89,7 @@ msgid "Project"
 msgstr "工程"
 
 #: dashboards/nova/access_and_security/panel.py:25
-#: dashboards/nova/instances/workflows.py:347
+#: dashboards/nova/instances/workflows.py:348
 msgid "Access & Security"
 msgstr "访问 & 安全"
 
@@ -109,8 +109,8 @@ msgstr "找不到浮动IP。"
 
 #: dashboards/nova/access_and_security/views.py:75
 #: dashboards/nova/access_and_security/floating_ips/workflows.py:64
-#: dashboards/nova/instances/workflows.py:536
-#: dashboards/nova/instances/workflows.py:617
+#: dashboards/nova/instances/workflows.py:537
+#: dashboards/nova/instances/workflows.py:618
 #: dashboards/syspanel/instances/views.py:46
 msgid "Unable to retrieve instance list."
 msgstr "找不到云主机列表"
@@ -185,8 +185,8 @@ msgstr "IP地址"
 #: dashboards/nova/instances/tables.py:91
 #: dashboards/nova/instances/tables.py:108
 #: dashboards/nova/instances/tables.py:137
-#: dashboards/nova/instances/workflows.py:514
-#: dashboards/nova/instances/workflows.py:605
+#: dashboards/nova/instances/workflows.py:515
+#: dashboards/nova/instances/workflows.py:606
 #: dashboards/nova/volumes/tables.py:205 tests/workflows_tests.py:58
 msgid "Instance"
 msgstr "云主机"
@@ -216,15 +216,15 @@ msgid "No IP addresses available"
 msgstr "无效的IP地址"
 
 #: dashboards/nova/access_and_security/floating_ips/workflows.py:75
-#: dashboards/nova/instances/workflows.py:547
-#: dashboards/nova/instances/workflows.py:628
+#: dashboards/nova/instances/workflows.py:548
+#: dashboards/nova/instances/workflows.py:629
 #: dashboards/nova/volumes/forms.py:160
 msgid "Select an instance"
 msgstr "请选择一个云主机"
 
 #: dashboards/nova/access_and_security/floating_ips/workflows.py:77
-#: dashboards/nova/instances/workflows.py:549
-#: dashboards/nova/instances/workflows.py:630
+#: dashboards/nova/instances/workflows.py:550
+#: dashboards/nova/instances/workflows.py:631
 #: dashboards/nova/volumes/forms.py:162
 msgid "No instances available"
 msgstr "无效的云主机"
@@ -273,7 +273,7 @@ msgstr "无法导入密钥对。"
 
 #: dashboards/nova/access_and_security/keypairs/tables.py:29
 #: dashboards/nova/instances/tables.py:350
-#: dashboards/nova/instances/workflows.py:334
+#: dashboards/nova/instances/workflows.py:335
 msgid "Keypair"
 msgstr "密钥对"
 
@@ -446,7 +446,8 @@ msgstr "源组"
 msgid ""
 "To specify an allowed IP range, select CIDR. To allow access from all "
 "members of another security group select Source Group."
-msgstr "要指定允许的IP范围，选择CIDR。要允许另一个安全组的全部成员访问，选择源组"
+msgstr ""
+"要指定允许的IP范围，选择CIDR。要允许另一个安全组的全部成员访问，选择源组"
 
 #: dashboards/nova/access_and_security/security_groups/forms.py:90
 #: dashboards/nova/networks/templates/networks/subnets/_detail_overview.html:15
@@ -507,7 +508,7 @@ msgstr "安全组"
 
 #: dashboards/nova/access_and_security/security_groups/tables.py:31
 #: dashboards/nova/access_and_security/security_groups/tables.py:65
-#: dashboards/nova/instances/workflows.py:339
+#: dashboards/nova/instances/workflows.py:340
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:49
 msgid "Security Groups"
 msgstr "安全组"
@@ -554,7 +555,7 @@ msgstr "访问 &amp; 安全"
 
 #: dashboards/nova/access_and_security/templates/access_and_security/index.html:10
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/index.html:6
-#: dashboards/nova/instances/templates/instances/index.html:42
+#: dashboards/nova/instances/templates/instances/index.html:47
 #: dashboards/nova/overview/templates/overview/usage.html:6
 #: dashboards/nova/volumes/templates/volumes/index.html:10
 msgid "Projects:"
@@ -656,7 +657,9 @@ msgid ""
 "Keypairs are ssh credentials which are injected into images when they are "
 "launched. Creating a new key pair registers the public key and downloads the "
 "private key (a .pem file)."
-msgstr "密钥对是镜像启动时注入到镜像中的ssh证书。创建一个新的密钥对会注册一个公钥并下载一个私钥（一个.pem文件）"
+msgstr ""
+"密钥对是镜像启动时注入到镜像中的ssh证书。创建一个新的密钥对会注册一个公钥并下"
+"载一个私钥（一个.pem文件）"
 
 #: dashboards/nova/access_and_security/templates/access_and_security/keypairs/_create.html:18
 #: dashboards/nova/access_and_security/templates/access_and_security/keypairs/_import.html:18
@@ -969,11 +972,11 @@ msgid ""
 "nested. You can, however, create an unlimited number of containers within "
 "your account. Data must be stored in a container so you must have at least "
 "one container defined in your account prior to uploading data."
-msgstr "" 
-"容器是数据的存储分隔，并为你提供一种方法来管理你的数据。你可以把容器想象成Windows中的文件夹或者UNIX中的目录"
-"容器和其他文件系统概念的主要差别是，容器中不能有其他容器。但是，你可以在你的账户内创建无数个容器。"
-"数据必须存储在容器中，所以在你上传数据之前，至少要有一个容器在你的账户之中。"
-
+msgstr ""
+"容器是数据的存储分隔，并为你提供一种方法来管理你的数据。你可以把容器想象成"
+"Windows中的文件夹或者UNIX中的目录容器和其他文件系统概念的主要差别是，容器中不"
+"能有其他容器。但是，你可以在你的账户内创建无数个容器。数据必须存储在容器中，"
+"所以在你上传数据之前，至少要有一个容器在你的账户之中。"
 
 #: dashboards/nova/containers/templates/containers/_upload.html:8
 #: dashboards/nova/messages/templates/containers/_upload.html:8
@@ -993,9 +996,9 @@ msgid ""
 "compression or encryption) and consists of a location (container), the "
 "object's name, and any metadata consisting of key/value pairs."
 msgstr ""
-"存储对象是OpenStack对象存储系统中，用来代表所存储的文件加上相关的metadata组成的存储基本单位。"
-"当你上传数据到 OpenStack 对象存储时，资料是原封不动的（未压缩或加密）被存储，"
-"包含位置（容器），对象名称，以及相关的key/value metadata"
+"存储对象是OpenStack对象存储系统中，用来代表所存储的文件加上相关的metadata组成"
+"的存储基本单位。当你上传数据到 OpenStack 对象存储时，资料是原封不动的（未压缩"
+"或加密）被存储，包含位置（容器），对象名称，以及相关的key/value metadata"
 
 #: dashboards/nova/containers/templates/containers/upload.html:6
 #: dashboards/nova/messages/templates/containers/upload.html:6
@@ -1112,7 +1115,7 @@ msgstr "镜像上传成功。"
 
 #: dashboards/nova/images_and_snapshots/images/tables.py:33
 #: dashboards/nova/images_and_snapshots/snapshots/tables.py:32
-#: dashboards/nova/instances/workflows.py:454
+#: dashboards/nova/instances/workflows.py:455
 msgid "Launch"
 msgstr "运行"
 
@@ -1143,8 +1146,10 @@ msgid "Edit"
 msgstr "编辑"
 
 #: dashboards/nova/images_and_snapshots/images/tables.py:112
+#: dashboards/nova/instances/tables.py:349
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:74
 #: dashboards/syspanel/images/tables.py:39
+#: dashboards/syspanel/instances/tables.py:77
 msgid "Image Name"
 msgstr "镜像名称"
 
@@ -1159,7 +1164,7 @@ msgstr "镜像名称"
 #: dashboards/nova/networks/templates/networks/ports/_detail_overview.html:30
 #: dashboards/nova/volumes/tables.py:153
 #: dashboards/nova/volumes/templates/volumes/_detail_overview.html:17
-#: dashboards/syspanel/instances/tables.py:78
+#: dashboards/syspanel/instances/tables.py:80
 #: dashboards/syspanel/networks/tables.py:74
 #: dashboards/syspanel/networks/ports/tables.py:77
 msgid "Status"
@@ -1246,7 +1251,9 @@ msgid ""
 "Currently only images available via an HTTP URL are supported. The image "
 "location must be accessible to the Image Service. Compressed image binaries "
 "are supported (.zip and .tar.gz.)"
-msgstr "目前只有镜像可以通过HTTP URL的支持。镜像的位置对镜像服务来说必须是可访问的。支持压缩二进制文件（.zip和.tar.gz）"
+msgstr ""
+"目前只有镜像可以通过HTTP URL的支持。镜像的位置对镜像服务来说必须是可访问的。"
+"支持压缩二进制文件（.zip和.tar.gz）"
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/images/_create.html:24
 msgid "Please note: "
@@ -1256,7 +1263,9 @@ msgstr "请注意"
 msgid ""
 "The Image Location field MUST be a valid and direct URL to the image binary. "
 "URLs that redirect or serve error pages will result in unusable images."
-msgstr "镜像位置字段必须是一个有效的直接指向镜像文件的URL。URL重定向或者指向错误页面将造成镜像无法使用。"
+msgstr ""
+"镜像位置字段必须是一个有效的直接指向镜像文件的URL。URL重定向或者指向错误页面"
+"将造成镜像无法使用。"
 
 #: dashboards/nova/images_and_snapshots/templates/images_and_snapshots/images/_detail_overview.html:3
 msgid "Image Overview"
@@ -1438,12 +1447,12 @@ msgstr "不能更新云主机"
 #: dashboards/nova/instances/tables.py:109
 #: dashboards/nova/instances/tables.py:138
 #: dashboards/nova/instances/tables.py:373
-#: dashboards/nova/instances/templates/instances/index.html:35
-#: dashboards/nova/instances/templates/instances/index.html:38
-#: dashboards/nova/instances/templates/instances/index.html:42
+#: dashboards/nova/instances/templates/instances/index.html:40
+#: dashboards/nova/instances/templates/instances/index.html:43
+#: dashboards/nova/instances/templates/instances/index.html:47
 #: dashboards/syspanel/instances/panel.py:28
-#: dashboards/syspanel/instances/tables.py:95
-#: dashboards/syspanel/instances/templates/instances/index.html:3
+#: dashboards/syspanel/instances/tables.py:97
+#: dashboards/syspanel/instances/templates/instances/index.html:41
 #: dashboards/syspanel/projects/workflows.py:38
 msgid "Instances"
 msgstr "云主机"
@@ -1497,7 +1506,7 @@ msgid "Resumed"
 msgstr "已恢复"
 
 #: dashboards/nova/instances/tables.py:164
-#: dashboards/nova/instances/workflows.py:453
+#: dashboards/nova/instances/workflows.py:454
 #: dashboards/nova/instances/templates/instances/launch.html:3
 #: dashboards/nova/instances/templates/instances/launch.html:6
 msgid "Launch Instance"
@@ -1509,12 +1518,12 @@ msgid "Edit Instance"
 msgstr "编辑云主机"
 
 #: dashboards/nova/instances/tables.py:180
-#: dashboards/nova/instances/workflows.py:649
+#: dashboards/nova/instances/workflows.py:650
 msgid "Confirm Resize"
 msgstr "确认升级"
 
 #: dashboards/nova/instances/tables.py:190
-#: dashboards/nova/instances/workflows.py:584
+#: dashboards/nova/instances/workflows.py:585
 #: dashboards/nova/instances/templates/instances/confirmresize.html:3
 #: dashboards/nova/instances/templates/instances/resize.html:3
 #: dashboards/nova/instances/templates/instances/resize.html:6
@@ -1540,7 +1549,7 @@ msgid "Not available"
 msgstr "无效"
 
 #: dashboards/nova/instances/tables.py:357
-#: dashboards/syspanel/instances/tables.py:82
+#: dashboards/syspanel/instances/tables.py:84
 msgid "Task"
 msgstr "任务"
 
@@ -1549,7 +1558,7 @@ msgid "Power"
 msgstr "电源状态"
 
 #: dashboards/nova/instances/tables.py:366
-#: dashboards/syspanel/instances/tables.py:91
+#: dashboards/syspanel/instances/tables.py:93
 msgid "Usage"
 msgstr "使用情况"
 
@@ -1673,126 +1682,134 @@ msgid "Instance Name"
 msgstr "云主机"
 
 #: dashboards/nova/instances/workflows.py:176
-#: dashboards/nova/instances/workflows.py:515
+msgid "Password for root"
+msgstr "设置root用户的密码"
+
+#: dashboards/nova/instances/workflows.py:176
+msgid "only for linux OS"
+msgstr "只对Linux类型的实例有效"
+
+#: dashboards/nova/instances/workflows.py:177
+#: dashboards/nova/instances/workflows.py:516
 #: dashboards/nova/instances/templates/instances/_detail_overview.html:22
 #: dashboards/syspanel/flavors/tables.py:13
 msgid "Flavor"
 msgstr "类型"
 
-#: dashboards/nova/instances/workflows.py:177
-#: dashboards/nova/instances/workflows.py:515
+#: dashboards/nova/instances/workflows.py:178
+#: dashboards/nova/instances/workflows.py:516
 msgid "Size of image to launch."
 msgstr "建立的映像大小"
 
-#: dashboards/nova/instances/workflows.py:178
+#: dashboards/nova/instances/workflows.py:179
 msgid "Instance Count"
 msgstr "云主机个数"
 
-#: dashboards/nova/instances/workflows.py:181
+#: dashboards/nova/instances/workflows.py:182
 msgid "Number of instances to launch."
 msgstr "启动云主机的个数"
 
-#: dashboards/nova/instances/workflows.py:184
-#: dashboards/nova/instances/workflows.py:518
-#: dashboards/nova/instances/workflows.py:608
+#: dashboards/nova/instances/workflows.py:185
+#: dashboards/nova/instances/workflows.py:519
+#: dashboards/nova/instances/workflows.py:609
 msgid "Details"
 msgstr "云主机信息"
 
-#: dashboards/nova/instances/workflows.py:197
+#: dashboards/nova/instances/workflows.py:198
 msgid ""
 "There are no image sources available; you must first create an image before "
 "attempting to launch an instance."
 msgstr "还没有可用的镜像来源；在执行启动一个云主机之前你必须先建立一个镜像"
 
-#: dashboards/nova/instances/workflows.py:202
+#: dashboards/nova/instances/workflows.py:203
 msgid "Please select an option for the instance source."
 msgstr "请选择云主机来源选项"
 
-#: dashboards/nova/instances/workflows.py:211
+#: dashboards/nova/instances/workflows.py:212
 msgid ""
 "Launching multiple instances is only supported for images and instance "
 "snapshots."
 msgstr "执行多个云主机只支持镜像和云主机快照"
 
-#: dashboards/nova/instances/workflows.py:228
+#: dashboards/nova/instances/workflows.py:229
 msgid "Unable to retrieve public images."
 msgstr "无法获取公共镜像"
 
-#: dashboards/nova/instances/workflows.py:243
+#: dashboards/nova/instances/workflows.py:244
 msgid "Unable to retrieve images for the current project."
 msgstr "无法获取当前工程的镜像"
 
-#: dashboards/nova/instances/workflows.py:266
+#: dashboards/nova/instances/workflows.py:267
 msgid "Select Image"
 msgstr "选择云主机模板"
 
-#: dashboards/nova/instances/workflows.py:268
+#: dashboards/nova/instances/workflows.py:269
 msgid "No images available."
 msgstr "无可用镜像"
 
-#: dashboards/nova/instances/workflows.py:277
+#: dashboards/nova/instances/workflows.py:278
 msgid "Select Instance Snapshot"
 msgstr "选择云主机快照"
 
-#: dashboards/nova/instances/workflows.py:279
+#: dashboards/nova/instances/workflows.py:280
 msgid "No snapshots available."
 msgstr "无可用快照"
 
-#: dashboards/nova/instances/workflows.py:290
-#: dashboards/nova/instances/workflows.py:527
+#: dashboards/nova/instances/workflows.py:291
+#: dashboards/nova/instances/workflows.py:528
 msgid "Unable to retrieve instance flavors."
 msgstr "无法检索云主机类型。"
 
-#: dashboards/nova/instances/workflows.py:303
-#: dashboards/nova/instances/workflows.py:560 usage/base.py:113
+#: dashboards/nova/instances/workflows.py:304
+#: dashboards/nova/instances/workflows.py:561 usage/base.py:113
 msgid "Unable to retrieve quota information."
 msgstr "无法获取配额信息"
 
-#: dashboards/nova/instances/workflows.py:336
+#: dashboards/nova/instances/workflows.py:337
 msgid "Which keypair to use for authentication."
 msgstr "用于验证的密钥对。"
 
-#: dashboards/nova/instances/workflows.py:343
+#: dashboards/nova/instances/workflows.py:344
 msgid "Launch instance in these security groups."
 msgstr "在这些安全组中运行云主机。"
 
-#: dashboards/nova/instances/workflows.py:348
+#: dashboards/nova/instances/workflows.py:349
 msgid ""
 "Control access to your instance via keypairs, security groups, and other "
 "mechanisms."
 msgstr "通过密钥对，安全组，和别的机制控制你的云主机"
 
-#: dashboards/nova/instances/workflows.py:358
+#: dashboards/nova/instances/workflows.py:359
 msgid "Unable to retrieve keypairs."
 msgstr "无法检索密钥对。"
 
-#: dashboards/nova/instances/workflows.py:360
+#: dashboards/nova/instances/workflows.py:361
 msgid "Select a keypair"
 msgstr "选择一个密钥对"
 
-#: dashboards/nova/instances/workflows.py:362
+#: dashboards/nova/instances/workflows.py:363
 msgid "No keypairs available."
 msgstr "无密钥对。"
 
-#: dashboards/nova/instances/workflows.py:371
+#: dashboards/nova/instances/workflows.py:372
 msgid "Unable to retrieve list of security groups"
 msgstr "无法检索到安全组列表"
 
-#: dashboards/nova/instances/workflows.py:391
+#: dashboards/nova/instances/workflows.py:392
 msgid "Customization Script"
 msgstr "定制脚本"
 
-#: dashboards/nova/instances/workflows.py:393
+#: dashboards/nova/instances/workflows.py:394
 msgid ""
 "A script or set of commands to be executed after the instance has been built "
 "(max 16kb)."
 msgstr "云主机建立后的脚本或命令集（最大16kb）"
 
-#: dashboards/nova/instances/workflows.py:400
+#: dashboards/nova/instances/workflows.py:401
 msgid "Post-Creation"
 msgstr "后期控制"
 
-#: dashboards/nova/instances/workflows.py:411
+#: dashboards/nova/instances/workflows.py:412
 #: dashboards/nova/networks/panel.py:24 dashboards/nova/networks/tables.py:43
 #: dashboards/nova/networks/tables.py:105
 #: dashboards/nova/networks/templates/networks/index.html:3
@@ -1805,62 +1822,62 @@ msgstr "后期控制"
 msgid "Networks"
 msgstr "网络"
 
-#: dashboards/nova/instances/workflows.py:414
+#: dashboards/nova/instances/workflows.py:415
 msgid "Launch instance withthese networks"
 msgstr "使用这些网络执行云主机"
 
-#: dashboards/nova/instances/workflows.py:418
+#: dashboards/nova/instances/workflows.py:419
 msgid "Networking"
 msgstr "网络"
 
-#: dashboards/nova/instances/workflows.py:420
+#: dashboards/nova/instances/workflows.py:421
 msgid "Select networks for your instance."
 msgstr "为你的云主机选择网络"
 
-#: dashboards/nova/instances/workflows.py:432
+#: dashboards/nova/instances/workflows.py:433
 msgid "Unable to retrieve networks."
 msgstr "无法获取网络"
 
-#: dashboards/nova/instances/workflows.py:455
+#: dashboards/nova/instances/workflows.py:456
 #, python-format
 msgid "Launched %(count)s named \"%(name)s\"."
 msgstr "执行 %(count)s 名称 \"%(name)s\" "
 
-#: dashboards/nova/instances/workflows.py:456
+#: dashboards/nova/instances/workflows.py:457
 #, python-format
 msgid "Unable to launch %(count)s named \"%(name)s\"."
 msgstr "无法执行 %(count)s 名称 \"%(name)s\" "
 
-#: dashboards/nova/instances/workflows.py:469
+#: dashboards/nova/instances/workflows.py:470
 #, python-format
 msgid "%s instances"
 msgstr "%s 云主机"
 
-#: dashboards/nova/instances/workflows.py:472
+#: dashboards/nova/instances/workflows.py:473
 msgid "instance"
 msgstr "云主机"
 
-#: dashboards/nova/instances/workflows.py:585
+#: dashboards/nova/instances/workflows.py:586
 msgid "Resize"
 msgstr "调整"
 
-#: dashboards/nova/instances/workflows.py:586
+#: dashboards/nova/instances/workflows.py:587
 #, python-format
 msgid "Resizing instance \"%(instance_id)s\" to \"%(flavor_id)s\"."
 msgstr "调整云主机 \"%(instance_id)s\" to \"%(flavor_id)s\" "
 
-#: dashboards/nova/instances/workflows.py:587
-#: dashboards/nova/instances/workflows.py:651
+#: dashboards/nova/instances/workflows.py:588
+#: dashboards/nova/instances/workflows.py:652
 #, fuzzy, python-format
 msgid "Unable to Resize \"%(instance_id)s\" to \"%(flavor_id)s\"."
 msgstr "无法检索云主机类型。"
 
-#: dashboards/nova/instances/workflows.py:648
+#: dashboards/nova/instances/workflows.py:649
 #: dashboards/nova/instances/templates/instances/confirmresize.html:6
 msgid "Confirm Resize Result"
 msgstr "确认调整结果"
 
-#: dashboards/nova/instances/workflows.py:650
+#: dashboards/nova/instances/workflows.py:651
 #, python-format
 msgid "Resizing instance \"%(instance_id)s\" is confirmed."
 msgstr "调整云主机 \"%(instance_id)s\" 已确认"
@@ -2226,9 +2243,9 @@ msgid ""
 "You can create a subnet associated with the new network, in which case "
 "\"Network Address\" must be specified. If you wish to create a network "
 "WITHOUT a subnet, uncheck the \"Create Subnet\" checkbox."
-msgstr "" 
-"在\"网络地址\"被指定的情况下，你可以创建与新网络关联的子网。"
-"如果你想创建一个没有子网的网络，不要选择\"创建子网\"选项"
+msgstr ""
+"在\"网络地址\"被指定的情况下，你可以创建与新网络关联的子网。如果你想创建一个"
+"没有子网的网络，不要选择\"创建子网\"选项"
 
 #: dashboards/nova/networks/workflows.py:88
 msgid "Specify \"Network Address\" or clear \"Create Subnet\" checkbox."
@@ -2464,7 +2481,9 @@ msgid ""
 "You can create a subnet for the network. Any network address can be "
 "specified unless the network address does not overlap other subnets in the "
 "network."
-msgstr "你可以创建网络子网，并给他指定任何网络地址，只要不和网络中的其他子网的地址重复"
+msgstr ""
+"你可以创建网络子网，并给他指定任何网络地址，只要不和网络中的其他子网的地址重"
+"复"
 
 #: dashboards/nova/networks/templates/networks/subnets/_detail_overview.html:3
 msgid "Subnet Overview"
@@ -2519,16 +2538,19 @@ msgid ""
 "an admin role has access to all resources in the system (volumes, snapshots, "
 "keypairs, etc.), even in the Project dashboard where they should only see a "
 "properly-scoped subset of those resources."
-msgstr "" 
-"由于不一致的方式阻碍计算和身份管理，管理员用户可以访问系统中的所有资源（云阵列，快照，密钥对，等）"
-"甚至是他们应该只看到这些资源适当范围的子集的工程管理面板。"
+msgstr ""
+"由于不一致的方式阻碍计算和身份管理，管理员用户可以访问系统中的所有资源（云阵"
+"列，快照，密钥对，等）甚至是他们应该只看到这些资源适当范围的子集的工程管理面"
+"板。"
 
 #: dashboards/nova/templates/nova/_warning.html:10
 msgid ""
 "This means that Nova allows an admin user in the Project Dashboard to "
 "successfully take actions which otherwise should not be permitted, causing "
 "irresolvable conflicts in Nova."
-msgstr "这意味着Nova（计算）允许管理员用户在工程控制面板成功的进行不应被允许的操作，在Nova（计算）中导致无法解决的冲突"
+msgstr ""
+"这意味着Nova（计算）允许管理员用户在工程控制面板成功的进行不应被允许的操作，"
+"在Nova（计算）中导致无法解决的冲突"
 
 #: dashboards/nova/templates/nova/_warning.html:11
 msgid "A list of the known problems are as follows:"
@@ -2570,9 +2592,9 @@ msgid ""
 "admin users and regular users separate. Create an \"admin\" project that "
 "admin users have access to, and do not grant your admin users the admin role "
 "on any other projects."
-msgstr "" 
-"在这个问题解决前的建议做法是让你的管理员用户和普通用户分开。创建一个管理员用户"
-"都能访问的\"admin\"工程,在其他的工程不给管理员用户管理员的权限"
+msgstr ""
+"在这个问题解决前的建议做法是让你的管理员用户和普通用户分开。创建一个管理员用"
+"户都能访问的\"admin\"工程,在其他的工程不给管理员用户管理员的权限"
 
 #: dashboards/nova/templates/nova/_warning.html:20
 msgid ""
@@ -2828,7 +2850,9 @@ msgid ""
 "Clicking \"Download EC2 Credentials\" will download a zip file which "
 "includes an rc file with your access/secret keys, as well as your x509 "
 "private key and certificate."
-msgstr "点击\"Download EC2 Credentials\"会下载一个压缩文件，里面含有你的x509私钥和凭证"
+msgstr ""
+"点击\"Download EC2 Credentials\"会下载一个压缩文件，里面含有你的x509私钥和凭"
+"证"
 
 #: dashboards/settings/project/forms.py:70
 #, python-format
@@ -2862,7 +2886,9 @@ msgstr "下载OpenStack RC文件"
 msgid ""
 "Download the RC file for the selected project, then type \"source openrc\" "
 "in the terminal to configure your environment to communicate with OpenStack."
-msgstr "下载所选工程的RC文件，然后在终端输入\"source openrc\"来设置你的环境以便和OpenStack做链接沟通"
+msgstr ""
+"下载所选工程的RC文件，然后在终端输入\"source openrc\"来设置你的环境以便和"
+"OpenStack做链接沟通"
 
 #: dashboards/settings/project/templates/project/_openrc.html:30
 msgid "Download RC File"
@@ -3002,7 +3028,7 @@ msgstr "备注：使用这个规格不会对现有的云主机资源分配造成
 
 #: dashboards/syspanel/flavors/templates/flavors/index.html:6
 #: dashboards/syspanel/images/templates/images/index.html:6
-#: dashboards/syspanel/instances/templates/instances/index.html:6
+#: dashboards/syspanel/instances/templates/instances/index.html:44
 #: dashboards/syspanel/overview/templates/overview/usage.html:6
 #: dashboards/syspanel/projects/templates/projects/index.html:12
 #: dashboards/syspanel/quotas/templates/quotas/index.html:12
@@ -3025,7 +3051,7 @@ msgstr "工程名称"
 msgid "Host"
 msgstr "主机"
 
-#: dashboards/syspanel/instances/tables.py:89
+#: dashboards/syspanel/instances/tables.py:91
 msgid "Power State"
 msgstr "电源情况"
 
@@ -3034,7 +3060,7 @@ msgstr "电源情况"
 msgid "Unable to retrieve instance tenant information."
 msgstr "无法获取云主机使用信息"
 
-#: dashboards/syspanel/instances/templates/instances/index.html:6
+#: dashboards/syspanel/instances/templates/instances/index.html:44
 msgid "All Instances"
 msgstr "云主机"
 

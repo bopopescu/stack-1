@@ -35,9 +35,12 @@ def get_enabled(service, reverse=False):
 
 class ServicesTable(tables.DataTable):
     id = tables.Column('id', verbose_name=_('Id'), hidden=True)
-    name = tables.Column("name", verbose_name=_('Name'))
-    service_type = tables.Column('__unicode__', verbose_name=_('Service'))
+    name = tables.Column("binary", verbose_name=_('Name'))
+    #service_type = tables.Column('__unicode__', verbose_name=_('Service'))
     host = tables.Column('host', verbose_name=_('Host'))
+    #cpu = tables.Column('cpu', verbose_name=_('CPU'))
+    #mem = tables.Column('mem', verbose_name=_('Memory'))
+    #vms = tables.Column('vms', verbose_name=_('VMS'))
     enabled = tables.Column(get_enabled,
                             verbose_name=_('Enabled'),
                             status=True)

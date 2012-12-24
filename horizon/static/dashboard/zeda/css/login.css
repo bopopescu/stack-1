@@ -33,13 +33,13 @@ div.input {display:inline;position:relative;padding-left:0px;}
 
 label[for="id_username"] {display: inline-block;height:24px;width:60px;}
 label[for="id_password"] {display: inline-block;height:24px;width:60px;}
-label[for="id_captcha_1"] {display: inline-block;height:24px;width:60px;}
+label[for="id_captcha_1"] {height:24px;width:60px;}
 
 #id_username { height:24px; width:110px; background:#ebf9ff; border:#9bd8ff 1px solid;}
 #id_password { height:24px; width:110px; background:#ebf9ff; border:#9bd8ff 1px solid;}
 #id_captcha_1 {width:50px;height:24px;}
 
-img.captcha {height:24px;width:50px;}
+img.captcha {height:24px;width:50px;padding-left:50px;}
 
 #submit_button {margin:10px;padding-left:80px;}
 #register_button {margin:10px;padding-left:20px;}
@@ -47,7 +47,7 @@ img.captcha {height:24px;width:50px;}
 button[type="submit"] {height:24px; width:70px; background:#ebf9ff; border:#9bd8ff 1px solid;font-family:"宋体"; font-size:14px; color:#4e4e4e;}
 button[type="button"] {height:24px; width:70px; background:#ebf9ff; border:#9bd8ff 1px solid;font-family:"宋体"; font-size:14px; color:#4e4e4e;}
 
-span.help-inline{display:inline-block;float:right}
+span.help-inline{display:inline;float:right;font-size:10px;}
 
 
 
