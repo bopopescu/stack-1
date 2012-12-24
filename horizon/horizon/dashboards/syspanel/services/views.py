@@ -23,16 +23,12 @@ import logging
 from horizon import api
 from horizon import tables
 from .tables import ServicesTable
-from nova import context
-import nova.flags as flags
-from nova import db
-from cinder import db as cinder_db
+from nova import context as nova_context
+from cinder import context as cinder_context
+import nova.flags as nova_flags
 import cinder.flags as cinder_flags
-
-#FLAGS = flags.FLAGS
-#flags.parse_args([])
-FLAGS=cinder_flags.FLAGS
-cinder_flags.parse_args([])
+from nova import db as nova_db
+from cinder import db as cinder_db
 
 
 LOG = logging.getLogger(__name__)
@@ -43,18 +39,23 @@ class IndexView(tables.DataTableView):
     template_name = 'syspanel/services/index.html'
 
     def get_data(self):
-        ctxt = context.get_admin_context()
-        db_services=db.service_get_all(ctxt)
-        db_cinder_services=cinder_db.service_get_all(ctxt)
-
         services = []
-        #for i, service in enumerate(self.request.user.service_catalog):
-        for i, service in enumerate(db_services):
-            service['id'] = i
-            #services.append(api.keystone.Service(service))
-            services.append(service)
+
+        ctxt = nova_context.get_admin_context()
+        FLAGS = nova_flags.FLAGS
+        nova_flags.parse_args([])
+        db_nova_services=nova_db.service_get_all(ctxt)
+
+        ctxt = cinder_context.get_admin_context()
+        FLAGS=cinder_flags.FLAGS
+        cinder_flags.parse_args([])
+        db_cinder_services=cinder_db.service_get_all(ctxt)
+        db_cinder_services.extend(db_nova_services)
         for i, service in enumerate(db_cinder_services):
             service['id'] = i
-            #services.append(api.keystone.Service(service))
             services.append(service)
+
+        services = sorted(services, key=lambda svc: (svc.host))#sort the list
+
         return services
+
