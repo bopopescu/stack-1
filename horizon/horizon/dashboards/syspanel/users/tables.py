@@ -6,6 +6,10 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import api
 from horizon import messages
 from horizon import tables
+import datetime
+from django.core.cache import cache
+import time
+
 
 
 LOG = logging.getLogger(__name__)
@@ -98,6 +102,12 @@ class UserFilterAction(tables.FilterAction):
 
         return filter(comp, users)
 
+def is_online(user):
+    last_seen = cache.get('seen_%s' % user.name)
+    now = time.time()
+    return (now-600) < last_seen
+
+
 
 class UsersTable(tables.DataTable):
     STATUS_CHOICES = (
@@ -111,6 +121,7 @@ class UsersTable(tables.DataTable):
     #default_tenant = tables.Column('default_tenant',
     #                               verbose_name=_('Default Project'))
     id = tables.Column('id', verbose_name=_('User ID'))
+    online=tables.Column(is_online, verbose_name=_('Online'))
     enabled = tables.Column('enabled', verbose_name=_('Enabled'),
                             status=True,
                             status_choices=STATUS_CHOICES,

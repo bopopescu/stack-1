@@ -53,6 +53,7 @@ ROOT_URLCONF = 'openstack_dashboard.urls'
 
 HORIZON_CONFIG = {
     'dashboards': ('nova', 'syspanel', 'settings',),
+    'user_lastseen_timeout': 600,
     'default_dashboard': 'nova',
     'user_home': 'horizon.views.base.get_user_home',
     'ajax_queue_limit': 10,
@@ -70,6 +71,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'horizon.middleware.HorizonMiddleware',
+    'horizon.middleware.ActiveUserMiddleware',
     'django.middleware.doc.XViewMiddleware',
 )
 

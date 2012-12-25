@@ -30,6 +30,11 @@ from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.utils.encoding import iri_to_uri
+import datetime
+import time
+from datetime import timedelta, tzinfo
+from django.core.cache import cache
+from django.conf import settings
 
 from horizon import exceptions
 from horizon.openstack.common import jsonutils
@@ -108,3 +113,16 @@ class HorizonMiddleware(object):
 	        # etc.) and is not meant as a long-term solution.
                 response['X-Horizon-Messages'] = jsonutils.dumps(queued_msgs)
         return response
+
+
+class ActiveUserMiddleware(object):
+    def process_request(self, request):
+        current_user = request.user
+        if request.user.is_authenticated():
+            #beijing=USTimeZone(+8, 'Eastern', 'EST', 'EDT')
+            #now = datetime.datetime.now()
+            now = time.time()
+            #cache.set('seen_%s' % (current_user.username), now, settings.HORIZON_CONFIG['user_lastseen_timeout'])
+            cache.set('seen_%s' % (current_user.username), now, 6000000)
+
+

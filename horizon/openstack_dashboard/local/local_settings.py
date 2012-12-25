@@ -63,6 +63,14 @@ OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 SWIFT_PAGINATE_LIMIT = 100
 
+# Setup caching per Django docs. In actuality, you'd probably use memcached instead of local memory.
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'default-cache'
+    }
+}
+
 # If you have external monitoring links, eg:
 # EXTERNAL_MONITORING = [
 #     ['Nagios','http://foo.com'],
