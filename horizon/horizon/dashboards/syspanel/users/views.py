@@ -34,11 +34,6 @@ from .forms import CreateUserForm, UpdateUserForm
 from .tables import UsersTable
 
 logger = logging.getLogger(__name__)
-#def my_view(request,agr1,arg):
-#    if bad_mojo:
-#        logger.error('Something went wrong!')
-    logger.info('bbb')
-    logger.error('error')
 
 class IndexView(tables.DataTableView):
     table_class = UsersTable

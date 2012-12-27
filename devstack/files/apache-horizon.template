@@ -10,6 +10,7 @@
     DocumentRoot %HORIZON_DIR%/.blackhole/
     Alias /media %HORIZON_DIR%/openstack_dashboard/static
     Alias /share /var/www
+    Alias /ganglia /opt/stack/ganglia-webfrontend
 
     <Directory />
         Options FollowSymLinks
@@ -17,6 +18,11 @@
     </Directory>
 
     <Directory /var/www>
+        Options FollowSymLinks Indexes
+        AllowOverride None
+    </Directory>
+
+    <Directory /opt/stack/ganglia-webfrontend>
         Options FollowSymLinks Indexes
         AllowOverride None
     </Directory>
