@@ -33,7 +33,6 @@ from horizon import tables
 from .forms import CreateUserForm, UpdateUserForm
 from .tables import UsersTable
 
-logger = logging.getLogger(__name__)
 
 class IndexView(tables.DataTableView):
     table_class = UsersTable

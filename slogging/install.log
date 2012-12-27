@@ -1,0 +1,135 @@
+running install
+Checking .pth file support in /usr/local/lib/python2.7/dist-packages/
+/usr/bin/python -E -c pass
+TEST PASSED: /usr/local/lib/python2.7/dist-packages/ appears to support .pth files
+running bdist_egg
+running egg_info
+creating slogging.egg-info
+writing slogging.egg-info/PKG-INFO
+writing top-level names to slogging.egg-info/top_level.txt
+writing dependency_links to slogging.egg-info/dependency_links.txt
+writing manifest file 'slogging.egg-info/SOURCES.txt'
+writing manifest file 'slogging.egg-info/SOURCES.txt'
+installing library code to build/bdist.linux-x86_64/egg
+running install_lib
+running build_py
+creating build
+creating build/lib.linux-x86_64-2.7
+creating build/lib.linux-x86_64-2.7/slogging
+copying slogging/compressing_file_reader.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/internal_proxy.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/log_uploader.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/log_processor.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/access_log_delivery.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/log_common.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/__init__.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/db_stats_collector.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/file_buffer.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/stats_processor.py -> build/lib.linux-x86_64-2.7/slogging
+copying slogging/access_processor.py -> build/lib.linux-x86_64-2.7/slogging
+creating build/lib.linux-x86_64-2.7/test_slogging
+creating build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_stats_processor.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_compressing_file_reader.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_log_uploader.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_access_processor.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_access_log_delivery.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_db_stats_collector.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/__init__.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_log_common.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_internal_proxy.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+copying test_slogging/unit/test_log_processor.py -> build/lib.linux-x86_64-2.7/test_slogging/unit
+creating build/bdist.linux-x86_64
+creating build/bdist.linux-x86_64/egg
+creating build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/compressing_file_reader.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/internal_proxy.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/log_uploader.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/log_processor.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/access_log_delivery.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/log_common.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/__init__.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/db_stats_collector.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/file_buffer.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/stats_processor.py -> build/bdist.linux-x86_64/egg/slogging
+copying build/lib.linux-x86_64-2.7/slogging/access_processor.py -> build/bdist.linux-x86_64/egg/slogging
+creating build/bdist.linux-x86_64/egg/test_slogging
+creating build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_stats_processor.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_compressing_file_reader.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_log_uploader.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_access_processor.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_access_log_delivery.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_db_stats_collector.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/__init__.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_log_common.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_internal_proxy.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+copying build/lib.linux-x86_64-2.7/test_slogging/unit/test_log_processor.py -> build/bdist.linux-x86_64/egg/test_slogging/unit
+byte-compiling build/bdist.linux-x86_64/egg/slogging/compressing_file_reader.py to compressing_file_reader.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/internal_proxy.py to internal_proxy.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/log_uploader.py to log_uploader.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/log_processor.py to log_processor.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/access_log_delivery.py to access_log_delivery.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/log_common.py to log_common.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/__init__.py to __init__.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/db_stats_collector.py to db_stats_collector.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/file_buffer.py to file_buffer.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/stats_processor.py to stats_processor.pyc
+byte-compiling build/bdist.linux-x86_64/egg/slogging/access_processor.py to access_processor.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_stats_processor.py to test_stats_processor.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_compressing_file_reader.py to test_compressing_file_reader.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_log_uploader.py to test_log_uploader.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_access_processor.py to test_access_processor.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_access_log_delivery.py to test_access_log_delivery.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_db_stats_collector.py to test_db_stats_collector.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/__init__.py to __init__.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_log_common.py to test_log_common.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_internal_proxy.py to test_internal_proxy.pyc
+byte-compiling build/bdist.linux-x86_64/egg/test_slogging/unit/test_log_processor.py to test_log_processor.pyc
+creating build/bdist.linux-x86_64/egg/EGG-INFO
+installing scripts to build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+running install_scripts
+running build_scripts
+creating build/scripts-2.7
+copying and adjusting bin/swift-account-stats-logger -> build/scripts-2.7
+copying and adjusting bin/swift-container-stats-logger -> build/scripts-2.7
+copying and adjusting bin/swift-log-stats-collector -> build/scripts-2.7
+copying and adjusting bin/swift-log-uploader -> build/scripts-2.7
+copying and adjusting bin/swift-access-log-delivery -> build/scripts-2.7
+changing mode of build/scripts-2.7/swift-account-stats-logger from 644 to 755
+changing mode of build/scripts-2.7/swift-container-stats-logger from 644 to 755
+changing mode of build/scripts-2.7/swift-log-stats-collector from 644 to 755
+changing mode of build/scripts-2.7/swift-log-uploader from 644 to 755
+changing mode of build/scripts-2.7/swift-access-log-delivery from 644 to 755
+creating build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+copying build/scripts-2.7/swift-container-stats-logger -> build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+copying build/scripts-2.7/swift-log-stats-collector -> build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+copying build/scripts-2.7/swift-log-uploader -> build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+copying build/scripts-2.7/swift-account-stats-logger -> build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+copying build/scripts-2.7/swift-access-log-delivery -> build/bdist.linux-x86_64/egg/EGG-INFO/scripts
+changing mode of build/bdist.linux-x86_64/egg/EGG-INFO/scripts/swift-container-stats-logger to 755
+changing mode of build/bdist.linux-x86_64/egg/EGG-INFO/scripts/swift-log-stats-collector to 755
+changing mode of build/bdist.linux-x86_64/egg/EGG-INFO/scripts/swift-log-uploader to 755
+changing mode of build/bdist.linux-x86_64/egg/EGG-INFO/scripts/swift-account-stats-logger to 755
+changing mode of build/bdist.linux-x86_64/egg/EGG-INFO/scripts/swift-access-log-delivery to 755
+copying slogging.egg-info/PKG-INFO -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying slogging.egg-info/SOURCES.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying slogging.egg-info/dependency_links.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+copying slogging.egg-info/top_level.txt -> build/bdist.linux-x86_64/egg/EGG-INFO
+zip_safe flag not set; analyzing archive contents...
+creating dist
+creating 'dist/slogging-1.1.8-py2.7.egg' and adding 'build/bdist.linux-x86_64/egg' to it
+removing 'build/bdist.linux-x86_64/egg' (and everything under it)
+Processing slogging-1.1.8-py2.7.egg
+creating /usr/local/lib/python2.7/dist-packages/slogging-1.1.8-py2.7.egg
+Extracting slogging-1.1.8-py2.7.egg to /usr/local/lib/python2.7/dist-packages
+Adding slogging 1.1.8 to easy-install.pth file
+Installing swift-container-stats-logger script to /usr/local/bin
+Installing swift-log-stats-collector script to /usr/local/bin
+Installing swift-log-uploader script to /usr/local/bin
+Installing swift-account-stats-logger script to /usr/local/bin
+Installing swift-access-log-delivery script to /usr/local/bin
+
+Installed /usr/local/lib/python2.7/dist-packages/slogging-1.1.8-py2.7.egg
+Processing dependencies for slogging==1.1.8
+Finished processing dependencies for slogging==1.1.8
