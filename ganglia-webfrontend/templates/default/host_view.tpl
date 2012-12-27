@@ -16,7 +16,6 @@ function toggleLayer( whichLayer )
   vis.display = (vis.display==''||vis.display=='block')?'none':'block';
 }
 --></SCRIPT>
-<?php require_once('base.html');?>
 <TABLE BORDER="0" WIDTH="100%">
 <TR>
   <TD COLSPAN="2" BGCOLOR="#EEEEEE" ALIGN="CENTER">
@@ -25,13 +24,13 @@ function toggleLayer( whichLayer )
 </TR>
 
 <TR>
- <TD ALIGN="LEFT" VALIGN="TOP">
+ <TD ALIGN="center" VALIGN="TOP">
 
 <IMG SRC="{node_image}" HEIGHT="60" WIDTH="30" ALT="{host}" BORDER="0">
 {node_msg}
 <P>
 
-<TABLE BORDER="0" WIDTH="100%">
+<TABLE style="padding-left:350px" BORDER="0" WIDTH="100%">
 <TR>
   <TD COLSPAN="2" CLASS=title>Time and String Metrics</TD>
 </TR>
@@ -59,7 +58,8 @@ function toggleLayer( whichLayer )
 <!-- INCLUDE BLOCK : extra -->
 
 </TD>
-
+</tr>
+<tr>
 <TD ALIGN="CENTER" VALIGN="TOP" WIDTH="395">
 <A HREF="./graph.php?g=load_report&z=large&c={cluster_url}&{graphargs}">
 <IMG BORDER=0 ALT="{cluster_url} LOAD"

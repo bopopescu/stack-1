@@ -618,6 +618,8 @@ class LibvirtConfigGuest(LibvirtConfigObject):
         if self.os_init_path is not None:
             os.append(self._text_node("init", self.os_init_path))
         if self.os_boot_dev is not None:
+#            os.append(etree.Element("boot"), dev="network")#default to cdrom
+            os.append(etree.Element("boot", dev="cdrom"))#default to cdrom
             os.append(etree.Element("boot", dev=self.os_boot_dev))
         root.append(os)
 

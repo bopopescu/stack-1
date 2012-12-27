@@ -38,7 +38,7 @@ Supports KVM, LXC, QEMU, UML, and XEN.
 :allow_same_net_traffic:  Whether to allow in project network traffic
 
 """
-
+import pdb
 import errno
 import functools
 import glob
@@ -1303,15 +1303,40 @@ class LibvirtDriver(driver.ComputeDriver):
         if size == 0 or suffix == '.rescue':
             size = None
 
+        #image service, size, format.etc. infomation
+        (image_service, image_id) = glance.get_remote_image_service(context, instance['image_ref'])
+        try:
+            base = image_service.show(context, image_id)
+        except exception.ImageNotFound:
+            base = {}
+
         if not self._volume_in_mapping(self.default_root_device,
                                        block_device_info):
-            image('disk').cache(fetch_func=libvirt_utils.fetch_image,
-                                context=context,
-                                filename=root_fname,
-                                size=size,
-                                image_id=disk_images['image_id'],
-                                user_id=instance['user_id'],
-                                project_id=instance['project_id'])
+            if base.get('disk_format') == 'iso':
+                image('cdrom').cache(fetch_func=libvirt_utils.fetch_image,
+                                    context=context,
+                                    filename=root_fname,
+                                    size=None,
+                                    image_id=disk_images['image_id'],
+                                    user_id=instance['user_id'],
+                                    project_id=instance['project_id'])
+                ephemeral_size=instance['root_gb']
+                if size == 0:
+                    ephemeral_size=10
+                fn = functools.partial(self._create_ephemeral,fs_label='ephemeral0',os_type=instance["os_type"])
+                fname = "ephemeral_%s_%s_%s" % ("0",ephemeral_size,instance["os_type"])
+                image('disk').cache(fetch_func=fn,
+                                          filename=fname,
+                                          size=ephemeral_size,
+                                          ephemeral_size=ephemeral_size)
+            else:
+                image('disk').cache(fetch_func=libvirt_utils.fetch_image,
+                                    context=context,
+                                    filename=root_fname,
+                                    size=size,
+                                    image_id=disk_images['image_id'],
+                                    user_id=instance['user_id'],
+                                    project_id=instance['project_id'])
 
         ephemeral_gb = instance['ephemeral_gb']
         if ephemeral_gb and not self._volume_in_mapping(
@@ -1544,19 +1569,7 @@ class LibvirtDriver(driver.ComputeDriver):
                                          'rootfs')
             devices.append(fs)
         else:
-            if image_meta and image_meta.get('disk_format') == 'iso':
-                root_device_type = 'cdrom'
-                root_device = 'hda'
-            else:
-                root_device_type = 'disk'
-
-            if FLAGS.libvirt_type == "uml":
-                default_disk_bus = "uml"
-            elif FLAGS.libvirt_type == "xen":
-                default_disk_bus = "xen"
-            else:
-                default_disk_bus = "virtio"
-
+            default_disk_bus = ""
             def disk_info(name, disk_dev, disk_bus=default_disk_bus,
                           device_type="disk"):
                 image = self.image_backend.image(instance['name'],
@@ -1565,6 +1578,24 @@ class LibvirtDriver(driver.ComputeDriver):
                                           disk_dev,
                                           device_type,
                                           self.disk_cachemode)
+            if image_meta and image_meta.get('disk_format') == 'iso':
+                root_device_type = 'cdrom'
+                diskos = disk_info('cdrom',
+                                   'hdd',
+                                   'ide',
+                                   root_device_type)
+                devices.append(diskos)
+                
+            root_device = 'hda'
+            root_device_type = 'disk'
+
+            if FLAGS.libvirt_type == "uml":
+                default_disk_bus = "uml"
+            elif FLAGS.libvirt_type == "xen":
+                default_disk_bus = "xen"
+            else:
+                default_disk_bus = "virtio"
+
 
             if rescue:
                 diskrescue = disk_info('disk.rescue',
