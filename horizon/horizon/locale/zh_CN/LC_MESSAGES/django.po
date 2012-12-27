@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Horizon\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-12-24 15:20+0800\n"
+"POT-Creation-Date: 2012-12-25 13:05+0800\n"
 "PO-Revision-Date: 2012-09-12 02:05+0000\n"
 "Last-Translator: QunShi Zhang <zhang.kris@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -335,7 +335,6 @@ msgstr "无法创建密钥对：%(exc)s"
 #: dashboards/syspanel/networks/subnets/tables.py:69
 #: dashboards/syspanel/projects/tables.py:87
 #: dashboards/syspanel/projects/workflows.py:69
-#: dashboards/syspanel/services_and_usage/services/tables.py:38
 #: dashboards/syspanel/volumes/tables.py:10
 msgid "Name"
 msgstr "名称"
@@ -1141,7 +1140,7 @@ msgid "Create Image"
 msgstr "创建镜像"
 
 #: dashboards/nova/images_and_snapshots/images/tables.py:67
-#: dashboards/syspanel/users/tables.py:31
+#: dashboards/syspanel/users/tables.py:35
 msgid "Edit"
 msgstr "编辑"
 
@@ -1604,8 +1603,8 @@ msgstr "无法获取云主机 \"%s\" 的详细信息"
 
 #: dashboards/nova/instances/workflows.py:38
 #: dashboards/syspanel/projects/tables.py:106
-#: dashboards/syspanel/users/tables.py:40
-#: dashboards/syspanel/users/tables.py:74 tests/workflows_tests.py:40
+#: dashboards/syspanel/users/tables.py:44
+#: dashboards/syspanel/users/tables.py:78 tests/workflows_tests.py:40
 msgid "User"
 msgstr "用户"
 
@@ -2867,6 +2866,7 @@ msgid "OpenStack API"
 msgstr "OpenStack API"
 
 #: dashboards/settings/project/tables.py:27
+#: dashboards/syspanel/services_and_usage/services/tables.py:38
 msgid "Service Name"
 msgstr "服务名"
 
@@ -3048,7 +3048,7 @@ msgstr "工程名称"
 
 #: dashboards/syspanel/instances/tables.py:66
 #: dashboards/syspanel/services_and_usage/services/tables.py:40
-#: dashboards/syspanel/services_and_usage/usage/tables.py:26
+#: dashboards/syspanel/services_and_usage/usage/tables.py:31
 msgid "Host"
 msgstr "主机"
 
@@ -3179,8 +3179,8 @@ msgstr "编辑工程"
 #: dashboards/syspanel/projects/workflows.py:74
 #: dashboards/syspanel/projects/workflows.py:249
 #: dashboards/syspanel/services_and_usage/services/tables.py:45
-#: dashboards/syspanel/users/tables.py:39
-#: dashboards/syspanel/users/tables.py:114
+#: dashboards/syspanel/users/tables.py:43
+#: dashboards/syspanel/users/tables.py:125
 msgid "Enabled"
 msgstr "已启用"
 
@@ -3194,9 +3194,9 @@ msgstr "已移除"
 
 #: dashboards/syspanel/projects/tables.py:107
 #: dashboards/syspanel/users/panel.py:28
-#: dashboards/syspanel/users/tables.py:41
-#: dashboards/syspanel/users/tables.py:75
-#: dashboards/syspanel/users/tables.py:121
+#: dashboards/syspanel/users/tables.py:45
+#: dashboards/syspanel/users/tables.py:79
+#: dashboards/syspanel/users/tables.py:132
 #: dashboards/syspanel/users/templates/users/index.html:8
 #: dashboards/syspanel/users/templates/users/index.html:11
 msgid "Users"
@@ -3370,7 +3370,7 @@ msgid "From here you can create a new user to add to this project."
 msgstr "在这里你可以创建新用户并加入到这个工程"
 
 #: dashboards/syspanel/projects/templates/projects/_create_user.html:23
-#: dashboards/syspanel/users/tables.py:19
+#: dashboards/syspanel/users/tables.py:23
 #: dashboards/syspanel/users/templates/users/_create.html:7
 #: dashboards/syspanel/users/templates/users/_create.html:22
 #: dashboards/syspanel/users/templates/users/create.html:7
@@ -3457,7 +3457,7 @@ msgid "Services & Usage"
 msgstr "服务及资源"
 
 #: dashboards/syspanel/services_and_usage/services/tables.py:37
-#: dashboards/syspanel/services_and_usage/usage/tables.py:25
+#: dashboards/syspanel/services_and_usage/usage/tables.py:30
 msgid "Id"
 msgstr ""
 
@@ -3469,25 +3469,30 @@ msgstr "服务"
 msgid "Service"
 msgstr "服务"
 
-#: dashboards/syspanel/services_and_usage/usage/tables.py:27
+#: dashboards/syspanel/services_and_usage/usage/tables.py:32
 #, fuzzy
 msgid "CPU"
 msgstr "CPU"
 
-#: dashboards/syspanel/services_and_usage/usage/tables.py:28
+#: dashboards/syspanel/services_and_usage/usage/tables.py:33
 msgid "Memory(M)"
 msgstr "内存(M)"
 
-#: dashboards/syspanel/services_and_usage/usage/tables.py:29
+#: dashboards/syspanel/services_and_usage/usage/tables.py:34
 msgid "VMS"
 msgstr "云主机个数"
 
-#: dashboards/syspanel/services_and_usage/usage/tables.py:30
+#: dashboards/syspanel/services_and_usage/usage/tables.py:35
 #, fuzzy
 msgid "Disk(G)"
 msgstr "磁盘(G)"
 
-#: dashboards/syspanel/services_and_usage/usage/tables.py:34
+#: dashboards/syspanel/services_and_usage/usage/tables.py:37
+#, fuzzy
+msgid "System Monitor"
+msgstr "监控"
+
+#: dashboards/syspanel/services_and_usage/usage/tables.py:41
 msgid "Resource Usage"
 msgstr "资源使用情况"
 
@@ -3497,13 +3502,13 @@ msgstr "密码不匹配"
 
 #: dashboards/syspanel/users/forms.py:61
 #: dashboards/syspanel/users/forms.py:114
-#: dashboards/syspanel/users/tables.py:107
+#: dashboards/syspanel/users/tables.py:117
 msgid "User Name"
 msgstr "用户名"
 
 #: dashboards/syspanel/users/forms.py:62
 #: dashboards/syspanel/users/forms.py:115
-#: dashboards/syspanel/users/tables.py:108
+#: dashboards/syspanel/users/tables.py:118
 msgid "Email"
 msgstr ""
 
@@ -3569,25 +3574,29 @@ msgstr "用户更新成功"
 msgid "Unable to update %(attributes)s for the user."
 msgstr "无法更新用户的 %(attributes)s "
 
-#: dashboards/syspanel/users/tables.py:38
+#: dashboards/syspanel/users/tables.py:42
 msgid "Enable"
 msgstr "启用"
 
-#: dashboards/syspanel/users/tables.py:38
+#: dashboards/syspanel/users/tables.py:42
 msgid "Disable"
 msgstr "停用"
 
-#: dashboards/syspanel/users/tables.py:39
+#: dashboards/syspanel/users/tables.py:43
 msgid "Disabled"
 msgstr "已停用"
 
-#: dashboards/syspanel/users/tables.py:62
+#: dashboards/syspanel/users/tables.py:66
 msgid "You cannot disable the user you are currently logged in as."
 msgstr "你不能停用你当前登录的使用者"
 
-#: dashboards/syspanel/users/tables.py:113
+#: dashboards/syspanel/users/tables.py:123
 msgid "User ID"
 msgstr "用户ID"
+
+#: dashboards/syspanel/users/tables.py:124
+msgid "Online"
+msgstr "在线"
 
 #: dashboards/syspanel/users/views.py:69
 msgid "Unable to update user."

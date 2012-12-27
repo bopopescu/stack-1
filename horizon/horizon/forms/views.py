@@ -15,6 +15,7 @@
 #    under the License.
 
 import os
+import logging
 
 from django import http
 from django.views import generic

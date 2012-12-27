@@ -19,6 +19,7 @@
 #    under the License.
 
 import operator
+import logging
 
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -32,6 +33,12 @@ from horizon import tables
 from .forms import CreateUserForm, UpdateUserForm
 from .tables import UsersTable
 
+logger = logging.getLogger(__name__)
+#def my_view(request,agr1,arg):
+#    if bad_mojo:
+#        logger.error('Something went wrong!')
+    logger.info('bbb')
+    logger.error('error')
 
 class IndexView(tables.DataTableView):
     table_class = UsersTable
@@ -109,3 +116,5 @@ class CreateView(forms.ModalFormView):
     def get_initial(self):
         default_role = api.keystone.get_default_role(self.request)
         return {'role_id': getattr(default_role, "id", None)}
+
+

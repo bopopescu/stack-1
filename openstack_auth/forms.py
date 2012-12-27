@@ -17,7 +17,7 @@ class Login(AuthenticationForm):
     password = forms.CharField(label=_("Password"),
                                widget=forms.PasswordInput(render_value=False))
     
-    captcha = CaptchaField(label=_("Captcha"))
+    captcha = CaptchaField(label=_("Captcha"), output_format=u'%(hidden_field)s %(text_field)s %(image)s')
     
     tenant = forms.CharField(required=False, widget=forms.HiddenInput())
 

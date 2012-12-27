@@ -22,9 +22,10 @@ def get_enabled(service, reverse=False):
     return options[0] if not service.disabled else options[1]
 
 def get_smon(service):
-    
-    #url = "horizon:syspanel:images:update"
-    return mark_safe("<a href='http://192.168.40.30/ganglia/graph.php?g=network_report&z=large&c=OpenStack&h=sdc-openstack-controller&m=load_one&r=hour&s=descending&hc=4&mc=2&st=1356406076'>detail</a>")
+    hostname = service['hypervisor_hostname']    
+    #url = ("<a href='http://192.168.40.30/ganglia/graph.php?hostname=%s'>detail</a>")%hostname
+    url = ("<a href = 'http://159.226.50.227/ganglia/?m=load_one&r=hour&c=%s&h=%s'>detail</a>") % ("OpenStack", hostname)
+    return mark_safe(url)
 
 class UsageTable(tables.DataTable):
     id = tables.Column('id', verbose_name=_('Id'), hidden=True)
