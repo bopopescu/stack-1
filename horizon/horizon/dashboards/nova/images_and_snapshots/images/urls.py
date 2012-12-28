@@ -20,7 +20,7 @@
 
 from django.conf.urls.defaults import patterns, url
 
-from .views import UpdateView, DetailView, CreateView
+from .views import UpdateView, DetailView, CreateView, AttachView
 
 VIEWS_MOD = 'horizon.dashboards.nova.images_and_snapshots.images.views'
 
@@ -28,5 +28,6 @@ VIEWS_MOD = 'horizon.dashboards.nova.images_and_snapshots.images.views'
 urlpatterns = patterns(VIEWS_MOD,
     url(r'^create/$', CreateView.as_view(), name='create'),
     url(r'^(?P<image_id>[^/]+)/update/$', UpdateView.as_view(), name='update'),
+    url(r'^(?P<image_id>[^/]+)/attach/$', AttachView.as_view(), name='attach'),
     url(r'^(?P<image_id>[^/]+)/$', DetailView.as_view(), name='detail'),
 )

@@ -77,6 +77,36 @@ class UpdateView(forms.ModalFormView):
                 'disk_format': image.disk_format,
                 'public': image.is_public == "True"}
 
+class AttachView(forms.ModalFormView):
+    form_class = UpdateImageForm
+    template_name = 'nova/images_and_snapshots/images/update.html'
+    success_url = reverse_lazy("horizon:nova:instances:index")
+
+    def get_object(self):
+        if not hasattr(self, "_object"):
+            try:
+                self._object = api.image_get(self.request,
+                                             self.kwargs['image_id'])
+            except:
+                msg = _('Unable to retrieve image.')
+                redirect = reverse('horizon:nova:images_and_snapshots:index')
+                exceptions.handle(self.request, msg, redirect=redirect)
+        return self._object
+
+    def get_context_data(self, **kwargs):
+        context = super(AttachView, self).get_context_data(**kwargs)
+        context['image'] = self.get_object()
+        return context
+
+    def get_initial(self):
+        image = self.get_object()
+        return {'image_id': self.kwargs['image_id'],
+                'name': image.name,
+                'kernel': image.properties.get('kernel_id', ''),
+                'ramdisk': image.properties.get('ramdisk_id', ''),
+                'architecture': image.properties.get('architecture', ''),
+                'disk_format': image.disk_format,
+                'public': image.is_public == "True"}
 
 class DetailView(tabs.TabView):
     tab_group_class = ImageDetailTabs

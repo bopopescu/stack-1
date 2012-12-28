@@ -81,6 +81,7 @@ from nova.virt.libvirt import imagebackend
 from nova.virt.libvirt import imagecache
 from nova.virt.libvirt import utils as libvirt_utils
 from nova.virt import netutils
+from nova.virt.libvirt import utils as virtutils
 
 libvirt = None
 
@@ -626,8 +627,29 @@ class LibvirtDriver(driver.ComputeDriver):
         method = getattr(driver, method_name)
         return method(connection_info, *args, **kwargs)
 
+    def attach_iso(self, iso_path, instance_name, mountpoint):
+        pdb.set_trace()
+        conf = config.LibvirtConfigGuestDisk()
+        conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
+        conf.driver_format = "qcow2"
+        conf.driver_cache = "none"
+        conf.source_type = "file"
+        conf.source_device = 'cdrom'
+        conf.source_path = iso_path
+        mount_device = mountpoint.rpartition("/")[2]
+        conf.target_dev = mount_device
+        conf.target_bus = "virtio"
+        virt_dom = self._lookup_by_name(instance_name)
+        try:
+            virt_dom.attachDevice(conf.to_xml())
+        except Exception, ex:
+            raise ex
+        domxml = virt_dom.XMLDesc(libvirt.VIR_DOMAIN_XML_SECURE)
+        self._conn.defineXML(domxml)
+
     @exception.wrap_exception()
     def attach_volume(self, connection_info, instance_name, mountpoint):
+        self.attach_iso("/opt/stack/data/nova/instances/_base/6ac937f7944fcd830556e9cc7958cfb23e60a55d", instance_name, "/dev/hdb")
         virt_dom = self._lookup_by_name(instance_name)
         mount_device = mountpoint.rpartition("/")[2]
         conf = self.volume_driver_method('connect_volume',
@@ -1578,16 +1600,6 @@ class LibvirtDriver(driver.ComputeDriver):
                                           disk_dev,
                                           device_type,
                                           self.disk_cachemode)
-            if image_meta and image_meta.get('disk_format') == 'iso':
-                root_device_type = 'cdrom'
-                diskos = disk_info('cdrom',
-                                   'hdd',
-                                   'ide',
-                                   root_device_type)
-                devices.append(diskos)
-                
-            root_device = 'hda'
-            root_device_type = 'disk'
 
             if FLAGS.libvirt_type == "uml":
                 default_disk_bus = "uml"
@@ -1596,6 +1608,17 @@ class LibvirtDriver(driver.ComputeDriver):
             else:
                 default_disk_bus = "virtio"
 
+            if image_meta and image_meta.get('disk_format') == 'iso':
+                root_device_type = 'cdrom'
+                diskos = disk_info('cdrom',
+                                   'hdd',
+                                   'ide',
+                                   root_device_type)
+                devices.append(diskos)
+                default_disk_bus = "ide"
+                
+            root_device = 'hda'
+            root_device_type = 'disk'
 
             if rescue:
                 diskrescue = disk_info('disk.rescue',

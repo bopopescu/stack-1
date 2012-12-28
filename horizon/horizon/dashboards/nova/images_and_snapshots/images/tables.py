@@ -96,6 +96,16 @@ class UpdateRow(tables.Row):
         image = api.image_get(request, image_id)
         return image
 
+class EditAttachments(tables.LinkAction):
+    name = "attach"
+    verbose_name = _("Edit Attachments")
+    url = "horizon:nova:images_and_snapshots:images:attach"
+    classes = ("ajax-modal", "btn-edit")
+
+    def allowed(self, request, image=None):
+        if image and getattr(image, "disk_format", "") == "iso":
+            return True
+        return False
 
 class ImagesTable(tables.DataTable):
     STATUS_CHOICES = (
@@ -130,5 +140,5 @@ class ImagesTable(tables.DataTable):
         status_columns = ["status"]
         verbose_name = _("Images")
         table_actions = (CreateImage, DeleteImage,)
-        row_actions = (LaunchImage, EditImage, DeleteImage,)
+        row_actions = (LaunchImage, EditImage, EditAttachments, DeleteImage, )
         pagination_param = "image_marker"
