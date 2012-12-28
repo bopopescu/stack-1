@@ -100,7 +100,7 @@ SERVICE_TOKEN=$PASSWORD
 SWIFT_HASH=$PASSWORD
 ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit,swift,n-cpu,n-net
 VOLUME_BACKING_FILE_SIZE=${back_file_size}G
-IMAGE_URLS=http://159.226.50.227/share/windows_xp.img,http://159.226.50.227/share/centos-6.2-x86_64.img,http://159.226.50.227/share/windows2008.img,http://159.226.50.227/share/ubuntu-11.10-desktop-i386.img,http://159.226.50.227/share/WinXP_SP3.iso,http://159.226.50.227/share/windows7_ultimate.iso
+IMAGE_URLS=http://159.226.50.227/share/windows_xp.img,http://159.226.50.227/share/centos-6.2-x86_64.img,http://159.226.50.227/share/windows2008.img,http://159.226.50.227/share/ubuntu-11.10-desktop-i386.img
 MY_ROLE=controller
 EOF
 ./stack.sh controller xxxxxxxxx

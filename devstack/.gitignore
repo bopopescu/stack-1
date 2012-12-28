@@ -1,6 +1,7 @@
 *.pyc
 *.gz
 *.img
+*.iso
 files/images/*
 localrc
 stack-screenrc
