@@ -382,13 +382,13 @@ class LibvirtConfigGuestDisk(LibvirtConfigGuestDevice):
                 drv.set("cache", self.driver_cache)
             dev.append(drv)
 
-        if self.source_type == "file":
+        if self.source_type == "file" and self.source_path is not None:
             dev.append(etree.Element("source", file=self.source_path))
-        elif self.source_type == "block":
+        elif self.source_type == "block" and self.source_path is not None:
             dev.append(etree.Element("source", dev=self.source_path))
-        elif self.source_type == "mount":
+        elif self.source_type == "mount" and self.source_path is not None:
             dev.append(etree.Element("source", dir=self.source_path))
-        elif self.source_type == "network":
+        elif self.source_type == "network" and self.source_protocol is not None:
             dev.append(etree.Element("source", protocol=self.source_protocol,
                                       name=self.source_host))
 

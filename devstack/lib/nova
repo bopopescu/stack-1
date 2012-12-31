@@ -300,8 +300,8 @@ function init_nova() {
     add_nova_opt "s3_port=$S3_SERVICE_PORT"
     add_nova_opt "osapi_compute_extension=nova.api.openstack.compute.contrib.standard_extensions"
     add_nova_opt "my_ip=$HOST_IP"
-    add_nova_opt "start_guests_on_host_boot=True"
-    add_nova_opt "resume_guests_state_on_host_boot=True"
+    add_nova_opt "start_guests_on_host_boot=False"
+    add_nova_opt "resume_guests_state_on_host_boot=False"
     add_nova_opt "rabbit_max_retries=0"
     #fix metadata problem 
     add_nova_opt "metadata_host=$HOST_IP"
