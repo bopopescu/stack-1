@@ -36,7 +36,6 @@ FOLDER_DELIMITER = "/"
 class Container(APIDictWrapper):
     pass
 
-
 class StorageObject(APIDictWrapper):
     def __init__(self, apidict, container_name, orig_name=None, data=None):
         super(StorageObject, self).__init__(apidict)
@@ -98,6 +97,8 @@ def _objectify(items, container_name):
 
 def swift_api(request):
     endpoint = url_for(request, 'object-store')
+    username = request.user.username
+    tokenid = request.user.token.id
     LOG.debug('Swift connection created using token "%s" and url "%s"'
               % (request.user.token.id, endpoint))
     return swiftclient.client.Connection(None,
@@ -129,6 +130,10 @@ def swift_get_containers(request, marker=None):
     headers, containers = swift_api(request).get_account(limit=limit + 1,
                                                          marker=marker,
                                                          full_listing=True)
+    #temp = swift_api(request).head_account()
+    #temp2 = swift_api(request).head_container('test')
+    #temp3 = swift_api(request).head_object('test','testobj')
+    #assert(0)
     container_objs = [Container(c) for c in containers]
     if(len(container_objs) > limit):
         return (container_objs[0:-1], True)

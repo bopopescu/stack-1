@@ -273,6 +273,8 @@ class LibvirtDriver(driver.ComputeDriver):
         self.firewall_driver = firewall.load_driver(
             default=DEFAULT_FIREWALL_DRIVER,
             get_connection=self._get_connection)
+        self.cdrom_path = None
+        self.disk_path = None
         self.vif_driver = importutils.import_object(FLAGS.libvirt_vif_driver)
         self.volume_drivers = {}
         for driver_str in FLAGS.libvirt_volume_drivers:
@@ -628,6 +630,7 @@ class LibvirtDriver(driver.ComputeDriver):
         return method(connection_info, *args, **kwargs)
 
     def attach_iso(self, iso_path, instance_name, mountpoint):
+        pdb.set_trace()
         import nova
         img_info = nova.virt.images.qemu_img_info(iso_path)
         conf = config.LibvirtConfigGuestDisk()
@@ -639,7 +642,7 @@ class LibvirtDriver(driver.ComputeDriver):
         conf.source_path = iso_path
         mount_device = mountpoint.rpartition("/")[2]
         conf.target_dev = mount_device
-        conf.target_bus = "ide"
+        conf.target_bus = "scsi"
         virt_dom = self._lookup_by_name(instance_name)
         try:
             virt_dom.attachDevice(conf.to_xml())
@@ -650,7 +653,6 @@ class LibvirtDriver(driver.ComputeDriver):
 
     @exception.wrap_exception()
     def attach_volume(self, connection_info, instance_name, mountpoint):
-        self.attach_iso("/opt/stack/data/nova/instances/_base/5e7435704f3926d1d20b825bf59b39e3d7c7fc2d", instance_name, "/dev/hdb")
         virt_dom = self._lookup_by_name(instance_name)
         mount_device = mountpoint.rpartition("/")[2]
         conf = self.volume_driver_method('connect_volume',
@@ -1343,6 +1345,7 @@ class LibvirtDriver(driver.ComputeDriver):
                                     image_id=disk_images['image_id'],
                                     user_id=instance['user_id'],
                                     project_id=instance['project_id'])
+                self.cdrom_path = os.path.join(FLAGS.instances_path,instance['name'],'cdrom')
                 ephemeral_size=instance['root_gb']
                 if ephemeral_size == 0:
                     ephemeral_size=10
@@ -1360,6 +1363,7 @@ class LibvirtDriver(driver.ComputeDriver):
                                     image_id=disk_images['image_id'],
                                     user_id=instance['user_id'],
                                     project_id=instance['project_id'])
+                self.disk_path = os.path.join(FLAGS.instances_path,instance['name'],'disk')
 
         ephemeral_gb = instance['ephemeral_gb']
         if ephemeral_gb and not self._volume_in_mapping(
@@ -1609,9 +1613,10 @@ class LibvirtDriver(driver.ComputeDriver):
             else:
                 default_disk_bus = "virtio"
 
+            #cdrom config
             if image_meta and image_meta.get('disk_format') == 'iso':
-                diskos = disk_info('cdrom','hdd','ide','cdrom')
-                devices.append(diskos)
+                conf = disk_info('cdrom','hdd','ide','cdrom')
+                devices.append(conf)
                 default_disk_bus = "ide"
                 
             root_device = 'hda'
