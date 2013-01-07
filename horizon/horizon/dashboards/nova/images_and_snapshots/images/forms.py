@@ -162,3 +162,64 @@ class UpdateImageForm(forms.SelfHandlingForm):
             return image
         except:
             exceptions.handle(request, error_updating % image_id)
+
+
+class AttachImageForm(forms.SelfHandlingForm):
+    instance = forms.ChoiceField(label=_("Attach to Instance"),
+                                 help_text=_("Select an instance to "
+                                             "attach to."))
+
+    image_id = forms.CharField(widget=forms.HiddenInput())
+
+    def __init__(self, *args, **kwargs):
+        super(AttachImageForm, self).__init__(*args, **kwargs)
+        # Populate instance choices
+        instance_list = kwargs.get('initial', {}).get('instances', [])
+        instances = []
+        for instance in instance_list:
+            if instance.status in ACTIVE_STATES and \
+                        not any(instance.id == att["server_id"]
+                                for att in volume.attachments):
+                instances.append((instance.id, '%s (%s)' % (instance.name,
+                                                            instance.id)))
+        if instances:
+            instances.insert(0, ("", _("Select an instance")))
+        else:
+            instances = (("", _("No instances available")),)
+        self.fields['instance'].choices = instances
+
+
+    def handle(self, request, data):
+        image_id = data['image_id']
+        instance_choices = dict(self.fields['instance'].choices)
+        instance_name = instance_choices.get(data['instance'],
+                                             _("Unknown instance (None)"))
+        # The name of the instance in the choices list has the ID appended to
+        # it, so let's slice that off...
+        instance_name = instance_name.rsplit(" (")[0]
+        try:
+            vol = api.volume_attach(request,
+                                    data['volume_id'],
+                                    data['instance'],
+                                    data.get('device', ''))
+            vol_name = api.volume_get(request, data['volume_id']).display_name
+
+            message = _('Attaching volume %(vol)s to instance '
+                         '%(inst)s on %(dev)s.') % {"vol": vol_name,
+                                                    "inst": instance_name,
+                                                    "dev": vol.device}
+            messages.info(request, message)
+            return True
+        except:
+            redirect = reverse("horizon:nova:volumes:index")
+            exceptions.handle(request,
+                              _('Unable to attach volume.'),
+                              redirect=redirect)
+
+
+        try:
+            image = api.image_update(request, image_id, **meta)
+            messages.success(request, _('Image was successfully updated.'))
+            return image
+        except:
+            exceptions.handle(request, error_updating % image_id)

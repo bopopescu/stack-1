@@ -629,20 +629,20 @@ class LibvirtDriver(driver.ComputeDriver):
         method = getattr(driver, method_name)
         return method(connection_info, *args, **kwargs)
 
-    def attach_iso(self, iso_path, instance_name, mountpoint):
-        pdb.set_trace()
+    @exception.wrap_exception()
+    def attach_iso(self, iso_path, instance_name, mountpoint, bus='scsi'):
         import nova
         img_info = nova.virt.images.qemu_img_info(iso_path)
         conf = config.LibvirtConfigGuestDisk()
         conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
         conf.driver_format = img_info['file format']
-        conf.driver_cache = "none"
+        conf.driver_cache = None
         conf.source_type = "file"
         conf.source_device = 'cdrom'
         conf.source_path = iso_path
         mount_device = mountpoint.rpartition("/")[2]
         conf.target_dev = mount_device
-        conf.target_bus = "scsi"
+        conf.target_bus = bus
         virt_dom = self._lookup_by_name(instance_name)
         try:
             virt_dom.attachDevice(conf.to_xml())
@@ -650,6 +650,36 @@ class LibvirtDriver(driver.ComputeDriver):
             raise ex
         domxml = virt_dom.XMLDesc(libvirt.VIR_DOMAIN_XML_SECURE)
         self._conn.defineXML(domxml)
+
+    @exception.wrap_exception()
+    def detach_iso(self, iso_path, instance_name, mountpoint, bus='scsi'):
+        import nova
+        img_info = nova.virt.images.qemu_img_info(iso_path)
+        conf = config.LibvirtConfigGuestDisk()
+        conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
+        conf.driver_format = img_info['file format']
+        conf.driver_cache = None
+        conf.source_type = "file"
+        conf.source_device = 'cdrom'
+        conf.source_path = iso_path
+        mount_device = mountpoint.rpartition("/")[2]
+        conf.target_dev = mount_device
+        conf.target_bus = bus
+        try:
+            virt_dom = self._lookup_by_name(instance_name)
+            xml = self._get_disk_xml(virt_dom.XMLDesc(0), mount_device)
+            if not xml:
+                raise exception.DiskNotFound(location=mount_device)
+            if FLAGS.libvirt_type == 'lxc':
+                pass
+            else:
+                virt_dom.detachDevice(xml)
+        except Exception, ex:
+            raise ex
+
+        domxml = virt_dom.XMLDesc(libvirt.VIR_DOMAIN_XML_SECURE)
+        self._conn.defineXML(domxml)
+
 
     @exception.wrap_exception()
     def attach_volume(self, connection_info, instance_name, mountpoint):
@@ -1612,6 +1642,18 @@ class LibvirtDriver(driver.ComputeDriver):
                 default_disk_bus = "xen"
             else:
                 default_disk_bus = "virtio"
+
+            conf = config.LibvirtConfigGuestDisk()
+            conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
+            conf.driver_format = None
+            conf.driver_cache = None
+            conf.source_type = "file"
+            conf.source_device = 'cdrom'
+            conf.source_path = None
+            conf.target_dev = 'hdc'
+            conf.target_bus = 'ide'
+            devices.append(conf)
+
 
             #cdrom config
             if image_meta and image_meta.get('disk_format') == 'iso':

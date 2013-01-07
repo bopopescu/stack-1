@@ -32,6 +32,7 @@ from horizon import exceptions
 from horizon import forms
 from horizon import tabs
 from .forms import UpdateImageForm
+from .forms import AttachImageForm
 from .forms import CreateImageForm
 from .tabs import ImageDetailTabs
 
@@ -78,8 +79,8 @@ class UpdateView(forms.ModalFormView):
                 'public': image.is_public == "True"}
 
 class AttachView(forms.ModalFormView):
-    form_class = UpdateImageForm
-    template_name = 'nova/images_and_snapshots/images/update.html'
+    form_class = AttachImageForm
+    template_name = 'nova/images_and_snapshots/images/attach.html'
     success_url = reverse_lazy("horizon:nova:instances:index")
 
     def get_object(self):
