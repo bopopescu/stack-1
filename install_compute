@@ -101,6 +101,7 @@ RABBIT_HOST=$CTRL_ADDRESS
 GLANCE_HOSTPORT=${CTRL_ADDRESS}:9292
 ENABLED_SERVICES=n-cpu,n-net,n-api,n-novnc,cinder,c-vol,swift
 MY_ROLE=compute
+SCREEN_LOGDIR=screen_log
 EOF
 ./stack.sh compute $CTRL_ADDRESS
 

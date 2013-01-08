@@ -637,7 +637,6 @@ function screen_it {
         if [[ -n ${SCREEN_LOGDIR} ]]; then
             screen -S $SCREEN_NAME -p $1 -X logfile ${SCREEN_LOGDIR}/screen-${1}.${CURRENT_LOG_TIME}.log
             screen -S $SCREEN_NAME -p $1 -X log on
-            ln -sf ${SCREEN_LOGDIR}/screen-${1}.${CURRENT_LOG_TIME}.log ${SCREEN_LOGDIR}/screen-${1}.log
         fi
         screen -S $SCREEN_NAME -p $1 -X stuff "$2$NL"
     fi
