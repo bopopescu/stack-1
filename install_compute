@@ -58,11 +58,6 @@ grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
     > /etc/sudoers.d/50_stack_sh )
 chown -R stack:stack $TOP_DIR
 
-#install sloggin
-cd $TOP_DIR
-cd slogging
-sudo python setup.py install 1>/dev/null 2>&1
-
 #get available space
 cd $TOP_DIR
 size=$(sudo df -m|grep '/$'|awk '{print $4}')

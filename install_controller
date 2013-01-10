@@ -60,12 +60,7 @@ chown -R stack:stack $TOP_DIR
 #install captcha
 cd $TOP_DIR
 cd django-simple-captcha-0.3.0
-sudo python setup.py install 1>/dev/null 2>&1
-
-#install sloggin
-cd $TOP_DIR
-cd slogging
-sudo python setup.py install 1>/dev/null 2>&1
+sudo python setup.py develop 1>/dev/null 2>&1
 
 #get available space
 cd $TOP_DIR
