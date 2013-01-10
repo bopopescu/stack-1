@@ -7,7 +7,7 @@ from django.conf import settings
 # Add this file path to sys.path in order to import settings
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '../..'))
 #move openstack_auth to /opt/stack directory
-sys.path.append(os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), '../../..'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'openstack_dashboard.settings'
 sys.stdout = sys.stderr
 

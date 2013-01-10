@@ -132,6 +132,11 @@ def service_get_all(context, disabled=None):
     """Get all services."""
     return IMPL.service_get_all(context, disabled)
 
+def operation_log_get_all(context):
+    return IMPL.operation_log_get_all(context)
+
+def operation_log_create(context, value):
+    return IMPL.operation_log_create(context, value)
 
 def service_get_all_by_topic(context, topic):
     """Get all services for a given topic."""

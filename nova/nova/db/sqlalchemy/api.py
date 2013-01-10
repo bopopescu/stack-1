@@ -5210,6 +5210,18 @@ def task_log_get_all(context, task_name, period_beginning,
         query = query.filter_by(state=state)
     return query.all()
 
+@require_admin_context
+def operation_log_get_all(context):
+    query = model_query(context, models.OperationLog)
+    return query.all()
+
+@require_admin_context
+def operation_log_create(context, values):
+    service_ref = models.OperationLog()
+    service_ref.update(values)
+    service_ref.save()
+    return service_ref
+
 
 @require_admin_context
 def task_log_begin_task(context, task_name,

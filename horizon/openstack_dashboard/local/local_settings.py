@@ -62,7 +62,6 @@ OPENSTACK_KEYSTONE_ADMIN_URL = "http://%s:35357/v2.0" % OPENSTACK_HOST
 OPENSTACK_KEYSTONE_DEFAULT_ROLE = "Member"
 
 SWIFT_PAGINATE_LIMIT = 100
-
 # Setup caching per Django docs. In actuality, you'd probably use memcached instead of local memory.
 CACHES = {
     'default': {
@@ -70,6 +69,7 @@ CACHES = {
         'LOCATION': 'default-cache'
     }
 }
+
 
 # If you have external monitoring links, eg:
 # EXTERNAL_MONITORING = [

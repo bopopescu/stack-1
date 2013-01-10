@@ -1017,3 +1017,16 @@ class TaskLog(BASE, NovaBase):
     message = Column(String(255), nullable=False)
     task_items = Column(Integer(), default=0)
     errors = Column(Integer(), default=0)
+
+class OperationLog(BASE, NovaBase):
+    __tablename__ = "operation_log"
+    id = Column(Integer, primary_key=True, nullable=False, autoincrement=True)
+    client_ip = Column(String(255), nullable=False)
+    roles = Column(String(255), nullable=False)
+    tenant = Column(String(255), nullable=False)
+    user = Column(String(255), nullable=False)
+    time_at = Column(String(255), default=timeutils.utcnow)
+    path_info = Column(String(255), nullable=False)
+    method = Column(String(255), nullable=False)
+    body = Column(String(255), nullable=False)
+
