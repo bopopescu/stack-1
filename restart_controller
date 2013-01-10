@@ -44,3 +44,6 @@ echo "Done"
 
 
 service apache2 restart
+service gmetad restart
+service ganglia-monitor restart
+

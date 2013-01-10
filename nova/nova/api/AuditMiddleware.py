@@ -28,7 +28,7 @@ class AuditMiddleware(wsgi.Middleware):
         return response  
 
     def _store_log(self, response):
-        value = []
+        value = {}
         value["client_ip"] = self._request.headers.get('HOST')
         value["roles"] = self._request.headers.get('X-Roles')
         value["tenant"] = self._request.headers.get('X-Tenant-Name')

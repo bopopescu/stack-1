@@ -40,3 +40,5 @@ su -c "swift-init all start&" stack
 
 
 service apache2 restart
+service ganglia-monitor restart
+
