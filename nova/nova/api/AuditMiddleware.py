@@ -8,6 +8,7 @@ from nova import wsgi
 from nova import db
 import time
 import pdb
+from nova import context
 
 LOG = logging.getLogger('nova.api.audit')
 
@@ -20,7 +21,6 @@ class AuditMiddleware(wsgi.Middleware):
         self._need_audit = req.method in self._audit_methods
         self._request = req
         self._requested_at = time.time()
-        self.context = getattr(local.store, 'context', None)
 
     def process_response(self, response):  
         if self._need_audit:
@@ -37,7 +37,8 @@ class AuditMiddleware(wsgi.Middleware):
         value["path_info"] = self._request.path_info
         value["method"] = self._request.method
         value["body"] = self._request.body
-        db.operation_log_create(self.context, value)
+        admin = context.get_admin_context()
+        db.operation_log_create(admin, value)
 
 
 
