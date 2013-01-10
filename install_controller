@@ -126,7 +126,9 @@ sudo mysql -uroot -pcsdb123cnic -e 'DROP DATABASE IF EXISTS monitor;'
 sudo mysql -uroot -pcsdb123cnic -e 'CREATE DATABASE monitor CHARACTER SET utf8;'
 sudo mysql -uroot -pcsdb123cnic -e 'use monitor;source vm_monitor.sql;'
 sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9 1>/dev/null 2>&1
-sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq 1>/dev/null 2>&1
+sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq gmetad ganglia-monitor 1>/dev/null 2>&1
+sudo service gmetad restart
+sudo service ganglia-monitor restart
 su -c "nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
 su -c "nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
 

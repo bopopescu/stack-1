@@ -110,6 +110,7 @@ dataserver_port: 5551
 log: /tmp/kanyun-worker.log
 EOF" stack
 sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9 1>/dev/null 2>&1
-sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq 1>/dev/null 2>&1
+sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq ganglia-monitor 1>/dev/null 2>&1
+sudo service ganglia-monitor restart
 su -c "nohup ./kanyun-worker >.kanyun-worker.nohup 2>/dev/null&" stack
 
