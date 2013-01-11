@@ -629,6 +629,7 @@ class LibvirtDriver(driver.ComputeDriver):
         method = getattr(driver, method_name)
         return method(connection_info, *args, **kwargs)
 
+    # function attach iso image by weiyuanke123@gmail.com
     @exception.wrap_exception()
     def attach_iso(self, iso_path, instance_name, mountpoint, bus='scsi'):
         import nova
@@ -651,6 +652,7 @@ class LibvirtDriver(driver.ComputeDriver):
         domxml = virt_dom.XMLDesc(libvirt.VIR_DOMAIN_XML_SECURE)
         self._conn.defineXML(domxml)
 
+    # function deattach iso image by weiyuanke123@gmail.com
     @exception.wrap_exception()
     def detach_iso(self, iso_path, instance_name, mountpoint, bus='scsi'):
         import nova
@@ -1643,6 +1645,7 @@ class LibvirtDriver(driver.ComputeDriver):
             else:
                 default_disk_bus = "virtio"
 
+            #configure for iso attachment by wyk
             conf = config.LibvirtConfigGuestDisk()
             conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
             conf.driver_format = None
@@ -1655,7 +1658,7 @@ class LibvirtDriver(driver.ComputeDriver):
             devices.append(conf)
 
 
-            #cdrom config
+            #cdrom config by weiyuanke123@gmail.com
             if image_meta and image_meta.get('disk_format') == 'iso':
                 conf = disk_info('cdrom','hdd','ide','cdrom')
                 devices.append(conf)

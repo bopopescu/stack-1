@@ -42,10 +42,12 @@ class IndexView(tables.DataTableView):
         users = []
         try:
             users = api.keystone.user_list(self.request)
+            #filter built-in users-- added by weiyuanke123@gmail.com
+            filter_users = filter(lambda x:x.name not in ['cinder', 'swift', 'glance', 'nova'], users) 
         except:
             exceptions.handle(self.request,
                               _('Unable to retrieve user list.'))
-        return users
+        return filter_users
 
 
 class UpdateView(forms.ModalFormView):

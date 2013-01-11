@@ -82,11 +82,13 @@ class IndexView(tables.DataTableView):
         tenants = []
         try:
             tenants = api.keystone.tenant_list(self.request, admin=True)
+            #filter built-in tenants by weiyuanke123@gmail.com
+            filter_tenants = filter(lambda x: x.name not in ['service'], tenants)
         except:
             exceptions.handle(self.request,
                               _("Unable to retrieve project list."))
         tenants.sort(key=lambda x: x.id, reverse=True)
-        return tenants
+        return filter_tenants
 
 
 class UsersView(tables.MultiTableView):
