@@ -1,5 +1,8 @@
 """
-operation audit middleware
+operation audit middleware by weiyuanke123@gmail.com
+
+todo:
+    extent nova-api to supprot query
 
 """
 from nova.openstack.common import log as logging
