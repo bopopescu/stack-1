@@ -846,7 +846,7 @@ if is_service_enabled horizon; then
 
     # ``local_settings.py`` is used to override horizon default settings.
     local_settings=$HORIZON_DIR/openstack_dashboard/local/local_settings.py
-    cp $FILES/horizon_settings.py $local_settings
+    cp $FILES/horizon_settings.conf $local_settings
 
     # Initialize the horizon database (it stores sessions and notices shown to
     # users).  The user system is external (keystone).
