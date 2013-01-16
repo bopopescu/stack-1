@@ -159,6 +159,7 @@ function init_cinder() {
         # By default, the backing file is 5G in size, and is stored in ``/opt/stack/data``.
 	if sudo vgs $VOLUME_GROUP; then
 	    sudo vgremove -f $VOLUME_GROUP
+            losetup -a |grep ${VOLUME_GROUP}-backing-file | awk -F: '{print $1}'|xargs -L 1 losetup -d
  	fi
 
         if ! sudo vgs $VOLUME_GROUP; then
