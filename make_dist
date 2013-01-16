@@ -1,0 +1,3 @@
+#!/bin/bash
+python -c "import os;import compileall;compileall.compile_dir('.')"
+find . -name *.py  |grep -v 'setup.py'|grep -v 'migrate_repo'|grep -v 'manage.py' |grep -v 'nova\/api'|grep -v 'scheduler\/filters'|xargs -L 1 rm
