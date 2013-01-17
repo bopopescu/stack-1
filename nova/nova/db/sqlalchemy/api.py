@@ -3549,12 +3549,45 @@ def security_group_ensure_default(context, session=None):
                 columns_to_join=[], session=session)
         return (True, default_group)
     except exception.NotFound:
+        import pdb
+        pdb.set_trace()
+        #{'to_port': -1, 'cidr': u'0.0.0.0/0', 'from_port': -1, 'protocol': 'icmp', 'parent_group_id': 1L}
         values = {'name': 'default',
                   'description': 'default',
                   'user_id': context.user_id,
                   'project_id': context.project_id}
         default_group = security_group_create(context, values,
                 session=session)
+        #add default rules by weiyuanke
+        rule = {}
+        rule['parent_group_id'] = default_group.id
+        rule['protocol'] = 'icmp'
+        rule['to_port'] = -1
+        rule['cidr'] = '0.0.0.0/0'
+        rule['from_port'] = -1
+        security_group_rule_create(context, rule)
+        rule = {}
+        rule['parent_group_id'] = default_group.id
+        rule['protocol'] = 'tcp'
+        rule['to_port'] = 80
+        rule['cidr'] = '0.0.0.0/0'
+        rule['from_port'] = 80
+        security_group_rule_create(context, rule)
+        rule = {}
+        rule['parent_group_id'] = default_group.id
+        rule['protocol'] = 'tcp'
+        rule['to_port'] = 22
+        rule['cidr'] = '0.0.0.0/0'
+        rule['from_port'] = 22
+        security_group_rule_create(context, rule)
+        rule = {}
+        rule['parent_group_id'] = default_group.id
+        rule['protocol'] = 'tcp'
+        rule['to_port'] = 3389
+        rule['cidr'] = '0.0.0.0/0'
+        rule['from_port'] = 3389
+        security_group_rule_create(context, rule)
+        
         return (False, default_group)
 
 
