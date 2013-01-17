@@ -23,8 +23,7 @@ def get_enabled(service, reverse=False):
 
 def get_smon(service):
     hostname = service['hypervisor_hostname']    
-    #url = ("<a href='http://192.168.40.30/ganglia/graph.php?hostname=%s'>detail</a>")%hostname
-    url = ("<a href = 'http://159.226.50.227/ganglia/?m=load_one&r=hour&c=%s&h=%s'>detail</a>") % ("OpenStack", hostname)
+    url = ("<a href = '/ganglia/?m=load_one&r=hour&c=%s&h=%s'>detail</a>") % ("OpenStack", hostname)
     return mark_safe(url)
 
 class UsageTable(tables.DataTable):
