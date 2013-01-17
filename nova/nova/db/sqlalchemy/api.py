@@ -3549,9 +3549,6 @@ def security_group_ensure_default(context, session=None):
                 columns_to_join=[], session=session)
         return (True, default_group)
     except exception.NotFound:
-        import pdb
-        pdb.set_trace()
-        #{'to_port': -1, 'cidr': u'0.0.0.0/0', 'from_port': -1, 'protocol': 'icmp', 'parent_group_id': 1L}
         values = {'name': 'default',
                   'description': 'default',
                   'user_id': context.user_id,
