@@ -105,6 +105,7 @@ function configure_cinder() {
     iniset $CINDER_API_PASTE_INI filter:authtoken admin_tenant_name $SERVICE_TENANT_NAME
     iniset $CINDER_API_PASTE_INI filter:authtoken admin_user cinder
     iniset $CINDER_API_PASTE_INI filter:authtoken admin_password $SERVICE_PASSWORD
+    iniset $CINDER_API_PASTE_INI filter:authtoken signing_dir $DATA_DIR/cinder/signing_dir
 
     cp $CINDER_DIR/etc/cinder/cinder.conf.sample $CINDER_CONF
     iniset $CINDER_CONF DEFAULT auth_strategy keystone
