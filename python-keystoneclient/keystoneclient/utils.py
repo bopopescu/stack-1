@@ -1,4 +1,5 @@
 import uuid
+import hashlib
 
 import prettytable
 
@@ -19,7 +20,7 @@ def pretty_choice_list(l):
     return ', '.join("'%s'" % i for i in l)
 
 
-def print_list(objs, fields, formatters={}):
+def print_list(objs, fields, formatters={}, order_by=None):
     pt = prettytable.PrettyTable([f for f in fields], caching=False)
     pt.aligns = ['l' for f in fields]
 
@@ -36,7 +37,9 @@ def print_list(objs, fields, formatters={}):
                 row.append(data)
         pt.add_row(row)
 
-    print pt.get_string(sortby=fields[0])
+    if order_by is None:
+        order_by = fields[0]
+    print pt.get_string(sortby=order_by)
 
 
 def _word_wrap(string, max_length=0):
@@ -114,3 +117,9 @@ def string_to_bool(arg):
         return arg
 
     return arg.strip().lower() in ('t', 'true', 'yes', '1')
+
+
+def hash_signed_token(signed_text):
+    hash_ = hashlib.md5()
+    hash_.update(signed_text)
+    return hash_.hexdigest()

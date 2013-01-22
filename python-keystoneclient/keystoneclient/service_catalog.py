@@ -27,7 +27,7 @@ class ServiceCatalog(object):
         self.catalog = resource_dict
 
     def get_token(self):
-        """Fetch token details fron service catalog.
+        """Fetch token details from service catalog.
 
         Returns a dictionary containing the following::
 
@@ -42,7 +42,7 @@ class ServiceCatalog(object):
         try:
             token['user_id'] = self.catalog['user']['id']
             token['tenant_id'] = self.catalog['token']['tenant']['id']
-        except:
+        except Exception:
             # just leave the tenant and user out if it doesn't exist
             pass
         return token

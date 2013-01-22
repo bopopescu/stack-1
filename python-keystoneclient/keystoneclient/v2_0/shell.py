@@ -16,6 +16,7 @@
 #    under the License.
 
 import argparse
+import getpass
 
 from keystoneclient.v2_0 import client
 from keystoneclient import utils
@@ -43,7 +44,8 @@ def require_service_catalog(f):
 def do_user_list(kc, args):
     """List users"""
     users = kc.users.list(tenant_id=args.tenant_id)
-    utils.print_list(users, ['id', 'name', 'enabled', 'email'])
+    utils.print_list(users, ['id', 'name', 'enabled', 'email'],
+                     order_by='name')
 
 
 @utils.arg('id', metavar='<user-id>', help='User ID to display')
@@ -96,7 +98,7 @@ def do_user_update(kc, args):
     try:
         kc.users.update(args.id, **kwargs)
         print 'User has been updated.'
-    except Exception, e:
+    except Exception as e:
         print 'Unable to update user: %s' % e
 
 
@@ -108,6 +110,38 @@ def do_user_password_update(kc, args):
     kc.users.update_password(args.id, args.passwd)
 
 
+@utils.arg('--current-password', metavar='<current-password>',
+           dest='currentpasswd', required=False, help='Current password, '
+                'Defaults to the password as set by --os-password or '
+                'OS_PASSWORD')
+@utils.arg('--new-password ', metavar='<new-password>', dest='newpasswd',
+           required=False, help='Desired new password')
+def do_password_update(kc, args):
+    """Update own password"""
+
+    # we are prompting for these passwords if they are not passed in
+    # this gives users the option not to have their password
+    # appear in bash history etc..
+    currentpasswd = args.os_password
+    if args.currentpasswd is not None:
+        currentpasswd = args.currentpasswd
+    if currentpasswd is None:
+        currentpasswd = getpass.getpass('Current Password: ')
+
+    newpasswd = args.newpasswd
+    while newpasswd is None:
+        passwd1 = getpass.getpass('New Password: ')
+        passwd2 = getpass.getpass('Repeat New Password: ')
+        if passwd1 == passwd2:
+            newpasswd = passwd1
+
+    kc.users.update_own_password(currentpasswd, newpasswd)
+
+    if args.os_password != newpasswd:
+        print "You should update the password you are using to authenticate "\
+              "to match your new password"
+
+
 @utils.arg('id', metavar='<user-id>', help='User ID to delete')
 def do_user_delete(kc, args):
     """Delete user"""
@@ -117,7 +151,7 @@ def do_user_delete(kc, args):
 def do_tenant_list(kc, args):
     """List all tenants"""
     tenants = kc.tenants.list()
-    utils.print_list(tenants, ['id', 'name', 'enabled'])
+    utils.print_list(tenants, ['id', 'name', 'enabled'], order_by='name')
 
 
 @utils.arg('id', metavar='<tenant-id>', help='Tenant ID to display')
@@ -189,7 +223,8 @@ def do_service_create(kc, args):
 def do_service_list(kc, args):
     """List all services in Service Catalog"""
     services = kc.services.list()
-    utils.print_list(services, ['id', 'name', 'type', 'description'])
+    utils.print_list(services, ['id', 'name', 'type', 'description'],
+                     order_by='name')
 
 
 @utils.arg('id', metavar='<service-id>', help='Service ID to display')
@@ -208,7 +243,7 @@ def do_service_delete(kc, args):
 def do_role_list(kc, args):
     """List all roles"""
     roles = kc.roles.list()
-    utils.print_list(roles, ['id', 'name'])
+    utils.print_list(roles, ['id', 'name'], order_by='name')
 
 
 @utils.arg('id', metavar='<role-id>', help='Role ID to display')
@@ -277,7 +312,8 @@ def do_user_role_list(kc, args):
         role.user_id = args.user_id
         role.tenant_id = args.tenant_id
 
-    utils.print_list(roles, ['id', 'name', 'user_id', 'tenant_id'])
+    utils.print_list(roles, ['id', 'name', 'user_id', 'tenant_id'],
+                     order_by='name')
 
 
 @utils.arg('--user-id', metavar='<user-id>', help='User ID')
@@ -285,7 +321,7 @@ def do_user_role_list(kc, args):
 @utils.arg('--tenant-id', metavar='<tenant-id>', help='Tenant ID')
 @utils.arg('--tenant_id', help=argparse.SUPPRESS)
 def do_ec2_credentials_create(kc, args):
-    """Create EC2-compatibile credentials for user per tenant"""
+    """Create EC2-compatible credentials for user per tenant"""
     if not args.tenant_id:
         # use the authenticated tenant id as a default
         args.tenant_id = kc.auth_tenant_id
@@ -301,7 +337,7 @@ def do_ec2_credentials_create(kc, args):
 @utils.arg('--access', metavar='<access-key>', required=True,
            help='Access Key')
 def do_ec2_credentials_get(kc, args):
-    """Display EC2-compatibile credentials"""
+    """Display EC2-compatible credentials"""
     if not args.user_id:
         # use the authenticated user id as a default
         args.user_id = kc.auth_user_id
@@ -313,7 +349,7 @@ def do_ec2_credentials_get(kc, args):
 @utils.arg('--user-id', metavar='<user-id>', help='User ID')
 @utils.arg('--user_id', help=argparse.SUPPRESS)
 def do_ec2_credentials_list(kc, args):
-    """List EC2-compatibile credentials for a user"""
+    """List EC2-compatible credentials for a user"""
     if not args.user_id:
         # use the authenticated user id as a default
         args.user_id = kc.auth_user_id
@@ -321,7 +357,7 @@ def do_ec2_credentials_list(kc, args):
     for cred in credentials:
         try:
             cred.tenant = getattr(kc.tenants.get(cred.tenant_id), 'name')
-        except:
+        except Exception:
             # FIXME(dtroyer): Retrieving the tenant name fails for normal
             #                 users; stuff in the tenant_id instead.
             cred.tenant = cred.tenant_id
@@ -333,14 +369,14 @@ def do_ec2_credentials_list(kc, args):
 @utils.arg('--access', metavar='<access-key>', required=True,
            help='Access Key')
 def do_ec2_credentials_delete(kc, args):
-    """Delete EC2-compatibile credentials"""
+    """Delete EC2-compatible credentials"""
     if not args.user_id:
         # use the authenticated user id as a default
         args.user_id = kc.auth_user_id
     try:
         kc.ec2.delete(args.user_id, args.access)
         print 'Credential has been deleted.'
-    except Exception, e:
+    except Exception as e:
         print 'Unable to delete credential: %s' % e
 
 
@@ -419,7 +455,7 @@ def do_endpoint_delete(kc, args):
     try:
         kc.endpoints.delete(args.id)
         print 'Endpoint has been deleted.'
-    except:
+    except Exception:
         print 'Unable to delete endpoint.'
 
 
