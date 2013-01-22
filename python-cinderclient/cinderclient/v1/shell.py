@@ -20,6 +20,7 @@ import os
 import sys
 import time
 
+from cinderclient import exceptions
 from cinderclient import utils
 
 
@@ -91,14 +92,17 @@ def _translate_volume_snapshot_keys(collection):
                 setattr(item, to_key, item._info[from_key])
 
 
-def _extract_metadata(arg_list):
+def _extract_metadata(args):
     metadata = {}
-    for metadatum in arg_list:
-        assert(metadatum.find('=') > -1), "Improperly formatted metadata "\
-                                          "input (%s)" % metadatum
-        (key, value) = metadatum.split('=', 1)
-        metadata[key] = value
+    for metadatum in args.metadata[0]:
+        # unset doesn't require a val, so we have the if/else
+        if '=' in metadatum:
+            (key, value) = metadatum.split('=', 1)
+        else:
+            key = metadatum
+            value = None
 
+        metadata[key] = value
     return metadata
 
 
@@ -144,7 +148,7 @@ def do_list(cs, args):
         servers = [s.get('server_id') for s in vol.attachments]
         setattr(vol, 'attached_to', ','.join(map(str, servers)))
     utils.print_list(volumes, ['ID', 'Status', 'Display Name',
-                     'Size', 'Volume Type', 'Attached to'])
+                     'Size', 'Volume Type', 'Bootable', 'Attached to'])
 
 
 @utils.arg('volume', metavar='<volume>', help='ID of the volume.')
@@ -166,6 +170,14 @@ def do_show(cs, args):
     help='Create volume from snapshot id (Optional, Default=None)')
 @utils.arg(
     '--snapshot_id',
+    help=argparse.SUPPRESS)
+@utils.arg(
+    '--source-volid',
+    metavar='<source-volid>',
+    default=None,
+    help='Create volume from volume id (Optional, Default=None)')
+@utils.arg(
+    '--source_volid',
     help=argparse.SUPPRESS)
 @utils.arg(
     '--image-id',
@@ -219,10 +231,11 @@ def do_create(cs, args):
 
     volume_metadata = None
     if args.metadata is not None:
-        volume_metadata = _extract_metadata(args.metadata)
+        volume_metadata = _extract_metadata(args)
 
     volume = cs.volumes.create(args.size,
                                args.snapshot_id,
+                               args.source_volid,
                                args.display_name,
                                args.display_description,
                                args.volume_type,
@@ -255,6 +268,31 @@ def do_rename(cs, args):
     if args.display_description is not None:
         kwargs['display_description'] = args.display_description
     _find_volume(cs, args.volume).update(**kwargs)
+
+
+@utils.arg('volume',
+           metavar='<volume>',
+           help='ID of the volume to update metadata on.')
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="Actions: 'set' or 'unset'")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           action='append',
+           default=[],
+           help='Metadata to set/unset (only key is necessary on unset)')
+@utils.service_type('volume')
+def do_metadata(cs, args):
+    """Set or Delete metadata on a volume."""
+    volume = _find_volume(cs, args.volume)
+    metadata = _extract_metadata(args)
+
+    if args.action == 'set':
+        cs.volumes.set_metadata(volume, metadata)
+    elif args.action == 'unset':
+        cs.volumes.delete_metadata(volume, metadata.keys())
 
 
 @utils.arg(
@@ -318,7 +356,7 @@ def do_snapshot_show(cs, args):
 @utils.arg('--force',
            metavar='<True|False>',
            help='Optional flag to indicate whether '
-           'to snapshot a volume even if its '
+           'to snapshot a volume even if it\'s '
            'attached to an instance. (Default=False)',
            default=False)
 @utils.arg(
@@ -378,6 +416,11 @@ def _print_volume_type_list(vtypes):
     utils.print_list(vtypes, ['ID', 'Name'])
 
 
+def _print_type_and_extra_specs_list(vtypes):
+    formatters = {'extra_specs': _print_type_extra_specs}
+    utils.print_list(vtypes, ['ID', 'Name', 'extra_specs'], formatters)
+
+
 @utils.service_type('volume')
 def do_type_list(cs, args):
     """Print a list of available 'volume types'."""
@@ -385,9 +428,16 @@ def do_type_list(cs, args):
     _print_volume_type_list(vtypes)
 
 
+@utils.service_type('volume')
+def do_extra_specs_list(cs, args):
+    """Print a list of current 'volume types and extra specs' (Admin Only)."""
+    vtypes = cs.volume_types.list()
+    _print_type_and_extra_specs_list(vtypes)
+
+
 @utils.arg('name',
            metavar='<name>',
-           help="Name of the new flavor")
+           help="Name of the new volume type")
 @utils.service_type('volume')
 def do_type_create(cs, args):
     """Create a new volume type."""
@@ -400,8 +450,33 @@ def do_type_create(cs, args):
            help="Unique ID of the volume type to delete")
 @utils.service_type('volume')
 def do_type_delete(cs, args):
-    """Delete a specific flavor"""
+    """Delete a specific volume type"""
     cs.volume_types.delete(args.id)
+
+
+@utils.arg('vtype',
+           metavar='<vtype>',
+           help="Name or ID of the volume type")
+@utils.arg('action',
+           metavar='<action>',
+           choices=['set', 'unset'],
+           help="Actions: 'set' or 'unset'")
+@utils.arg('metadata',
+           metavar='<key=value>',
+           nargs='+',
+           action='append',
+           default=[],
+           help='Extra_specs to set/unset (only key is necessary on unset)')
+@utils.service_type('volume')
+def do_type_key(cs, args):
+    "Set or unset extra_spec for a volume type."""
+    vtype = _find_volume_type(cs, args.vtype)
+    keypair = _extract_metadata(args)
+
+    if args.action == 'set':
+        vtype.set_keys(keypair)
+    elif args.action == 'unset':
+        vtype.unset_keys(keypair.keys())
 
 
 def do_endpoints(cs, args):
@@ -513,3 +588,47 @@ def do_rate_limits(cs, args):
     limits = cs.limits.get().rate
     columns = ['Verb', 'URI', 'Value', 'Remain', 'Unit', 'Next_Available']
     utils.print_list(limits, columns)
+
+
+def _print_type_extra_specs(vol_type):
+    try:
+        return vol_type.get_keys()
+    except exceptions.NotFound:
+        return "N/A"
+
+
+def _find_volume_type(cs, vtype):
+    """Get a volume type by name or ID."""
+    return utils.find_resource(cs.volume_types, vtype)
+
+
+@utils.arg('volume_id',
+           metavar='<volume-id>',
+           help='ID of the volume to snapshot')
+@utils.arg('--force',
+           metavar='<True|False>',
+           help='Optional flag to indicate whether '
+           'to upload a volume even if it\'s '
+           'attached to an instance. (Default=False)',
+           default=False)
+@utils.arg('--container-format',
+           metavar='<container-format>',
+           help='Optional type for container format '
+           '(Default=bare)',
+           default='bare')
+@utils.arg('--disk-format',
+           metavar='<disk-format>',
+           help='Optional type for disk format '
+           '(Default=raw)',
+           default='raw')
+@utils.arg('image_name',
+           metavar='<image-name>',
+           help='Name for created image')
+@utils.service_type('volume')
+def do_upload_to_image(cs, args):
+    """Upload volume to image service as image."""
+    volume = _find_volume(cs, args.volume_id)
+    volume.upload_to_image(args.force,
+                           args.image_name,
+                           args.container_format,
+                           args.disk_format)

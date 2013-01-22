@@ -95,6 +95,23 @@ class Volume(base.Resource):
         """
         return self.manager.terminate_connection(self, connector)
 
+    def set_metadata(self, volume, metadata):
+        """
+        Set or Append metadata to a volume.
+
+        :param type : The :class: `Volume` to set metadata on
+        :param metadata: A dict of key/value pairs to set
+        """
+        return self.manager.set_metadata(self, metadata)
+
+    def upload_to_image(self, force, image_name, container_format,
+                        disk_format):
+        """
+        Upload a volume to image service as an image.
+        """
+        self.manager.upload_to_image(self, force, image_name, container_format,
+                                     disk_format)
+
 
 class VolumeManager(base.ManagerWithFind):
     """
@@ -102,7 +119,7 @@ class VolumeManager(base.ManagerWithFind):
     """
     resource_class = Volume
 
-    def create(self, size, snapshot_id=None,
+    def create(self, size, snapshot_id=None, source_volid=None,
                display_name=None, display_description=None,
                volume_type=None, user_id=None,
                project_id=None, availability_zone=None,
@@ -121,6 +138,7 @@ class VolumeManager(base.ManagerWithFind):
         :param availability_zone: Availability Zone to use
         :param metadata: Optional metadata to set on volume creation
         :param imageRef: reference to an image stored in glance
+        :param source_volid: ID of source volume to clone from
         """
 
         if metadata is None:
@@ -140,6 +158,7 @@ class VolumeManager(base.ManagerWithFind):
                            'attach_status': "detached",
                            'metadata': volume_metadata,
                            'imageRef': imageRef,
+                           'source_volid': source_volid,
                            }}
         return self._create('/volumes', body, 'volume')
 
@@ -196,52 +215,6 @@ class VolumeManager(base.ManagerWithFind):
         body = {"volume": kwargs}
 
         self._update("/volumes/%s" % base.getid(volume), body)
-
-    def create_server_volume(self, server_id, volume_id, device):
-        """
-        Attach a volume identified by the volume ID to the given server ID
-
-        :param server_id: The ID of the server
-        :param volume_id: The ID of the volume to attach.
-        :param device: The device name
-        :rtype: :class:`Volume`
-        """
-        body = {'volumeAttachment': {'volumeId': volume_id,
-                                     'device': device}}
-        return self._create("/servers/%s/os-volume_attachments" % server_id,
-                            body, "volumeAttachment")
-
-    def get_server_volume(self, server_id, attachment_id):
-        """
-        Get the volume identified by the attachment ID, that is attached to
-        the given server ID
-
-        :param server_id: The ID of the server
-        :param attachment_id: The ID of the attachment
-        :rtype: :class:`Volume`
-        """
-        return self._get("/servers/%s/os-volume_attachments/%s" % (server_id,
-                         attachment_id,), "volumeAttachment")
-
-    def get_server_volumes(self, server_id):
-        """
-        Get a list of all the attached volumes for the given server ID
-
-        :param server_id: The ID of the server
-        :rtype: list of :class:`Volume`
-        """
-        return self._list("/servers/%s/os-volume_attachments" % server_id,
-                          "volumeAttachments")
-
-    def delete_server_volume(self, server_id, attachment_id):
-        """
-        Detach a volume identified by the attachment ID from the given server
-
-        :param server_id: The ID of the server
-        :param attachment_id: The ID of the attachment
-        """
-        self._delete("/servers/%s/os-volume_attachments/%s" %
-                     (server_id, attachment_id,))
 
     def _action(self, action, volume, info=None, **kwargs):
         """
@@ -330,3 +303,38 @@ class VolumeManager(base.ManagerWithFind):
         """
         self._action('os-terminate_connection', volume,
                      {'connector': connector})
+
+    def set_metadata(self, volume, metadata):
+        """
+        Update/Set a volumes metadata.
+
+        :param volume: The :class:`Volume`.
+        :param metadata: A list of keys to be set.
+        """
+        body = {'metadata': metadata}
+        return self._create("/volumes/%s/metadata" % base.getid(volume),
+                            body, "metadata")
+
+    def delete_metadata(self, volume, keys):
+        """
+        Delete specified keys from volumes metadata.
+
+        :param volume: The :class:`Volume`.
+        :param metadata: A list of keys to be removed.
+        """
+        for k in keys:
+            self._delete("/volumes/%s/metadata/%s" % (base.getid(volume), k))
+
+    def upload_to_image(self, volume, force, image_name, container_format,
+                        disk_format):
+        """
+        Upload volume to image service as image.
+
+        :param volume: The :class:`Volume` to upload.
+        """
+        return self._action('os-volume_upload_image',
+                            volume,
+                            {'force': force,
+                            'image_name': image_name,
+                            'container_format': container_format,
+                            'disk_format': disk_format})
