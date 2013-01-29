@@ -1,0 +1,135 @@
+#!/bin/bash
+TOP_DIR=$(cd $(dirname "$0") && pwd)
+if [[ $UID -ne 0 ]]; then
+	echo "only root can execute this script"
+	exit 1
+fi
+
+rm -f $TOP_DIR/devstack/stack-screenrc
+
+if [ $# -ne 2 ];then
+	echo "Usage:"
+        echo "      `basename $0` -p password"
+	exit 0
+fi
+while getopts 'p:' OPT; do
+case $OPT in
+        p)
+            PASSWORD="$OPTARG";;
+        ?)
+            echo "Usage:"
+            echo "      `basename $0` -p password"
+	    exit 0
+esac
+done
+
+#add 163 repository
+cat << EOF  > /etc/apt/sources.list
+deb http://mirrors.163.com/ubuntu/ precise main universe restricted multiverse
+deb-src http://mirrors.163.com/ubuntu/ precise main universe restricted multiverse
+deb http://mirrors.163.com/ubuntu/ precise-security universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-security universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ precise-proposed universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-proposed universe main multiverse restricted
+deb http://mirrors.163.com/ubuntu/ precise-backports universe main multiverse restricted
+deb-src http://mirrors.163.com/ubuntu/ precise-backports universe main multiverse restricted
+
+EOF
+
+
+#create stack user
+source $TOP_DIR/devstack/functions
+is_package_installed sudo || install_package sudo
+if ! getent group stack >/dev/null; then
+    echo "Creating a group called stack"
+    groupadd stack
+fi
+if ! getent passwd stack >/dev/null; then
+    echo "Creating a user called stack"
+    useradd -g stack -s /bin/bash -d $DEST -m stack
+fi
+echo "Giving stack user passwordless sudo privileges"
+# UEC images ``/etc/sudoers`` does not have a ``#includedir``, add one
+grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
+    echo "#includedir /etc/sudoers.d" >> /etc/sudoers
+( umask 226 && echo "stack ALL=(ALL) NOPASSWD:ALL" \
+    > /etc/sudoers.d/50_stack_sh )
+chown -R stack:stack $TOP_DIR
+
+
+#install captcha
+cd $TOP_DIR
+cd django-simple-captcha-0.3.0
+sudo python setup.py develop 1>/dev/null 2>&1
+
+#get available space
+cd $TOP_DIR
+size=$(sudo df -m|grep '/$'|awk '{print $4}')
+ava_size=$[size/1024]
+if [ $ava_size -gt 300 ];then
+        back_file_size=$[ava_size-300]
+else
+        back_file_size=5
+fi
+
+
+#install openstack
+FIXED_RANGE=10.0.0.0/20
+FLOATING_RANGE=192.168.136.192/26
+cd $TOP_DIR
+cd devstack
+sudo killall screen 1>/dev/null 2>&1
+cat <<EOF >localrc
+FLAT_INTERFACE=eth0
+FIXED_RANGE=$FIXED_RANGE
+FIXED_NETWORK_SIZE=4096
+FLOATING_RANGE=$FLOATING_RANGE
+MULTI_HOST=1
+MYSQL_HOST=127.0.0.1
+MYSQL_PASSWORD=csdb123cnic
+RABBIT_PASSWORD=$PASSWORD
+SERVICE_PASSWORD=$PASSWORD
+ADMIN_PASSWORD=$PASSWORD
+SERVICE_TOKEN=$PASSWORD
+SWIFT_HASH=$PASSWORD
+ENABLED_SERVICES=g-api,g-reg,key,n-api,n-crt,n-obj,cinder,c-sch,c-api,c-vol,n-sch,n-novnc,n-xvnc,n-cauth,horizon,mysql,rabbit,swift,n-cpu,n-net
+VOLUME_BACKING_FILE_SIZE=${back_file_size}G
+IMAGE_URLS=http://159.226.50.227/share/centos-6.2-x86_64.img
+MY_ROLE=controller
+SCREEN_LOGDIR=screen_log
+EOF
+./stack.sh controller xxxxxxxxx
+
+#install monitor related package and start services
+cd $TOP_DIR
+cd kanyun/
+su -c "cat <<EOF >kanyun.conf
+[server]
+host: *
+port: 5551
+
+[mysql_db]
+host:127.0.0.1
+user:root
+passwd:csdb123cnic
+db:monitor
+cache_server:localhost
+cache_time_buffer:144000
+
+[worker]
+id: worker_$(hostname)
+worker_timeout: 60
+dataserver_host: 127.0.0.1
+dataserver_port: 5551
+log: /tmp/kanyun-worker.log
+EOF" stack
+sudo mysql -uroot -pcsdb123cnic -e 'DROP DATABASE IF EXISTS monitor;'
+sudo mysql -uroot -pcsdb123cnic -e 'CREATE DATABASE monitor CHARACTER SET utf8;'
+sudo mysql -uroot -pcsdb123cnic -e 'use monitor;source vm_monitor.sql;'
+sudo ps ax|grep -v grep|grep kanyun-|awk '{print $1}'|xargs -L 1 kill -9 1>/dev/null 2>&1
+sudo apt-get -y install libzmq-dev python-setuptools python-mysqldb redis-server python-redis python-zmq gmetad ganglia-monitor 1>/dev/null 2>&1
+sudo service gmetad restart
+sudo service ganglia-monitor restart
+su -c "nohup ./kanyun-server > .kanyun-server.nohup 2>/dev/null&" stack
+su -c "nohup ./kanyun-worker > .kanyun-worker.nohup 2>/dev/null&" stack
+
