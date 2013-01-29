@@ -1,0 +1,66 @@
+{% load branding i18n %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content='text/html; charset=utf-8' http-equiv='Content-Type' />
+    <title>{% block title %}{% endblock %} - {% site_branding %}</title>
+    {% block myjs%} {%endblock%}
+    {% include "horizon/_conf.html" %}
+    {% block css %}
+      {% include "_stylesheets.html" %}
+    {% endblock %}
+    {% include "horizon/client_side/_script_loader.html" %}
+  </head>
+
+<body id="{% block body_id %}{% endblock %}"> 
+    {%block openstack_header%}
+    <div class='openstack_header'>
+	  <div  height=35px><br><br></div>
+          {% include "_header.html" %}
+    </div>
+    {%endblock%}
+
+
+    {%block openstack_top_nav%}
+    <div class="menu">
+  	<table width="194" height="30" border="0" cellpadding="0" cellspacing="0" align="left">
+   	    <tbody><tr><td width="15"><img src="/static/dashboard/images/glcd.png"></td><td width="179">{% trans "Menu" %}</tr></tbody>
+        </table>
+    	<div class="weizhi_div">
+      	    <table width="588" height="30" border="0" align="left">
+     	        <tbody><tr>
+                <td width="26" height="25 "><img src="/static/dashboard/images/diannao.png" width="16" height="16"></td>
+                <td width="67">{%trans "Position:"%}</td>
+                <td width="477">{%block position_info%}{%endblock%}</td>
+                </tr>       
+	        </tbody>
+	    </table>
+        </div>
+    </div>
+    {%endblock%}
+    
+	
+    {% block content %}
+      <div id="container">
+        {% block sidebar %}
+          {% include 'horizon/common/_sidebar.html' %}
+        {% endblock %}
+        <div id='main_content'>
+          <!--<div class='topbar'>
+          {% block page_header %}{% endblock %}
+          </div>-->
+          {% include "horizon/_messages.html" %}
+          {% block main %}{% endblock %}
+        </div>
+      </div>
+    {% endblock %}
+
+    <div id="footer">
+      {% block footer %}{% endblock %}
+    </div>
+    {% block js %}
+      {% include "horizon/_scripts.html" %}
+    {% endblock %}
+    <div id="modal_wrapper" />
+  </body>
+</html>
