@@ -79,6 +79,16 @@ FLOATING_RANGE=192.168.136.192/26
 cd $TOP_DIR
 cd devstack
 sudo killall screen 1>/dev/null 2>&1
+
+# Exit on any errors
+trap failed ERR
+failed() {
+    local r=$?
+    kill >/dev/null 2>&1 $(jobs -p)
+    set +o xtrace
+    exit $r
+}
+
 cat <<EOF >localrc
 FLAT_INTERFACE=eth0
 FIXED_RANGE=$FIXED_RANGE
