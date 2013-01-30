@@ -14,12 +14,6 @@ source $TOP_DIR/functions
 # and ``DISTRO``
 GetDistro
 
-#config libvirtd for live migration
-sudo sed -i 's/#listen_tls/listen_tls/' /etc/libvirt/libvirtd.conf
-sudo sed -i 's/#listen_tcp/listen_tcp/' /etc/libvirt/libvirtd.conf
-sudo sed -i 's/^.auth_tcp.*$/auth_tcp = "none"/' /etc/libvirt/libvirtd.conf
-sudo sed -i 's/exec \/usr\/sbin\/libvirtd \$libvirtd_opts/exec \/usr\/sbin\/libvirtd -d -l/' /etc/init/libvirt-bin.conf
-sudo sed -i 's/libvirtd_opts="-d"/libvirtd_opts="-d -l"/' /etc/default/libvirt-bin
 
 # Settings
 # ========
@@ -142,6 +136,14 @@ else
     # Remove old file
     sudo rm -f /etc/sudoers.d/stack_sh_nova
 fi
+
+
+#config libvirtd for live migration
+sudo sed -i 's/#listen_tls/listen_tls/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/#listen_tcp/listen_tcp/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/^.auth_tcp.*$/auth_tcp = "none"/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/exec \/usr\/sbin\/libvirtd \$libvirtd_opts/exec \/usr\/sbin\/libvirtd -d -l/' /etc/init/libvirt-bin.conf
+sudo sed -i 's/libvirtd_opts="-d"/libvirtd_opts="-d -l"/' /etc/default/libvirt-bin
 
 # Create the destination directory and ensure it is writable by the user
 sudo mkdir -p $DEST
@@ -436,7 +438,7 @@ function echo_nolog() {
 # Append '.xxxxxxxx' to the given name to maintain history
 # where 'xxxxxxxx' is a representation of the date the file was created
 if [[ -n "$LOGFILE" || -n "$SCREEN_LOGDIR" ]]; then
-    LOGDAYS=${LOGDAYS:-7}
+    LOGDAYS=${LOGDAYS:-1}
     TIMESTAMP_FORMAT=${TIMESTAMP_FORMAT:-"%F-%H%M%S"}
     CURRENT_LOG_TIME=$(date "+$TIMESTAMP_FORMAT")
 fi
