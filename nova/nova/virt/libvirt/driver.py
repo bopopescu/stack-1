@@ -1646,16 +1646,16 @@ class LibvirtDriver(driver.ComputeDriver):
                 default_disk_bus = "virtio"
 
             #configure for iso attachment by wyk
-            conf = config.LibvirtConfigGuestDisk()
-            conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
-            conf.driver_format = None
-            conf.driver_cache = None
-            conf.source_type = "file"
-            conf.source_device = 'cdrom'
-            conf.source_path = None
-            conf.target_dev = 'hdc'
-            conf.target_bus = 'ide'
-            devices.append(conf)
+#            conf = config.LibvirtConfigGuestDisk()
+#            conf.driver_name = virtutils.pick_disk_driver_name(is_block_dev=True)
+#            conf.driver_format = None
+#            conf.driver_cache = None
+#            conf.source_type = "file"
+#            conf.source_device = 'cdrom'
+#            conf.source_path = None
+#            conf.target_dev = 'hdc'
+#            conf.target_bus = 'ide'
+#            devices.append(conf)
 
 
             #cdrom config by weiyuanke123@gmail.com
