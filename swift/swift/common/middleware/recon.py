@@ -16,8 +16,8 @@
 import errno
 import os
 
-from webob import Request, Response
-from swift.common.utils import split_path, get_logger, TRUE_VALUES
+from swift.common.swob import Request, Response
+from swift.common.utils import get_logger, config_true_value
 from swift.common.constraints import check_mount
 from resource import getpagesize
 from hashlib import md5
@@ -59,8 +59,7 @@ class ReconMiddleware(object):
         self.object_ring_path = os.path.join(swift_dir, 'object.ring.gz')
         self.rings = [self.account_ring_path, self.container_ring_path,
                       self.object_ring_path]
-        self.mount_check = conf.get('mount_check', 'true').lower() \
-                                    in TRUE_VALUES
+        self.mount_check = config_true_value(conf.get('mount_check', 'true'))
 
     def _from_recon_cache(self, cache_keys, cache_file, openr=open):
         """retrieve values from a recon cache file
@@ -123,14 +122,17 @@ class ReconMiddleware(object):
         """get replication info"""
         if recon_type == 'account':
             return self._from_recon_cache(['replication_time',
-                                           'replication_stats'],
+                                           'replication_stats',
+                                           'replication_last'],
                                           self.account_recon_cache)
         elif recon_type == 'container':
             return self._from_recon_cache(['replication_time',
-                                           'replication_stats'],
+                                           'replication_stats',
+                                           'replication_last'],
                                           self.container_recon_cache)
         elif recon_type == 'object':
-            return self._from_recon_cache(['object_replication_time'],
+            return self._from_recon_cache(['object_replication_time',
+                                           'object_replication_last'],
                                           self.object_recon_cache)
         else:
             return None
@@ -159,7 +161,7 @@ class ReconMiddleware(object):
         if recon_type == 'object':
             return self._from_recon_cache(['object_expiration_pass',
                                            'expired_last_pass'],
-                                           self.object_recon_cache)
+                                          self.object_recon_cache)
 
     def get_auditor_info(self, recon_type):
         """get auditor info"""
@@ -186,8 +188,8 @@ class ReconMiddleware(object):
         """list unmounted (failed?) devices"""
         mountlist = []
         for entry in os.listdir(self.devices):
-            mpoint = {'device': entry, \
-                "mounted": check_mount(self.devices, entry)}
+            mpoint = {'device': entry,
+                      'mounted': check_mount(self.devices, entry)}
             if not mpoint['mounted']:
                 mountlist.append(mpoint)
         return mountlist
@@ -202,11 +204,12 @@ class ReconMiddleware(object):
                 capacity = disk.f_bsize * disk.f_blocks
                 available = disk.f_bsize * disk.f_bavail
                 used = disk.f_bsize * (disk.f_blocks - disk.f_bavail)
-                devices.append({'device': entry, 'mounted': True, \
-                    'size': capacity, 'used': used, 'avail': available})
+                devices.append({'device': entry, 'mounted': True,
+                                'size': capacity, 'used': used,
+                                'avail': available})
             else:
-                devices.append({'device': entry, 'mounted': False, \
-                    'size': '', 'used': '', 'avail': ''})
+                devices.append({'device': entry, 'mounted': False,
+                                'size': '', 'used': '', 'avail': ''})
         return devices
 
     def get_ring_md5(self, openr=open):
@@ -273,7 +276,7 @@ class ReconMiddleware(object):
         return sockstat
 
     def GET(self, req):
-        root, rcheck, rtype = split_path(req.path, 1, 3, True)
+        root, rcheck, rtype = req.split_path(1, 3, True)
         all_rtypes = ['account', 'container', 'object']
         if rcheck == "mem":
             content = self.get_mem()

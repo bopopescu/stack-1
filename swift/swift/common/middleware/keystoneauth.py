@@ -14,10 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import webob
-
 from swift.common import utils as swift_utils
 from swift.common.middleware import acl as swift_acl
+from swift.common.swob import HTTPNotFound, HTTPForbidden, HTTPUnauthorized
 
 
 class KeystoneAuth(object):
@@ -92,12 +91,9 @@ class KeystoneAuth(object):
         self.reseller_admin_role = conf.get('reseller_admin_role',
                                             'ResellerAdmin')
         config_is_admin = conf.get('is_admin', "false").lower()
-        self.is_admin = config_is_admin in swift_utils.TRUE_VALUES
-        cfg_synchosts = conf.get('allowed_sync_hosts', '127.0.0.1')
-        self.allowed_sync_hosts = [h.strip() for h in cfg_synchosts.split(',')
-                                   if h.strip()]
+        self.is_admin = swift_utils.config_true_value(config_is_admin)
         config_overrides = conf.get('allow_overrides', 't').lower()
-        self.allow_overrides = config_overrides in swift_utils.TRUE_VALUES
+        self.allow_overrides = swift_utils.config_true_value(config_overrides)
 
     def __call__(self, environ, start_response):
         identity = self._keystone_identity(environ)
@@ -144,16 +140,44 @@ class KeystoneAuth(object):
         """Check reseller prefix."""
         return account == self._get_account_for_tenant(tenant_id)
 
+    def _authorize_cross_tenant(self, user, tenant_id, tenant_name, roles):
+        """ Check cross-tenant ACLs
+
+        Match tenant_id:user, tenant_name:user, and *:user.
+
+        :param user: The user name from the identity token.
+        :param tenant_id: The tenant ID from the identity token.
+        :param tenant_name: The tenant name from the identity token.
+        :param roles: The given container ACL.
+
+        :returns: True if tenant_id:user, tenant_name:user, or *:user matches
+                  the given ACL. False otherwise.
+
+        """
+        wildcard_tenant_match = '*:%s' % (user)
+        tenant_id_user_match = '%s:%s' % (tenant_id, user)
+        tenant_name_user_match = '%s:%s' % (tenant_name, user)
+
+        return (wildcard_tenant_match in roles
+                or tenant_id_user_match in roles
+                or tenant_name_user_match in roles)
+
     def authorize(self, req):
         env = req.environ
         env_identity = env.get('keystone.identity', {})
         tenant_id, tenant_name = env_identity.get('tenant')
+        user = env_identity.get('user', '')
+        referrers, roles = swift_acl.parse_acl(getattr(req, 'acl', None))
+
+        #allow OPTIONS requests to proceed as normal
+        if req.method == 'OPTIONS':
+            return
 
         try:
-            part = swift_utils.split_path(req.path, 1, 4, True)
+            part = req.split_path(1, 4, True)
             version, account, container, obj = part
         except ValueError:
-            return webob.exc.HTTPNotFound(request=req)
+            return HTTPNotFound(request=req)
 
         user_roles = env_identity.get('roles', [])
 
@@ -163,6 +187,13 @@ class KeystoneAuth(object):
             msg = 'User %s has reseller admin authorizing'
             self.logger.debug(msg % tenant_id)
             req.environ['swift_owner'] = True
+            return
+
+        # cross-tenant authorization
+        if self._authorize_cross_tenant(user, tenant_id, tenant_name, roles):
+            log_msg = 'user %s:%s, %s:%s, or *:%s allowed in ACL authorizing'
+            self.logger.debug(log_msg % (tenant_name, user,
+                                         tenant_id, user, user))
             return
 
         # Check if a user tries to access an account that does not match their
@@ -185,12 +216,9 @@ class KeystoneAuth(object):
                 return
 
         # If user is of the same name of the tenant then make owner of it.
-        user = env_identity.get('user', '')
         if self.is_admin and user == tenant_name:
             req.environ['swift_owner'] = True
             return
-
-        referrers, roles = swift_acl.parse_acl(getattr(req, 'acl', None))
 
         authorized = self._authorize_unconfirmed_identity(req, obj, referrers,
                                                           roles)
@@ -198,14 +226,6 @@ class KeystoneAuth(object):
             return
         elif authorized is not None:
             return self.denied_response(req)
-
-        # Allow ACL at individual user level (tenant:user format)
-        # For backward compatibility, check for ACL in tenant_id:user format
-        if ('%s:%s' % (tenant_name, user) in roles
-                or '%s:%s' % (tenant_id, user) in roles):
-            log_msg = 'user %s:%s or %s:%s allowed in ACL authorizing'
-            self.logger.debug(log_msg % (tenant_name, user, tenant_id, user))
-            return
 
         # Check if we have the role in the userroles and allow it
         for user_role in user_roles:
@@ -223,10 +243,14 @@ class KeystoneAuth(object):
         :returns: None if authorization is granted, an error page otherwise.
         """
         try:
-            part = swift_utils.split_path(req.path, 1, 4, True)
+            part = req.split_path(1, 4, True)
             version, account, container, obj = part
         except ValueError:
-            return webob.exc.HTTPNotFound(request=req)
+            return HTTPNotFound(request=req)
+
+        #allow OPTIONS requests to proceed as normal
+        if req.method == 'OPTIONS':
+            return
 
         is_authoritative_authz = (account and
                                   account.startswith(self.reseller_prefix))
@@ -249,12 +273,9 @@ class KeystoneAuth(object):
         """
         # Allow container sync.
         if (req.environ.get('swift_sync_key')
-            and req.environ['swift_sync_key'] ==
-                req.headers.get('x-container-sync-key', None)
-            and 'x-timestamp' in req.headers
-            and (req.remote_addr in self.allowed_sync_hosts
-                 or swift_utils.get_remote_client(req)
-                 in self.allowed_sync_hosts)):
+                and (req.environ['swift_sync_key'] ==
+                     req.headers.get('x-container-sync-key', None))
+                and 'x-timestamp' in req.headers):
             log_msg = 'allowing proxy %s for container-sync' % req.remote_addr
             self.logger.debug(log_msg)
             return True
@@ -274,9 +295,9 @@ class KeystoneAuth(object):
         depending on whether the REMOTE_USER is set or not.
         """
         if req.remote_user:
-            return webob.exc.HTTPForbidden(request=req)
+            return HTTPForbidden(request=req)
         else:
-            return webob.exc.HTTPUnauthorized(request=req)
+            return HTTPUnauthorized(request=req)
 
 
 def filter_factory(global_conf, **local_conf):

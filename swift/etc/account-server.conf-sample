@@ -1,6 +1,7 @@
 [DEFAULT]
 # bind_ip = 0.0.0.0
 # bind_port = 6002
+# bind_timeout = 30
 # backlog = 4096
 # workers = 1
 # user = swift
@@ -13,6 +14,10 @@
 # log_facility = LOG_LOCAL0
 # log_level = INFO
 # log_address = /dev/log
+# comma separated list of functions to call to setup custom log handlers.
+# functions get passed: conf, name, log_to_console, log_route, fmt, logger,
+# adapted_logger
+# log_custom_handlers =
 # If set, log_udp_host will override log_address
 # log_udp_host =
 # log_udp_port = 514
@@ -24,9 +29,10 @@
 # If you don't mind the extra disk space usage in overhead, you can turn this
 # on to preallocate disk space with SQLite databases to decrease fragmentation.
 # db_preallocation = off
+# eventlet_debug = false
 
 [pipeline:main]
-pipeline = recon account-server
+pipeline = healthcheck recon account-server
 
 [app:account-server]
 use = egg:swift#account
@@ -37,6 +43,12 @@ use = egg:swift#account
 # set log_requests = True
 # set log_address = /dev/log
 # auto_create_account_prefix = .
+
+[filter:healthcheck]
+use = egg:swift#healthcheck
+# An optional filesystem path, which if present, will cause the healthcheck
+# URL to return "503 Service Unavailable" with a body of "DISABLED BY FILE"
+# disable_path =
 
 [filter:recon]
 use = egg:swift#recon

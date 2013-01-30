@@ -21,6 +21,7 @@ Application Bindings
 
 * `RSwift <https://github.com/pandemicsyn/RSwift>`_ - Unofficial R API bindings.
 
+* `Go language bindings <https://github.com/ncw/swift>`_
 
 Authentication
 --------------
@@ -57,7 +58,15 @@ Alternative API
 ---------------
 
 * `Swift3 <https://github.com/fujita/swift3>`_ - Amazon S3 API emulation.
+* `CDMI <https://github.com/osaddon/cdmi>`_ - CDMI support
 
+
+.. _custom-logger-hooks-label:
+
+Custom Logger Hooks
+-------------------
+
+* `swift-sentry <https://github.com/pandemicsyn/swift-sentry>`_ - Sentry exception reporting for Swift
 
 Other
 -----
