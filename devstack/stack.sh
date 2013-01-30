@@ -14,6 +14,12 @@ source $TOP_DIR/functions
 # and ``DISTRO``
 GetDistro
 
+#config libvirtd for live migration
+sudo sed -i 's/#listen_tls/listen_tls/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/#listen_tcp/listen_tcp/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/^.auth_tcp.*$/auth_tcp = "none"/' /etc/libvirt/libvirtd.conf
+sudo sed -i 's/exec \/usr\/sbin\/libvirtd \$libvirtd_opts/exec \/usr\/sbin\/libvirtd -d -l/' /etc/init/libvirt-bin.conf
+sudo sed -i 's/libvirtd_opts="-d"/libvirtd_opts="-d -l"/' /etc/default/libvirt-bin
 
 # Settings
 # ========

@@ -40,6 +40,28 @@ class AdminUpdateRow(UpdateRow):
         instance.tenant_name = getattr(tenant, "name", None)
         return instance
 
+ACTIVE_STATES = ("ACTIVE",)
+def _is_deleting(instance):
+    task_state = getattr(instance, "OS-EXT-STS:task_state", None)
+    if not task_state:
+        return False
+    return task_state.lower() == "deleting"
+class MigrateInstance(tables.BatchAction):
+    name = "migrate"
+    action_present = _("Migrate")
+    action_past = _("Migrating")
+    data_type_singular = _("Instance")
+    data_type_plural = _("Instances")
+    classes = ('btn-danger', 'btn-reboot')
+
+    def allowed(self, request, instance=None):
+        return ((instance.status in ACTIVE_STATES)
+                and not _is_deleting(instance))
+
+    def action(self, request, obj_id):
+        api.server_live_migrate(request, obj_id, "sdc-openstack-compute72", True)
+#        api.server_migrate(request, obj_id)
+
 
 class SyspanelInstancesTable(tables.DataTable):
     TASK_STATUS_CHOICES = (
@@ -100,4 +122,4 @@ class SyspanelInstancesTable(tables.DataTable):
         row_class = AdminUpdateRow
         row_actions = (EditInstance, ConsoleLink, LogLink, CreateSnapshot,
                        TogglePause, ToggleSuspend, RebootInstance,
-                       TerminateInstance)
+                       TerminateInstance, MigrateInstance,)

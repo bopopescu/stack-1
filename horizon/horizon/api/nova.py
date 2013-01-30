@@ -372,6 +372,7 @@ def server_reboot(request, instance_id, hardness=REBOOT_HARD):
     server = server_get(request, instance_id)
     server.reboot(hardness)
 
+#add by wyk
 def server_resize(request, instance_id, flavor_id):
     novaclient(request).servers.resize(instance_id, flavor_id)
 
@@ -380,6 +381,13 @@ def server_confirm_resize(request, instance_id):
 
 def server_revert_resize(request, instance_id):
     novaclient(request).servers.revert_resize(instance_id)
+
+#add by wyk
+def server_migrate(request, instance_id):
+    novaclient(request).servers.migrate(instance_id)
+
+def server_live_migrate(request, instance_id, desthostname, block_migration=False, disk_over_commit=False):
+    novaclient(request).servers.live_migrate(instance_id, desthostname, block_migration, disk_over_commit)
 
 def server_update(request, instance_id, name):
     response = novaclient(request).servers.update(instance_id, name=name)
