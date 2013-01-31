@@ -22,13 +22,13 @@ import hmac
 import base64
 
 from eventlet import Timeout
-from swift.common.swob import Response, Request
-from swift.common.swob import HTTPBadRequest, HTTPForbidden, HTTPNotFound, \
+from webob import Response, Request
+from webob.exc import HTTPBadRequest, HTTPForbidden, HTTPNotFound, \
     HTTPUnauthorized
 
 from swift.common.middleware.acl import clean_acl, parse_acl, referrer_allowed
 from swift.common.utils import cache_from_env, get_logger, get_remote_client, \
-    split_path, config_true_value
+    split_path, TRUE_VALUES
 from swift.common.http import HTTP_CLIENT_CLOSED_REQUEST
 
 
@@ -54,11 +54,6 @@ class TempAuth(object):
         user_test_tester = testing .admin
         user_test2_tester2 = testing2 .admin
         user_test_tester3 = testing3
-        # To allow accounts/users with underscores you can base64 encode them.
-        # Here is the account "under_score" and username "a_b" (note the lack
-        # of padding equal signs):
-        user64_dW5kZXJfc2NvcmU_YV9i = testing4
-
 
     See the proxy-server.conf-sample for more information.
 
@@ -70,46 +65,43 @@ class TempAuth(object):
         self.app = app
         self.conf = conf
         self.logger = get_logger(conf, log_route='tempauth')
-        self.log_headers = config_true_value(conf.get('log_headers', 'f'))
+        self.log_headers = conf.get('log_headers', 'f').lower() in TRUE_VALUES
         self.reseller_prefix = conf.get('reseller_prefix', 'AUTH').strip()
         if self.reseller_prefix and self.reseller_prefix[-1] != '_':
             self.reseller_prefix += '_'
         self.logger.set_statsd_prefix('tempauth.%s' % (
             self.reseller_prefix if self.reseller_prefix else 'NONE',))
         self.auth_prefix = conf.get('auth_prefix', '/auth/')
-        if not self.auth_prefix or not self.auth_prefix.strip('/'):
-            self.logger.warning('Rewriting invalid auth prefix "%s" to '
-                                '"/auth/" (Non-empty auth prefix path '
-                                'is required)' % self.auth_prefix)
+        if not self.auth_prefix:
             self.auth_prefix = '/auth/'
         if self.auth_prefix[0] != '/':
             self.auth_prefix = '/' + self.auth_prefix
         if self.auth_prefix[-1] != '/':
             self.auth_prefix += '/'
         self.token_life = int(conf.get('token_life', 86400))
-        self.allow_overrides = config_true_value(
-            conf.get('allow_overrides', 't'))
-        self.storage_url_scheme = conf.get('storage_url_scheme', 'default')
+        self.allowed_sync_hosts = [h.strip()
+            for h in conf.get('allowed_sync_hosts', '127.0.0.1').split(',')
+            if h.strip()]
+        self.allow_overrides = \
+            conf.get('allow_overrides', 't').lower() in TRUE_VALUES
         self.users = {}
         for conf_key in conf:
-            if conf_key.startswith('user_') or conf_key.startswith('user64_'):
-                account, username = conf_key.split('_', 1)[1].split('_')
-                if conf_key.startswith('user64_'):
-                    # Because trailing equal signs would screw up config file
-                    # parsing, we auto-pad with '=' chars.
-                    account += '=' * (len(account) % 4)
-                    account = base64.b64decode(account)
-                    username += '=' * (len(username) % 4)
-                    username = base64.b64decode(username)
+            if conf_key.startswith('user_'):
                 values = conf[conf_key].split()
                 if not values:
                     raise ValueError('%s has no key set' % conf_key)
                 key = values.pop(0)
-                if values and ('://' in values[-1] or '$HOST' in values[-1]):
+                if values and '://' in values[-1]:
                     url = values.pop()
                 else:
-                    url = '$HOST/v1/%s%s' % (self.reseller_prefix, account)
-                self.users[account + ':' + username] = {
+                    url = 'https://' if 'cert_file' in conf else 'http://'
+                    ip = conf.get('bind_ip', '127.0.0.1')
+                    if ip == '0.0.0.0':
+                        ip = '127.0.0.1'
+                    url += ip
+                    url += ':' + conf.get('bind_port', '8080') + '/v1/' + \
+                           self.reseller_prefix + conf_key.split('_')[1]
+                self.users[conf_key.split('_', 1)[1].replace('_', ':')] = {
                     'key': key, 'url': url, 'groups': values}
 
     def __call__(self, env, start_response):
@@ -239,9 +231,8 @@ class TempAuth(object):
         Returns None if the request is authorized to continue or a standard
         WSGI response callable if not.
         """
-
         try:
-            version, account, container, obj = req.split_path(1, 4, True)
+            version, account, container, obj = split_path(req.path, 1, 4, True)
         except ValueError:
             self.logger.increment('errors')
             return HTTPNotFound(request=req)
@@ -259,13 +250,12 @@ class TempAuth(object):
             # account DELETE or PUT...
             req.environ['swift_owner'] = True
             return None
-        if (req.environ.get('swift_sync_key')
-                and (req.environ['swift_sync_key'] ==
-                     req.headers.get('x-container-sync-key', None))
-                and 'x-timestamp' in req.headers):
-            return None
-        if req.method == 'OPTIONS':
-            #allow OPTIONS requests to proceed as normal
+        if (req.environ.get('swift_sync_key') and
+            req.environ['swift_sync_key'] ==
+                req.headers.get('x-container-sync-key', None) and
+            'x-timestamp' in req.headers and
+            (req.remote_addr in self.allowed_sync_hosts or
+             get_remote_client(req) in self.allowed_sync_hosts)):
             return None
         referrers, groups = parse_acl(getattr(req, 'acl', None))
         if referrer_allowed(req.referer, referrers):
@@ -295,7 +285,7 @@ class TempAuth(object):
         """
         WSGI entry point for auth requests (ones that match the
         self.auth_prefix).
-        Wraps env in swob.Request object and passes it down.
+        Wraps env in webob.Request object and passes it down.
 
         :param env: WSGI environment dictionary
         :param start_response: WSGI callable
@@ -331,14 +321,15 @@ class TempAuth(object):
     def handle_request(self, req):
         """
         Entry point for auth requests (ones that match the self.auth_prefix).
-        Should return a WSGI-style callable (such as swob.Response).
+        Should return a WSGI-style callable (such as webob.Response).
 
-        :param req: swob.Request object
+        :param req: webob.Request object
         """
         req.start_time = time()
         handler = None
         try:
-            version, account, user, _junk = req.split_path(1, 4, True)
+            version, account, user, _junk = split_path(req.path_info,
+                minsegs=1, maxsegs=4, rest_with_last=True)
         except ValueError:
             self.logger.increment('errors')
             return HTTPNotFound(request=req)
@@ -372,13 +363,14 @@ class TempAuth(object):
         X-Storage-Token set to the token to use with Swift and X-Storage-URL
         set to the URL to the default Swift cluster to use.
 
-        :param req: The swob.Request to process.
-        :returns: swob.Response, 2xx on success with data set as explained
+        :param req: The webob.Request to process.
+        :returns: webob.Response, 2xx on success with data set as explained
                   above.
         """
         # Validate the request info
         try:
-            pathsegs = split_path(req.path_info, 1, 3, True)
+            pathsegs = split_path(req.path_info, minsegs=1, maxsegs=3,
+                                  rest_with_last=True)
         except ValueError:
             self.logger.increment('errors')
             return HTTPNotFound(request=req)
@@ -458,13 +450,9 @@ class TempAuth(object):
                 '%s/user/%s' % (self.reseller_prefix, account_user)
             memcache_client.set(memcache_user_key, token,
                                 timeout=float(expires - time()))
-        resp = Response(request=req, headers={
-            'x-auth-token': token, 'x-storage-token': token})
-        url = self.users[account_user]['url'].replace('$HOST', resp.host_url)
-        if self.storage_url_scheme != 'default':
-            url = self.storage_url_scheme + ':' + url.split(':', 1)[1]
-        resp.headers['x-storage-url'] = url
-        return resp
+        return Response(request=req,
+            headers={'x-auth-token': token, 'x-storage-token': token,
+                     'x-storage-url': self.users[account_user]['url']})
 
     def posthooklogger(self, env, req):
         if not req.path.startswith(self.auth_prefix):
@@ -489,13 +477,12 @@ class TempAuth(object):
         if getattr(req, 'client_disconnect', False) or \
                 getattr(response, 'client_disconnect', False):
             status_int = HTTP_CLIENT_CLOSED_REQUEST
-        self.logger.info(
-            ' '.join(quote(str(x)) for x in (client or '-',
+        self.logger.info(' '.join(quote(str(x)) for x in (client or '-',
             req.remote_addr or '-', strftime('%d/%b/%Y/%H/%M/%S', gmtime()),
             req.method, the_request, req.environ['SERVER_PROTOCOL'],
             status_int, req.referer or '-', req.user_agent or '-',
             req.headers.get('x-auth-token',
-                            req.headers.get('x-auth-admin-user', '-')),
+                req.headers.get('x-auth-admin-user', '-')),
             getattr(req, 'bytes_transferred', 0) or '-',
             getattr(response, 'bytes_transferred', 0) or '-',
             req.headers.get('etag', '-'),

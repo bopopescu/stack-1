@@ -314,8 +314,6 @@ Configure the Storage nodes
         [container-updater]
 
         [container-auditor]
-
-        [container-sync]
         EOF
 
 #. Create /etc/swift/object-server.conf::

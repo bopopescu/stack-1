@@ -27,14 +27,11 @@ import simplejson as json
 from nose import SkipTest
 from xml.dom import minidom
 
-
 class AuthenticationFailed(Exception):
     pass
 
-
 class RequestError(Exception):
     pass
-
 
 class ResponseError(Exception):
     def __init__(self, response):
@@ -48,16 +45,14 @@ class ResponseError(Exception):
     def __repr__(self):
         return '%d: %s' % (self.status, self.reason)
 
-
 def listing_empty(method):
     for i in xrange(0, 6):
         if len(method()) == 0:
             return True
 
-        time.sleep(2 ** i)
+        time.sleep(2**i)
 
     return False
-
 
 def listing_items(method):
     marker = None
@@ -69,17 +64,17 @@ def listing_items(method):
             yield i
 
         if once or marker:
-            if marker:
-                items = method(parms={'marker': marker})
-            else:
-                items = method()
+             if marker:
+                 items = method(parms={'marker':marker})
+             else:
+                 items = method()
 
-            if len(items) == 10000:
-                marker = items[-1]
-            else:
-                marker = None
+             if len(items) == 10000:
+                 marker = items[-1]
+             else:
+                 marker = None
 
-            once = False
+             once = False
         else:
             items = []
 
@@ -87,7 +82,7 @@ def listing_items(method):
 class Connection(object):
     def __init__(self, config):
         for key in 'auth_host auth_port auth_ssl username password'.split():
-            if not key in config:
+            if not config.has_key(key):
                 raise SkipTest
 
         self.auth_host = config['auth_host']
@@ -128,10 +123,10 @@ class Connection(object):
         path = '%sv1.0' % (self.auth_prefix)
         if self.auth_ssl:
             connection = httplib.HTTPSConnection(self.auth_host,
-                                                 port=self.auth_port)
+                port=self.auth_port)
         else:
             connection = httplib.HTTPConnection(self.auth_host,
-                                                port=self.auth_port)
+                port=self.auth_port)
         #connection.set_debuglevel(3)
         connection.request('GET', path, '', headers)
         response = connection.getresponse()
@@ -146,7 +141,7 @@ class Connection(object):
         for hdr in response.getheaders():
             if hdr[0].lower() == "x-storage-url":
                 storage_url = hdr[1]
-            elif hdr[0].lower() == "x-auth-token":
+            elif hdr[0].lower() == "x-storage-token":
                 storage_token = hdr[1]
 
         if not (storage_url and storage_token):
@@ -161,7 +156,7 @@ class Connection(object):
             self.conn_class = httplib.HTTPSConnection
             self.storage_port = 443
         else:
-            raise ValueError('unexpected protocol %s' % (x[0]))
+            raise ValueError, 'unexpected protocol %s' % (x[0])
 
         self.storage_host = x[2].split(':')[0]
         if ':' in x[2]:
@@ -175,9 +170,9 @@ class Connection(object):
 
     def http_connect(self):
         self.connection = self.conn_class(self.storage_host,
-                                          port=self.storage_port)
+            port=self.storage_port)
         #self.connection.set_debuglevel(3)
-
+        
     def make_path(self, path=[], cfg={}):
         if cfg.get('version_only_path'):
             return '/' + self.storage_url.split('/')[1]
@@ -186,8 +181,8 @@ class Connection(object):
             quote = urllib.quote
             if cfg.get('no_quote') or cfg.get('no_path_quote'):
                 quote = lambda x: x
-            return '%s/%s' % (self.storage_url,
-                              '/'.join([quote(i) for i in path]))
+            return '%s/%s' % (self.storage_url, '/'.join([quote(i) for i
+                in path]))
         else:
             return self.storage_url
 
@@ -202,15 +197,16 @@ class Connection(object):
         return headers
 
     def make_request(self, method, path=[], data='', hdrs={}, parms={},
-                     cfg={}):
+        cfg={}):
+
         path = self.make_path(path, cfg=cfg)
         headers = self.make_headers(hdrs, cfg=cfg)
         if isinstance(parms, dict) and parms:
             quote = urllib.quote
             if cfg.get('no_quote') or cfg.get('no_parms_quote'):
                 quote = lambda x: x
-            query_args = ['%s=%s' % (quote(x), quote(str(y)))
-                          for (x, y) in parms.items()]
+            query_args = ['%s=%s' % (quote(x), quote(str(y))) for (x,y) in
+                parms.items()]
             path = '%s?%s' % (path, '&'.join(query_args))
         if not cfg.get('no_content_length'):
             if cfg.get('set_content_length'):
@@ -262,16 +258,16 @@ class Connection(object):
             quote = urllib.quote
             if cfg.get('no_quote') or cfg.get('no_parms_quote'):
                 quote = lambda x: x
-            query_args = ['%s=%s' % (quote(x), quote(str(y)))
-                          for (x, y) in parms.items()]
+            query_args = ['%s=%s' % (quote(x), quote(str(y))) for (x,y) in
+                parms.items()]
             path = '%s?%s' % (path, '&'.join(query_args))
 
             query_args = ['%s=%s' % (urllib.quote(x),
-                          urllib.quote(str(y))) for (x, y) in parms.items()]
+                urllib.quote(str(y))) for (x,y) in parms.items()]
             path = '%s?%s' % (path, '&'.join(query_args))
 
         self.connection = self.conn_class(self.storage_host,
-                                          port=self.storage_port)
+            port=self.storage_port)
         #self.connection.set_debuglevel(3)
         self.connection.putrequest('PUT', path)
         for key, value in headers.iteritems():
@@ -280,7 +276,7 @@ class Connection(object):
 
     def put_data(self, data, chunked=False):
         if chunked:
-            self.connection.send('%x\r\n%s\r\n' % (len(data), data))
+            self.connection.send('%s\r\n%s\r\n' % (hex(len(data)), data))
         else:
             self.connection.send(data)
 
@@ -292,7 +288,6 @@ class Connection(object):
         self.connection.close()
         return self.response.status
 
-
 class Base:
     def __str__(self):
         return self.name
@@ -301,16 +296,15 @@ class Base:
         headers = dict(self.conn.response.getheaders())
         ret = {}
         for field in fields:
-            if not field[1] in headers:
+            if not headers.has_key(field[1]):
                 raise ValueError("%s was not found in response header" %
-                                 (field[1]))
+                    (field[1]))
 
             try:
                 ret[field[0]] = int(headers[field[1]])
             except ValueError:
                 ret[field[0]] = headers[field[1]]
         return ret
-
 
 class Account(Base):
     def __init__(self, conn, name):
@@ -324,11 +318,11 @@ class Account(Base):
         format = parms.get('format', None)
         if format not in [None, 'json', 'xml']:
             raise RequestError('Invalid format: %s' % format)
-        if format is None and 'format' in parms:
+        if format is None and parms.has_key('format'):
             del parms['format']
 
         status = self.conn.make_request('GET', self.path, hdrs=hdrs,
-                                        parms=parms, cfg=cfg)
+            parms=parms, cfg=cfg)
         if status == 200:
             if format == 'json':
                 conts = json.loads(self.conn.response.read())
@@ -367,20 +361,19 @@ class Account(Base):
 
     def info(self, hdrs={}, parms={}, cfg={}):
         if self.conn.make_request('HEAD', self.path, hdrs=hdrs,
-                                  parms=parms, cfg=cfg) != 204:
+            parms=parms, cfg=cfg) != 204:
 
             raise ResponseError(self.conn.response)
 
         fields = [['object_count', 'x-account-object-count'],
-                  ['container_count', 'x-account-container-count'],
-                  ['bytes_used', 'x-account-bytes-used']]
+            ['container_count', 'x-account-container-count'],
+            ['bytes_used', 'x-account-bytes-used']]
 
         return self.header_fields(fields)
 
     @property
     def path(self):
         return []
-
 
 class Container(Base):
     def __init__(self, conn, account, name):
@@ -390,11 +383,11 @@ class Container(Base):
 
     def create(self, hdrs={}, parms={}, cfg={}):
         return self.conn.make_request('PUT', self.path, hdrs=hdrs,
-                                      parms=parms, cfg=cfg) in (201, 202)
+            parms=parms, cfg=cfg) in (201, 202)
 
     def delete(self, hdrs={}, parms={}):
         return self.conn.make_request('DELETE', self.path, hdrs=hdrs,
-                                      parms=parms) == 204
+            parms=parms) == 204
 
     def delete_files(self):
         for f in listing_items(self.files):
@@ -414,11 +407,11 @@ class Container(Base):
         format = parms.get('format', None)
         if format not in [None, 'json', 'xml']:
             raise RequestError('Invalid format: %s' % format)
-        if format is None and 'format' in parms:
+        if format is None and parms.has_key('format'):
             del parms['format']
 
         status = self.conn.make_request('GET', self.path, hdrs=hdrs,
-                                        parms=parms, cfg=cfg)
+            parms=parms, cfg=cfg)
         if status == 200:
             if format == 'json':
                 files = json.loads(self.conn.response.read())
@@ -433,7 +426,7 @@ class Container(Base):
                 for x in tree.getElementsByTagName('object'):
                     file = {}
                     for key in ['name', 'hash', 'bytes', 'content_type',
-                                'last_modified']:
+                        'last_modified']:
 
                         file[key] = x.getElementsByTagName(key)[0].\
                             childNodes[0].nodeValue
@@ -459,11 +452,11 @@ class Container(Base):
 
     def info(self, hdrs={}, parms={}, cfg={}):
         status = self.conn.make_request('HEAD', self.path, hdrs=hdrs,
-                                        parms=parms, cfg=cfg)
+            parms=parms, cfg=cfg)
 
         if self.conn.response.status == 204:
             fields = [['bytes_used', 'x-container-bytes-used'],
-                      ['object_count', 'x-container-object-count']]
+                ['object_count', 'x-container-object-count']]
 
             return self.header_fields(fields)
 
@@ -472,7 +465,6 @@ class Container(Base):
     @property
     def path(self):
         return [self.name]
-
 
 class File(Base):
     def __init__(self, conn, account, container, name):
@@ -504,7 +496,7 @@ class File(Base):
             headers['Content-Type'] = 'application/octet-stream'
 
         for key in self.metadata:
-            headers['X-Object-Meta-' + key] = self.metadata[key]
+            headers['X-Object-Meta-'+key] = self.metadata[key]
 
         return headers
 
@@ -524,7 +516,7 @@ class File(Base):
         return checksum.hexdigest()
 
     def copy(self, dest_cont, dest_file, hdrs={}, parms={}, cfg={}):
-        if 'destination' in cfg:
+        if cfg.has_key('destination'):
             headers = {'Destination': cfg['destination']}
         elif cfg.get('no_destination'):
             headers = {}
@@ -532,15 +524,15 @@ class File(Base):
             headers = {'Destination': '%s/%s' % (dest_cont, dest_file)}
         headers.update(hdrs)
 
-        if 'Destination' in headers:
+        if headers.has_key('Destination'):
             headers['Destination'] = urllib.quote(headers['Destination'])
 
         return self.conn.make_request('COPY', self.path, hdrs=headers,
-                                      parms=parms) == 201
+            parms=parms) == 201
 
     def delete(self, hdrs={}, parms={}):
         if self.conn.make_request('DELETE', self.path, hdrs=hdrs,
-                                  parms=parms) != 204:
+            parms=parms) != 204:
 
             raise ResponseError(self.conn.response)
 
@@ -548,14 +540,13 @@ class File(Base):
 
     def info(self, hdrs={}, parms={}, cfg={}):
         if self.conn.make_request('HEAD', self.path, hdrs=hdrs,
-                                  parms=parms, cfg=cfg) != 200:
+            parms=parms, cfg=cfg) != 200:
 
             raise ResponseError(self.conn.response)
 
-        fields = [['content_length', 'content-length'],
-                  ['content_type', 'content-type'],
-                  ['last_modified', 'last-modified'],
-                  ['etag', 'etag']]
+        fields = [['content_length', 'content-length'], ['content_type',
+            'content-type'], ['last_modified', 'last-modified'], ['etag',
+            'etag']]
 
         header_fields = self.header_fields(fields)
         header_fields['etag'] = header_fields['etag'].strip('"')
@@ -566,7 +557,7 @@ class File(Base):
             return False
 
         status = self.conn.make_request('HEAD', self.path, hdrs=hdrs,
-                                        parms=parms)
+            parms=parms)
         if status == 404:
             return False
         elif (status < 200) or (status > 299):
@@ -605,7 +596,7 @@ class File(Base):
         return data
 
     def read(self, size=-1, offset=0, hdrs=None, buffer=None,
-             callback=None, cfg={}):
+        callback=None, cfg={}):
 
         if size > 0:
             range = 'bytes=%d-%d' % (offset, (offset + size) - 1)
@@ -615,7 +606,7 @@ class File(Base):
                 hdrs = {'Range': range}
 
         status = self.conn.make_request('GET', self.path, hdrs=hdrs,
-                                        cfg=cfg)
+            cfg=cfg)
 
         if(status < 200) or (status > 299):
             raise ResponseError(self.conn.response)
@@ -689,7 +680,7 @@ class File(Base):
             headers.update(hdrs)
 
             self.conn.put_start(self.path, hdrs=headers, parms=parms,
-                                cfg=cfg, chunked=True)
+                cfg=cfg, chunked=True)
 
             self.conn.put_data(data, True)
         elif self.chunked_write_in_progress:
@@ -699,7 +690,7 @@ class File(Base):
             raise RuntimeError
 
     def write(self, data='', hdrs={}, parms={}, callback=None, cfg={}):
-        block_size = 2 ** 20
+        block_size = 2**20
 
         if isinstance(data, file):
             try:
@@ -732,7 +723,8 @@ class File(Base):
             raise err
 
         if (self.conn.response.status < 200) or \
-           (self.conn.response.status > 299):
+            (self.conn.response.status > 299):
+
             raise ResponseError(self.conn.response)
 
         self.md5 = self.compute_md5sum(data)

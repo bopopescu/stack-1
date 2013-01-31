@@ -1,7 +1,6 @@
 [DEFAULT]
 # bind_ip = 0.0.0.0
 # bind_port = 6000
-# bind_timeout = 30
 # backlog = 4096
 # workers = 1
 # user = swift
@@ -15,10 +14,6 @@
 # log_facility = LOG_LOCAL0
 # log_level = INFO
 # log_address = /dev/log
-# comma separated list of functions to call to setup custom log handlers.
-# functions get passed: conf, name, log_to_console, log_route, fmt, logger,
-# adapted_logger
-# log_custom_handlers =
 # If set, log_udp_host will override log_address
 # log_udp_host =
 # log_udp_port = 514
@@ -27,10 +22,9 @@
 # log_statsd_port = 8125
 # log_statsd_default_sample_rate = 1
 # log_statsd_metric_prefix =
-# eventlet_debug = false
 
 [pipeline:main]
-pipeline = healthcheck recon object-server
+pipeline = recon object-server
 
 [app:object-server]
 use = egg:swift#object
@@ -58,12 +52,6 @@ use = egg:swift#object
 # Content-Type, etag, Content-Length, or deleted
 # allowed_headers = Content-Disposition, Content-Encoding, X-Delete-At, X-Object-Manifest
 # auto_create_account_prefix = .
-
-[filter:healthcheck]
-use = egg:swift#healthcheck
-# An optional filesystem path, which if present, will cause the healthcheck
-# URL to return "503 Service Unavailable" with a body of "DISABLED BY FILE"
-# disable_path =
 
 [filter:recon]
 use = egg:swift#recon

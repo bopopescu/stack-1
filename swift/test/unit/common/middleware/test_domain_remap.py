@@ -15,7 +15,8 @@
 
 import unittest
 
-from swift.common.swob import Request
+from webob import Request
+
 from swift.common.middleware import domain_remap
 
 

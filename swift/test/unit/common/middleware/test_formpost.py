@@ -20,7 +20,8 @@ from contextlib import contextmanager
 from StringIO import StringIO
 from time import time
 
-from swift.common.swob import Request, Response
+from webob import Request, Response
+
 from swift.common.middleware import tempauth, formpost
 
 

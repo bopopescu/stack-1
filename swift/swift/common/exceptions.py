@@ -46,10 +46,6 @@ class DiskFileNotExist(SwiftException):
     pass
 
 
-class PathNotDir(OSError):
-    pass
-
-
 class AuthException(SwiftException):
     pass
 

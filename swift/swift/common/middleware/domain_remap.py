@@ -49,7 +49,8 @@ advised. With container sync, you should use the true storage end points as
 sync destinations.
 """
 
-from swift.common.swob import Request, HTTPBadRequest
+from webob import Request
+from webob.exc import HTTPBadRequest
 
 
 class DomainRemapMiddleware(object):
@@ -102,7 +103,7 @@ class DomainRemapMiddleware(object):
                 # account prefix is not in config list. bail.
                 return self.app(env, start_response)
             prefix_index = self.reseller_prefixes_lower.index(
-                account_reseller_prefix)
+                                                    account_reseller_prefix)
             real_prefix = self.reseller_prefixes[prefix_index]
             if not account.startswith(real_prefix):
                 account_suffix = account[len(real_prefix):]

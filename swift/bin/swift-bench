@@ -21,9 +21,8 @@ import signal
 import uuid
 from optparse import OptionParser
 
-from swift.common.bench import (BenchController, DistributedBenchController,
-                                create_containers, delete_containers)
-from swift.common.utils import readconf, LogAdapter, config_true_value
+from swift.common.bench import BenchController
+from swift.common.utils import readconf, LogAdapter
 
 # The defaults should be sufficient to run swift-bench on a SAIO
 CONF_DEFAULTS = {
@@ -50,8 +49,6 @@ CONF_DEFAULTS = {
     'devices': 'sdb1',  # space-sep list
     'log_level': 'INFO',
     'timeout': '10',
-    'auth_version': '1.0',
-    'bench_clients': [],
 }
 
 SAIO_DEFAULTS = {
@@ -84,25 +81,10 @@ if __name__ == '__main__':
                       help='User name for obtaining an auth token')
     parser.add_option('-K', '--key', dest='key',
                       help='Key for obtaining an auth token')
-    parser.add_option('-b', '--bench-clients', action='append',
-                      metavar='<ip>:<port>',
-                      help=('A string of the form "<ip>:<port>" which matches '
-                            'the arguments supplied to a swift-bench-client '
-                            'process.  This argument must be specified '
-                            'once per swift-bench-client you want to '
-                            'utilize.'))
     parser.add_option('-u', '--url', dest='url',
                       help='Storage URL')
     parser.add_option('-c', '--concurrency', dest='concurrency',
-                      help=('Number of concurrent connections to use. For '
-                            'finer-grained control, see --get-concurrency, '
-                            '--put-concurrency, and --delete-concurrency.'))
-    parser.add_option('--get-concurrency', dest='get_concurrency',
-                      help='Number of concurrent GET requests')
-    parser.add_option('--put-concurrency', dest='put_concurrency',
-                      help='Number of concurrent PUT requests')
-    parser.add_option('--delete-concurrency', dest='delete_concurrency',
-                      help='Number of concurrent DELETE requests')
+                      help='Number of concurrent connections to use')
     parser.add_option('-s', '--object-size', dest='object_size',
                       help='Size of objects to PUT (in bytes)')
     parser.add_option('-l', '--lower-object-size', dest='lower_object_size',
@@ -112,8 +94,6 @@ if __name__ == '__main__':
                       help='Number of objects to PUT')
     parser.add_option('-g', '--num-gets', dest='num_gets',
                       help='Number of GET operations to perform')
-    parser.add_option('-C', '--num-containers', dest='num_containers',
-                      help='Number of containers to distribute objects among')
     parser.add_option('-x', '--no-delete', dest='delete', action='store_false',
                       help='If set, will not delete the objects created')
     parser.add_option('-V', '--auth_version', dest='auth_version',
@@ -137,7 +117,6 @@ if __name__ == '__main__':
             sys.exit("No such conf file: %s" % conf)
         conf = readconf(conf, 'bench', log_name='swift-bench',
                         defaults=CONF_DEFAULTS)
-        conf['bench_clients'] = []
     else:
         conf = CONF_DEFAULTS
     parser.set_defaults(**conf)
@@ -146,13 +125,6 @@ if __name__ == '__main__':
         options.put_concurrency = options.concurrency
         options.get_concurrency = options.concurrency
         options.del_concurrency = options.concurrency
-    options.containers = ['%s_%d' % (options.container_name, i)
-                          for i in xrange(int(options.num_containers))]
-    # check boolean options vs config parameter values
-    if config_true_value(str(options.delete).lower()):
-        options.delete = 'yes'
-    else:
-        options.delete = 'no'
 
     def sigterm(signum, frame):
         sys.exit('Termination signal received.')
@@ -173,13 +145,5 @@ if __name__ == '__main__':
                                   '%(message)s')
     loghandler.setFormatter(logformat)
 
-    if options.use_proxy:
-        create_containers(logger, options)
-
-    controller_class = DistributedBenchController if options.bench_clients \
-        else BenchController
-    controller = controller_class(logger, options)
+    controller = BenchController(logger, options)
     controller.run()
-
-    if config_true_value(options.delete.lower()):
-        delete_containers(logger, options)

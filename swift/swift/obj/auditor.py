@@ -20,7 +20,7 @@ from eventlet import Timeout
 
 from swift.obj import server as object_server
 from swift.common.utils import get_logger, audit_location_generator, \
-    ratelimit_sleep, config_true_value, dump_recon_cache
+    ratelimit_sleep, TRUE_VALUES, dump_recon_cache
 from swift.common.exceptions import AuditException, DiskFileError, \
     DiskFileNotExist
 from swift.common.daemon import Daemon
@@ -31,11 +31,12 @@ SLEEP_BETWEEN_AUDITS = 30
 class AuditorWorker(object):
     """Walk through file system to audit object"""
 
-    def __init__(self, conf, logger, zero_byte_only_at_fps=0):
+    def __init__(self, conf, zero_byte_only_at_fps=0):
         self.conf = conf
-        self.logger = logger
+        self.logger = get_logger(conf, log_route='object-auditor')
         self.devices = conf.get('devices', '/srv/node')
-        self.mount_check = config_true_value(conf.get('mount_check', 'true'))
+        self.mount_check = conf.get('mount_check', 'true').lower() in \
+            TRUE_VALUES
         self.max_files_per_second = float(conf.get('files_per_second', 20))
         self.max_bytes_per_second = float(conf.get('bytes_per_second',
                                                    10000000))
@@ -86,23 +87,24 @@ class AuditorWorker(object):
                     'files/sec: %(frate).2f , bytes/sec: %(brate).2f, '
                     'Total time: %(total).2f, Auditing time: %(audit).2f, '
                     'Rate: %(audit_rate).2f') % {
-                        'type': self.auditor_type,
-                        'start_time': time.ctime(reported),
-                        'passes': self.passes, 'quars': self.quarantines,
-                        'errors': self.errors,
-                        'frate': self.passes / (now - reported),
-                        'brate': self.bytes_processed / (now - reported),
-                        'total': (now - begin), 'audit': time_auditing,
-                        'audit_rate': time_auditing / (now - begin)})
+                            'type': self.auditor_type,
+                            'start_time': time.ctime(reported),
+                            'passes': self.passes, 'quars': self.quarantines,
+                            'errors': self.errors,
+                            'frate': self.passes / (now - reported),
+                            'brate': self.bytes_processed / (now - reported),
+                            'total': (now - begin), 'audit': time_auditing,
+                            'audit_rate': time_auditing / (now - begin)})
                 dump_recon_cache({'object_auditor_stats_%s' %
-                                  self.auditor_type: {
-                                      'errors': self.errors,
-                                      'passes': self.passes,
-                                      'quarantined': self.quarantines,
-                                      'bytes_processed': self.bytes_processed,
-                                      'start_time': reported,
-                                      'audit_time': time_auditing}},
-                                 self.rcache, self.logger)
+                                    self.auditor_type: {
+                                        'errors': self.errors,
+                                        'passes': self.passes,
+                                        'quarantined': self.quarantines,
+                                        'bytes_processed':
+                                            self.bytes_processed,
+                                        'start_time': reported,
+                                        'audit_time': time_auditing}
+                                 }, self.rcache, self.logger)
                 reported = now
                 total_quarantines += self.quarantines
                 total_errors += self.errors
@@ -176,8 +178,7 @@ class AuditorWorker(object):
             self.logger.increment('quarantines')
             self.quarantines += 1
             self.logger.error(_('ERROR Object %(obj)s failed audit and will '
-                                'be quarantined: %(err)s'),
-                              {'obj': path, 'err': err})
+                'be quarantined: %(err)s'), {'obj': path, 'err': err})
             object_server.quarantine_renamer(
                 os.path.join(self.devices, device), path)
             return
@@ -195,8 +196,8 @@ class ObjectAuditor(Daemon):
     def __init__(self, conf, **options):
         self.conf = conf
         self.logger = get_logger(conf, log_route='object-auditor')
-        self.conf_zero_byte_fps = int(
-            conf.get('zero_byte_files_per_second', 50))
+        self.conf_zero_byte_fps = int(conf.get(
+                'zero_byte_files_per_second', 50))
 
     def _sleep(self):
         time.sleep(SLEEP_BETWEEN_AUDITS)
@@ -224,6 +225,6 @@ class ObjectAuditor(Daemon):
         """Run the object audit once."""
         mode = kwargs.get('mode', 'once')
         zero_byte_only_at_fps = kwargs.get('zero_byte_fps', 0)
-        worker = AuditorWorker(self.conf, self.logger,
+        worker = AuditorWorker(self.conf,
                                zero_byte_only_at_fps=zero_byte_only_at_fps)
         worker.audit_all_objects(mode=mode)

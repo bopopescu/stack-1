@@ -18,10 +18,11 @@ from urllib import quote, unquote
 import cStringIO as StringIO
 from logging.handlers import SysLogHandler
 
+from webob import Request
+
 from test.unit import FakeLogger
 from swift.common.utils import get_logger
 from swift.common.middleware import proxy_logging
-from swift.common.swob import Request
 
 
 class FakeApp(object):
@@ -146,7 +147,6 @@ class TestProxyLogging(unittest.TestCase):
             'HEAD': 'HEAD',
             'POST': 'POST',
             'DELETE': 'DELETE',
-            'OPTIONS': 'OPTIONS',
         }
         for method, exp_method in method_map.iteritems():
             app = proxy_logging.ProxyLoggingMiddleware(FakeApp(), {})
@@ -390,6 +390,25 @@ class TestProxyLogging(unittest.TestCase):
         self.assertEquals(log_parts[6], '200')
         self.assertEquals(resp_body, '')
         self.assertEquals(log_parts[11], '-')
+
+    def test_no_content_length_no_transfer_encoding_with_str_body(self):
+        app = proxy_logging.ProxyLoggingMiddleware(
+            FakeAppNoContentLengthNoTransferEncoding(
+                body='line1\nline2\n',
+            ), {})
+        app.access_logger = FakeLogger()
+        req = Request.blank('/', environ={'REQUEST_METHOD': 'GET'})
+        resp = app(req.environ, start_response)
+        # Python 2.7 can have assertRaises act as a context manager, but python
+        # 2.6 can't.  So there's this.
+        try:
+            resp_body = ''.join(resp)
+        except Exception as e:
+            self.assertEquals(
+                "WSGI [proxy-logging]: No content-length or transfer-encoding "
+                "header sent and there is content! 'l'", str(e))
+        else:
+            self.assert_(False)
 
     def test_req_path_info_popping(self):
         app = proxy_logging.ProxyLoggingMiddleware(FakeApp(), {})

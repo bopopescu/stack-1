@@ -436,7 +436,7 @@ class TestContainerSync(unittest.TestCase):
             fcb = FakeContainerBroker('path',
                 info={'account': 'a', 'container': 'c',
                       'x_container_sync_point1': 1,
-                      'x_container_sync_point2': 1},
+                      'x_container_sync_point2': -1},
                 metadata={'x-container-sync-to': ('http://127.0.0.1/a/c', 1),
                           'x-container-sync-key': ('key', 1)},
                 items_since=[{'ROWID': 1, 'name': 'o'}])
@@ -445,7 +445,7 @@ class TestContainerSync(unittest.TestCase):
             cs._myport = 1000           # Match
             cs.allowed_sync_hosts = ['127.0.0.1']
             cs.container_sync('isa.db')
-            # Succeeds because the two sync points haven't deviated yet
+            # Succeeds because the two sync points haven't deviated enough yet
             self.assertEquals(cs.container_failures, 0)
             self.assertEquals(cs.container_skips, 0)
             self.assertEquals(fcb.sync_point1, -1)
@@ -739,10 +739,9 @@ class TestContainerSync(unittest.TestCase):
                 'key', FakeContainerBroker('broker'), {'account': 'a',
                 'container': 'c'}))
             self.assertEquals(cs.container_puts, 2)
-            self.assertEquals(len(exc), 3)
+            self.assertEquals(len(exc), 1)
             self.assertEquals(str(exc[-1]), 'test exception')
 
-            exc = []
             def fake_direct_get_object(node, part, account, container, obj,
                                        resp_chunk_size=1):
                 exc.append(ClientException('test client exception'))
@@ -755,7 +754,7 @@ class TestContainerSync(unittest.TestCase):
                 'key', FakeContainerBroker('broker'), {'account': 'a',
                 'container': 'c'}))
             self.assertEquals(cs.container_puts, 2)
-            self.assertEquals(len(exc), 3)
+            self.assertEquals(len(exc), 4)
             self.assertEquals(str(exc[-1]), 'test client exception')
 
             def fake_direct_get_object(node, part, account, container, obj,

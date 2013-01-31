@@ -15,6 +15,7 @@ most Linux platforms with the following software:
 And the following python libraries:
 
 * Eventlet 0.9.8
+* WebOb 0.9.8
 * Setuptools
 * Simplejson
 * Xattr
@@ -34,8 +35,8 @@ A source tarball for the latest release of Swift is available on the `launchpad 
 
 Prebuilt packages for Ubuntu are available starting with Natty, or from PPAs for earlier releases.
 
-* `Swift Ubuntu Packages <https://launchpad.net/ubuntu/+source/swift>`_
-* `Swift PPA Archive <https://launchpad.net/~swift-core/+archive/release>`_
+* `Swift Latest Release PPA <https://launchpad.net/~swift-core/+archive/release>`_
+* `Swift Current Trunk PPA <https://launchpad.net/~swift-core/+archive/trunk>`_
 
 -----------
 Development

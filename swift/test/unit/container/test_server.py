@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import operator
 import os
 import sys
 import unittest
@@ -24,8 +23,8 @@ from tempfile import mkdtemp
 
 from eventlet import spawn, Timeout, listen
 import simplejson
+from webob import Request
 
-from swift.common.swob import Request
 from swift.container import server as container_server
 from swift.common.utils import normalize_timestamp, mkdirs
 
@@ -586,9 +585,6 @@ class TestContainerController(unittest.TestCase):
         self.assertEquals(eval(resp.body), json_body)
         self.assertEquals(resp.charset, 'utf-8')
 
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'application/json')
-
         for accept in ('application/json', 'application/json;q=1.0,*/*;q=0.9',
                  '*/*;q=0.9,application/json;q=1.0', 'application/*'):
             req = Request.blank('/sda1/p/a/jsonc',
@@ -597,10 +593,6 @@ class TestContainerController(unittest.TestCase):
             resp = self.controller.GET(req)
             self.assertEquals(eval(resp.body), json_body,
                 'Invalid body for Accept: %s' % accept)
-            self.assertEquals(resp.content_type, 'application/json',
-                'Invalid content_type for Accept: %s' % accept)
-
-            resp = self.controller.HEAD(req)
             self.assertEquals(resp.content_type, 'application/json',
                 'Invalid content_type for Accept: %s' % accept)
 
@@ -632,9 +624,6 @@ class TestContainerController(unittest.TestCase):
         self.assertEquals(resp.body, plain_body)
         self.assertEquals(resp.charset, 'utf-8')
 
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'text/plain')
-
         for accept in ('', 'text/plain', 'application/xml;q=0.8,*/*;q=0.9',
                 '*/*;q=0.9,application/xml;q=0.8', '*/*',
                 'text/plain,application/xml'):
@@ -644,10 +633,6 @@ class TestContainerController(unittest.TestCase):
             resp = self.controller.GET(req)
             self.assertEquals(resp.body, plain_body,
                 'Invalid body for Accept: %s' % accept)
-            self.assertEquals(resp.content_type, 'text/plain',
-                'Invalid content_type for Accept: %s' % accept)
-
-            resp = self.controller.HEAD(req)
             self.assertEquals(resp.content_type, 'text/plain',
                 'Invalid content_type for Accept: %s' % accept)
 
@@ -740,9 +725,6 @@ class TestContainerController(unittest.TestCase):
         self.assertEquals(resp.body, xml_body)
         self.assertEquals(resp.charset, 'utf-8')
 
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'application/xml')
-
         for xml_accept in ('application/xml', 'application/xml;q=1.0,*/*;q=0.9',
                  '*/*;q=0.9,application/xml;q=1.0', 'application/xml,text/xml'):
             req = Request.blank('/sda1/p/a/xmlc',
@@ -751,10 +733,6 @@ class TestContainerController(unittest.TestCase):
             resp = self.controller.GET(req)
             self.assertEquals(resp.body, xml_body,
                 'Invalid body for Accept: %s' % xml_accept)
-            self.assertEquals(resp.content_type, 'application/xml',
-                'Invalid content_type for Accept: %s' % xml_accept)
-
-            resp = self.controller.HEAD(req)
             self.assertEquals(resp.content_type, 'application/xml',
                 'Invalid content_type for Accept: %s' % xml_accept)
 
@@ -798,7 +776,7 @@ class TestContainerController(unittest.TestCase):
         resp = self.controller.GET(req)
         result = [x['content_type'] for x in simplejson.loads(resp.body)]
         self.assertEquals(result, [u'\u2603', 'text/plain; "utf-8"'])
-
+        
     def test_GET_accept_not_valid(self):
         req = Request.blank('/sda1/p/a/c', environ={'REQUEST_METHOD': 'PUT',
             'HTTP_X_TIMESTAMP': '0'})
@@ -813,8 +791,9 @@ class TestContainerController(unittest.TestCase):
         req = Request.blank('/sda1/p/a/c', environ={'REQUEST_METHOD': 'GET'})
         req.accept = 'application/xml*'
         resp = self.controller.GET(req)
-        self.assertEquals(resp.status_int, 406)
-
+        self.assertEquals(resp.status_int, 400)
+        self.assertEquals(resp.body, 'bad accept header: application/xml*')
+        
     def test_GET_limit(self):
         # make a container
         req = Request.blank('/sda1/p/a/c', environ={'REQUEST_METHOD': 'PUT',
@@ -1045,111 +1024,6 @@ class TestContainerController(unittest.TestCase):
         resp = self.controller.DELETE(Request.blank('/sda1/p/a/.c/.o',
             environ={'REQUEST_METHOD': 'DELETE'}, headers=dict(headers)))
         self.assertEquals(resp.status_int, 404)
-
-    def test_content_type_on_HEAD(self):
-        self.controller.PUT(Request.blank('/sda1/p/a/o',
-                            headers={'X-Timestamp': normalize_timestamp(1)},
-                            environ={'REQUEST_METHOD': 'PUT'}))
-
-        env = {'REQUEST_METHOD': 'HEAD'}
-
-        req = Request.blank('/sda1/p/a/o?format=xml', environ=env)
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'application/xml')
-        self.assertEquals(resp.charset, 'utf-8')
-
-        req = Request.blank('/sda1/p/a/o?format=json', environ=env)
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'application/json')
-        self.assertEquals(resp.charset, 'utf-8')
-
-        req = Request.blank('/sda1/p/a/o', environ=env)
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'text/plain')
-        self.assertEquals(resp.charset, 'utf-8')
-
-        req = Request.blank(
-            '/sda1/p/a/o', headers={'Accept': 'application/json'}, environ=env)
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'application/json')
-        self.assertEquals(resp.charset, 'utf-8')
-
-        req = Request.blank(
-            '/sda1/p/a/o', headers={'Accept': 'application/xml'}, environ=env)
-        resp = self.controller.HEAD(req)
-        self.assertEquals(resp.content_type, 'application/xml')
-        self.assertEquals(resp.charset, 'utf-8')
-
-    def test_updating_multiple_container_servers(self):
-        http_connect_args = []
-        def fake_http_connect(ipaddr, port, device, partition, method, path,
-                              headers=None, query_string=None, ssl=False):
-            class SuccessfulFakeConn(object):
-                @property
-                def status(self):
-                    return 200
-
-                def getresponse(self):
-                    return self
-
-                def read(self):
-                    return ''
-
-            captured_args = {'ipaddr': ipaddr, 'port': port,
-                             'device': device, 'partition': partition,
-                             'method': method, 'path': path, 'ssl': ssl,
-                             'headers': headers, 'query_string': query_string}
-
-            http_connect_args.append(
-                dict((k,v) for k,v in captured_args.iteritems()
-                     if v is not None))
-
-        req = Request.blank(
-            '/sda1/p/a/c',
-            environ={'REQUEST_METHOD': 'PUT'},
-            headers={'X-Timestamp': '12345',
-                     'X-Account-Partition': '30',
-                     'X-Account-Host': '1.2.3.4:5, 6.7.8.9:10',
-                     'X-Account-Device': 'sdb1, sdf1'})
-
-        orig_http_connect = container_server.http_connect
-        try:
-            container_server.http_connect = fake_http_connect
-            self.controller.PUT(req)
-        finally:
-            container_server.http_connect = orig_http_connect
-
-        http_connect_args.sort(key=operator.itemgetter('ipaddr'))
-
-        self.assertEquals(len(http_connect_args), 2)
-        self.assertEquals(
-            http_connect_args[0],
-            {'ipaddr': '1.2.3.4',
-             'port': '5',
-             'path': '/a/c',
-             'device': 'sdb1',
-             'partition': '30',
-             'method': 'PUT',
-             'ssl': False,
-             'headers': {'x-bytes-used': 0,
-                         'x-delete-timestamp': '0',
-                         'x-object-count': 0,
-                         'x-put-timestamp': '0000012345.00000',
-                         'x-trans-id': '-'}})
-        self.assertEquals(
-            http_connect_args[1],
-            {'ipaddr': '6.7.8.9',
-             'port': '10',
-             'path': '/a/c',
-             'device': 'sdf1',
-             'partition': '30',
-             'method': 'PUT',
-             'ssl': False,
-             'headers': {'x-bytes-used': 0,
-                         'x-delete-timestamp': '0',
-                         'x-object-count': 0,
-                         'x-put-timestamp': '0000012345.00000',
-                         'x-trans-id': '-'}})
 
 
 if __name__ == '__main__':

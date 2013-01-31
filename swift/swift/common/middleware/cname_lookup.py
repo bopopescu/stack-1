@@ -27,6 +27,8 @@ maximum lookup depth. If a match is found, the environment's Host header is
 rewritten and the request is passed further down the WSGI chain.
 """
 
+from webob import Request
+from webob.exc import HTTPBadRequest
 try:
     import dns.resolver
     from dns.exception import DNSException
@@ -37,7 +39,6 @@ except ImportError:
 else:  # executed if the try block finishes with no errors
     MODULE_DEPENDENCY_MET = True
 
-from swift.common.swob import Request, HTTPBadRequest
 from swift.common.utils import cache_from_env, get_logger
 
 
@@ -125,16 +126,15 @@ class CNAMELookupMiddleware(object):
                     break
                 else:
                     # try one more deep in the chain
-                    self.logger.debug(
-                        _('Following CNAME chain for  '
-                          '%(given_domain)s to %(found_domain)s') %
-                        {'given_domain': given_domain,
-                         'found_domain': found_domain})
+                    self.logger.debug(_('Following CNAME chain for  ' \
+                            '%(given_domain)s to %(found_domain)s') %
+                            {'given_domain': given_domain,
+                             'found_domain': found_domain})
                     a_domain = found_domain
             if error:
                 if found_domain:
                     msg = 'CNAME lookup failed after %d tries' % \
-                        self.lookup_depth
+                            self.lookup_depth
                 else:
                     msg = 'CNAME lookup failed to resolve to a valid domain'
                 resp = HTTPBadRequest(request=Request(env), body=msg,

@@ -94,7 +94,7 @@ class BufferedHTTPConnection(HTTPConnection):
 
     def getexpect(self):
         response = BufferedHTTPResponse(self.sock, strict=self.strict,
-                                        method=self._method)
+                                       method=self._method)
         response.expect_response()
         return response
 
@@ -102,9 +102,8 @@ class BufferedHTTPConnection(HTTPConnection):
         response = HTTPConnection.getresponse(self)
         logging.debug(_("HTTP PERF: %(time).5f seconds to %(method)s "
                         "%(host)s:%(port)s %(path)s)"),
-                      {'time': time.time() - self._connected_time,
-                       'method': self._method, 'host': self.host,
-                       'port': self.port, 'path': self._path})
+           {'time': time.time() - self._connected_time, 'method': self._method,
+            'host': self.host, 'port': self.port, 'path': self._path})
         return response
 
 
@@ -126,14 +125,27 @@ def http_connect(ipaddr, port, device, partition, method, path,
     :param ssl: set True if SSL should be used (default: False)
     :returns: HTTPConnection object
     """
+    if not port:
+        port = 443 if ssl else 80
+    if ssl:
+        conn = HTTPSConnection('%s:%s' % (ipaddr, port))
+    else:
+        conn = BufferedHTTPConnection('%s:%s' % (ipaddr, port))
     if isinstance(path, unicode):
         try:
             path = path.encode("utf-8")
         except UnicodeError:
             pass   # what should I do?
     path = quote('/' + device + '/' + str(partition) + path)
-    return http_connect_raw(
-        ipaddr, port, method, path, headers, query_string, ssl)
+    if query_string:
+        path += '?' + query_string
+    conn.path = path
+    conn.putrequest(method, path, skip_host=(headers and 'Host' in headers))
+    if headers:
+        for header, value in headers.iteritems():
+            conn.putheader(header, str(value))
+    conn.endheaders()
+    return conn
 
 
 def http_connect_raw(ipaddr, port, method, path, headers=None,

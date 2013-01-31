@@ -18,8 +18,6 @@ import sys
 import signal
 from re import sub
 
-import eventlet.debug
-
 from swift.common import utils
 
 
@@ -77,23 +75,19 @@ def run_daemon(klass, conf_file, section_name='', once=False, **kwargs):
                           log_name=kwargs.get('log_name'))
 
     # once on command line (i.e. daemonize=false) will over-ride config
-    once = once or not utils.config_true_value(conf.get('daemonize', 'true'))
+    once = once or \
+            conf.get('daemonize', 'true').lower() not in utils.TRUE_VALUES
 
     # pre-configure logger
     if 'logger' in kwargs:
         logger = kwargs.pop('logger')
     else:
         logger = utils.get_logger(conf, conf.get('log_name', section_name),
-                                  log_to_console=kwargs.pop('verbose', False),
-                                  log_route=section_name)
+           log_to_console=kwargs.pop('verbose', False), log_route=section_name)
 
     # disable fallocate if desired
-    if utils.config_true_value(conf.get('disable_fallocate', 'no')):
+    if conf.get('disable_fallocate', 'no').lower() in utils.TRUE_VALUES:
         utils.disable_fallocate()
-
-    # By default, disable eventlet printing stacktraces
-    eventlet_debug = utils.config_true_value(conf.get('eventlet_debug', 'no'))
-    eventlet.debug.hub_exceptions(eventlet_debug)
 
     try:
         klass(conf).run(once=once, **kwargs)

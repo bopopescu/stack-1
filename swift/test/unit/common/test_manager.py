@@ -32,7 +32,6 @@ DUMMY_SIG = 1
 
 
 class MockOs():
-    RAISE_EPERM_SIG = 99
 
     def __init__(self, pids):
         self.running_pids = pids
@@ -42,8 +41,6 @@ class MockOs():
         self.execlp_called = False
 
     def kill(self, pid, sig):
-        if sig == self.RAISE_EPERM_SIG:
-            raise OSError(errno.EPERM, 'Operation not permitted')
         if pid not in self.running_pids:
             raise OSError(3, 'No such process')
         self.pid_sigs[pid].append(sig)
@@ -181,7 +178,7 @@ class TestManagerModule(unittest.TestCase):
 
         class MockServer():
 
-            def __init__(self, pids, run_dir=manager.RUN_DIR, zombie=0):
+            def __init__(self, pids, zombie=0):
                 self.heartbeat = (pids for _ in range(zombie))
 
             def get_running_pids(self):
@@ -308,24 +305,6 @@ class TestServer(unittest.TestCase):
         conf_file = self.join_swift_dir(
             'container-server/1/container-auditor.conf')
         pid_file = self.join_run_dir(
-            'container-auditor/1/container-auditor.pid')
-        self.assertEquals(pid_file, server.get_pid_file_name(conf_file))
-
-    def test_get_custom_pid_file_name(self):
-        random_run_dir = "/random/dir"
-        get_random_run_dir = lambda x: os.path.join(random_run_dir, x)
-        server = manager.Server('proxy', run_dir=random_run_dir)
-        conf_file = self.join_swift_dir('proxy-server.conf')
-        pid_file = get_random_run_dir('proxy-server.pid')
-        self.assertEquals(pid_file, server.get_pid_file_name(conf_file))
-        server = manager.Server('object-replicator', run_dir=random_run_dir)
-        conf_file = self.join_swift_dir('object-server/1.conf')
-        pid_file = get_random_run_dir('object-replicator/1.pid')
-        self.assertEquals(pid_file, server.get_pid_file_name(conf_file))
-        server = manager.Server('container-auditor', run_dir=random_run_dir)
-        conf_file = self.join_swift_dir(
-            'container-server/1/container-auditor.conf')
-        pid_file = get_random_run_dir(
             'container-auditor/1/container-auditor.pid')
         self.assertEquals(pid_file, server.get_pid_file_name(conf_file))
 
@@ -468,7 +447,7 @@ class TestServer(unittest.TestCase):
         files, contents = zip(*pid_files)
         with temptree(files, contents) as t:
             manager.RUN_DIR = t
-            server = manager.Server('proxy', run_dir=t)
+            server = manager.Server('proxy')
             # test get one file
             iter = server.iter_pid_files()
             pid_file, pid = iter.next()
@@ -477,13 +456,13 @@ class TestServer(unittest.TestCase):
             # ... and only one file
             self.assertRaises(StopIteration, iter.next)
             # test invalid value in pid file
-            server = manager.Server('auth', run_dir=t)
+            server = manager.Server('auth')
             self.assertRaises(ValueError, server.iter_pid_files().next)
             # test object-server doesn't steal pids from object-replicator
-            server = manager.Server('object', run_dir=t)
+            server = manager.Server('object')
             self.assertRaises(StopIteration, server.iter_pid_files().next)
             # test multi-pid iter
-            server = manager.Server('object-replicator', run_dir=t)
+            server = manager.Server('object-replicator')
             real_map = {
                 11: self.join_run_dir('object-replicator/1.pid'),
                 12: self.join_run_dir('object-replicator/2.pid'),
@@ -512,7 +491,7 @@ class TestServer(unittest.TestCase):
             files, pids = zip(*pid_files)
             with temptree(files, pids) as t:
                 manager.RUN_DIR = t
-                server = manager.Server('object', run_dir=t)
+                server = manager.Server('object')
                 # test get all pid files
                 real_map = {
                     1: self.join_run_dir('object-server/1.pid'),
@@ -541,14 +520,13 @@ class TestServer(unittest.TestCase):
         pid_files = (
             ('proxy-server.pid', 1),
             ('auth-server.pid', 2),
-            ('object-server.pid', 3),
         )
         files, pids = zip(*pid_files)
         with temptree(files, pids) as t:
             manager.RUN_DIR = t
             # mock os with both pids running
             manager.os = MockOs([1, 2])
-            server = manager.Server('proxy', run_dir=t)
+            server = manager.Server('proxy')
             pids = server.signal_pids(DUMMY_SIG)
             self.assertEquals(len(pids), 1)
             self.assert_(1 in pids)
@@ -580,19 +558,13 @@ class TestServer(unittest.TestCase):
                         self.join_run_dir('proxy-server.pid')))
                     # reset mock os with no running pids
                     manager.os = MockOs([])
-                    server = manager.Server('auth', run_dir=t)
+                    server = manager.Server('auth')
                     # test verbose warns on removing pid file
                     pids = server.signal_pids(signal.SIG_DFL, verbose=True)
                     output = pop_stream(f)
                     self.assert_('stale pid' in output.lower())
                     auth_pid = self.join_run_dir('auth-server.pid')
                     self.assert_(auth_pid in output)
-                    # test warning with insufficient permissions
-                    server = manager.Server('object', run_dir=t)
-                    pids = server.signal_pids(manager.os.RAISE_EPERM_SIG)
-                    output = pop_stream(f)
-                    self.assert_('no permission to signal pid 3' in
-                                 output.lower(), output)
             finally:
                 sys.stdout = old_stdout
 
@@ -604,7 +576,7 @@ class TestServer(unittest.TestCase):
         )
         with temptree(*zip(*pid_files)) as t:
             manager.RUN_DIR = t
-            server = manager.Server('test-server', run_dir=t)
+            server = manager.Server('test-server')
             # mock os, only pid '1' is running
             manager.os = MockOs([1])
             running_pids = server.get_running_pids()
@@ -638,7 +610,7 @@ class TestServer(unittest.TestCase):
             manager.RUN_DIR = t
             # all pids are running
             manager.os = MockOs(pids)
-            server = manager.Server('thing-doer', run_dir=t)
+            server = manager.Server('thing-doer')
             running_pids = server.get_running_pids()
             # only thing-doer.pid, 1
             self.assertEquals(len(running_pids), 1)
@@ -654,7 +626,7 @@ class TestServer(unittest.TestCase):
                 self.assert_(os.path.exists, os.path.join(t, f))
             # verify that servers are in fact not running
             for server_name in ('thing-sayer', 'other-doer', 'other-sayer'):
-                server = manager.Server(server_name, run_dir=t)
+                server = manager.Server(server_name)
                 running_pids = server.get_running_pids()
                 self.assertFalse(running_pids)
             # and now all OTHER pid files are cleaned out
@@ -671,7 +643,7 @@ class TestServer(unittest.TestCase):
         files, running_pids = zip(*pid_files)
         with temptree(files, running_pids) as t:
             manager.RUN_DIR = t
-            server = manager.Server('object', run_dir=t)
+            server = manager.Server('object')
             # test no servers running
             manager.os = MockOs([])
             pids = server.kill_running_pids()
@@ -679,10 +651,8 @@ class TestServer(unittest.TestCase):
         files, running_pids = zip(*pid_files)
         with temptree(files, running_pids) as t:
             manager.RUN_DIR = t
-            server.run_dir = t
             # start up pid
             manager.os = MockOs([1])
-            server = manager.Server('object', run_dir=t)
             # test kill one pid
             pids = server.kill_running_pids()
             self.assertEquals(len(pids), 1)
@@ -702,7 +672,7 @@ class TestServer(unittest.TestCase):
             # test multi server kill & ignore graceful on unsupported server
             self.assertFalse('object-replicator' in
                              manager.GRACEFUL_SHUTDOWN_SERVERS)
-            server = manager.Server('object-replicator', run_dir=t)
+            server = manager.Server('object-replicator')
             pids = server.kill_running_pids(graceful=True)
             self.assertEquals(len(pids), 2)
             for pid in (11, 12):
@@ -733,7 +703,7 @@ class TestServer(unittest.TestCase):
             with temptree(files, pids) as t:
                 manager.RUN_DIR = t
                 # setup running servers
-                server = manager.Server('test', run_dir=t)
+                server = manager.Server('test')
                 # capture stdio
                 old_stdout = sys.stdout
                 try:
@@ -832,7 +802,6 @@ class TestServer(unittest.TestCase):
             manager.SWIFT_DIR = swift_dir
             with temptree([]) as t:
                 manager.RUN_DIR = t
-                server.run_dir = t
                 old_subprocess = manager.subprocess
                 try:
                     # test single server process calls spawn once
@@ -863,7 +832,7 @@ class TestServer(unittest.TestCase):
                     conf2 = self.join_swift_dir('test-server/2.conf')
                     conf3 = self.join_swift_dir('test-server/3.conf')
                     conf4 = self.join_swift_dir('test-server/4.conf')
-                    server = manager.Server('test', run_dir=t)
+                    server = manager.Server('test')
                     # test server run once
                     server.spawn(conf1, once=True)
                     self.assert_(server.procs)
@@ -1101,11 +1070,11 @@ class TestServer(unittest.TestCase):
                     with open(os.path.join(t, 'output'), 'w+') as f:
                         sys.stdout = f
                         # can't start server w/o an conf
-                        server = manager.Server('test', run_dir=t)
+                        server = manager.Server('test')
                         self.assertFalse(server.launch())
                         # start mock os running all pids
                         manager.os = MockOs(pids)
-                        server = manager.Server('proxy', run_dir=t)
+                        server = manager.Server('proxy')
                         # can't start server if it's already running
                         self.assertFalse(server.launch())
                         output = pop_stream(f)
@@ -1199,7 +1168,7 @@ class TestServer(unittest.TestCase):
                 manager.RUN_DIR = t
                 # start all pids in mock os
                 manager.os = MockOs(pids)
-                server = manager.Server('account-reaper', run_dir=t)
+                server = manager.Server('account-reaper')
                 # test kill all running pids
                 pids = server.stop()
                 self.assertEquals(len(pids), 4)
@@ -1290,7 +1259,7 @@ class TestManager(unittest.TestCase):
     def test_status(self):
         class MockServer():
 
-            def __init__(self, server, run_dir=manager.RUN_DIR):
+            def __init__(self, server):
                 self.server = server
                 self.called_kwargs = []
 
@@ -1325,7 +1294,7 @@ class TestManager(unittest.TestCase):
             getattr(mock_setup_env, 'called', []).append(True)
 
         class MockServer():
-            def __init__(self, server, run_dir=manager.RUN_DIR):
+            def __init__(self, server):
                 self.server = server
                 self.called = defaultdict(list)
 
@@ -1387,7 +1356,7 @@ class TestManager(unittest.TestCase):
 
     def test_no_wait(self):
         class MockServer():
-            def __init__(self, server, run_dir=manager.RUN_DIR):
+            def __init__(self, server):
                 self.server = server
                 self.called = defaultdict(list)
 
@@ -1438,7 +1407,7 @@ class TestManager(unittest.TestCase):
     def test_no_daemon(self):
         class MockServer():
 
-            def __init__(self, server, run_dir=manager.RUN_DIR):
+            def __init__(self, server):
                 self.server = server
                 self.called = defaultdict(list)
 
@@ -1473,7 +1442,7 @@ class TestManager(unittest.TestCase):
     def test_once(self):
         class MockServer():
 
-            def __init__(self, server, run_dir=manager.RUN_DIR):
+            def __init__(self, server):
                 self.server = server
                 self.called = defaultdict(list)
 
@@ -1510,16 +1479,16 @@ class TestManager(unittest.TestCase):
     def test_stop(self):
         class MockServerFactory():
             class MockServer():
-                def __init__(self, pids, run_dir=manager.RUN_DIR):
+                def __init__(self, pids):
                     self.pids = pids
 
                 def stop(self, **kwargs):
                     return self.pids
 
-            def __init__(self, server_pids, run_dir=manager.RUN_DIR):
+            def __init__(self, server_pids):
                 self.server_pids = server_pids
 
-            def __call__(self, server, run_dir=manager.RUN_DIR):
+            def __call__(self, server):
                 return MockServerFactory.MockServer(self.server_pids[server])
 
         def mock_watch_server_pids(server_pids, **kwargs):

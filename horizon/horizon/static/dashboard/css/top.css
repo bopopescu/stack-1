@@ -21,6 +21,6 @@ textarea{resize:none}
 
 .container{margin:0 auto; padding:0; background:url(../image/fotter-bg.png) repeat-x; height:76px; width:auto;}
 .logo_div{ padding-top:17px; padding-left:20px; width:292px ; height:46px;}
-.table_div{padding-right:20px; margin-top:-58px;  text-align:right; float:right;}
+.table_div{padding-right:20px; margin-top:-58px;  text-align:right;}
 .table_div2{ margin-top:-15px;  text-align:right; color:#FFFFFF; font-size:12px;}
 tr td a{color:#FFFFFF;}

@@ -20,7 +20,8 @@ except ImportError:
 import unittest
 from contextlib import contextmanager
 
-from swift.common.swob import Request, Response
+from webob import Request, Response
+
 from swift.common.middleware import staticweb
 from test.unit import FakeLogger
 

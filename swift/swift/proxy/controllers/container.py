@@ -28,13 +28,13 @@ import time
 from urllib import unquote
 from random import shuffle
 
-from swift.common.utils import normalize_timestamp, public, csv_append
+from webob.exc import HTTPBadRequest, HTTPForbidden, HTTPNotFound
+
+from swift.common.utils import normalize_timestamp, public
 from swift.common.constraints import check_metadata, MAX_CONTAINER_NAME_LENGTH
 from swift.common.http import HTTP_ACCEPTED
 from swift.proxy.controllers.base import Controller, delay_denial, \
-    get_container_memcache_key, headers_to_container_info, cors_validation
-from swift.common.swob import HTTPBadRequest, HTTPForbidden, \
-    HTTPNotFound
+    get_container_memcache_key
 
 
 class ContainerController(Controller):
@@ -68,18 +68,23 @@ class ContainerController(Controller):
         if not self.account_info(self.account_name)[1]:
             return HTTPNotFound(request=req)
         part, nodes = self.app.container_ring.get_nodes(
-            self.account_name, self.container_name)
+                        self.account_name, self.container_name)
         shuffle(nodes)
-        resp = self.GETorHEAD_base(
-            req, _('Container'), part, nodes, req.path_info, len(nodes))
+        resp = self.GETorHEAD_base(req, _('Container'), part, nodes,
+                req.path_info, len(nodes))
+
         if self.app.memcache:
             # set the memcache container size for ratelimiting
             cache_key = get_container_memcache_key(self.account_name,
                                                    self.container_name)
-            self.app.memcache.set(
-                cache_key,
-                headers_to_container_info(resp.headers, resp.status_int),
-                timeout=self.app.recheck_container_existence)
+            self.app.memcache.set(cache_key,
+              {'status': resp.status_int,
+               'read_acl': resp.headers.get('x-container-read'),
+               'write_acl': resp.headers.get('x-container-write'),
+               'sync_key': resp.headers.get('x-container-sync-key'),
+               'container_size': resp.headers.get('x-container-object-count'),
+               'versions': resp.headers.get('x-versions-location')},
+                                  timeout=self.app.recheck_container_existence)
 
         if 'swift.authorize' in req.environ:
             req.acl = resp.headers.get('x-container-read')
@@ -95,20 +100,17 @@ class ContainerController(Controller):
 
     @public
     @delay_denial
-    @cors_validation
     def GET(self, req):
         """Handler for HTTP GET requests."""
         return self.GETorHEAD(req)
 
     @public
     @delay_denial
-    @cors_validation
     def HEAD(self, req):
         """Handler for HTTP HEAD requests."""
         return self.GETorHEAD(req)
 
     @public
-    @cors_validation
     def PUT(self, req):
         """HTTP PUT request handler."""
         error_response = \
@@ -134,19 +136,25 @@ class ContainerController(Controller):
             return HTTPNotFound(request=req)
         container_partition, containers = self.app.container_ring.get_nodes(
             self.account_name, self.container_name)
-        headers = self._backend_requests(req, len(containers),
-                                         account_partition, accounts)
+        headers = []
+        for account in accounts:
+            nheaders = {'X-Timestamp': normalize_timestamp(time.time()),
+                        'x-trans-id': self.trans_id,
+                        'X-Account-Host': '%(ip)s:%(port)s' % account,
+                        'X-Account-Partition': account_partition,
+                        'X-Account-Device': account['device'],
+                        'Connection': 'close'}
+            self.transfer_headers(req.headers, nheaders)
+            headers.append(nheaders)
         if self.app.memcache:
             cache_key = get_container_memcache_key(self.account_name,
                                                    self.container_name)
             self.app.memcache.delete(cache_key)
-        resp = self.make_requests(
-            req, self.app.container_ring,
-            container_partition, 'PUT', req.path_info, headers)
+        resp = self.make_requests(req, self.app.container_ring,
+                container_partition, 'PUT', req.path_info, headers)
         return resp
 
     @public
-    @cors_validation
     def POST(self, req):
         """HTTP POST request handler."""
         error_response = \
@@ -165,15 +173,15 @@ class ContainerController(Controller):
                    'Connection': 'close'}
         self.transfer_headers(req.headers, headers)
         if self.app.memcache:
-            self.app.memcache.delete(get_container_memcache_key(
-                self.account_name, self.container_name))
-        resp = self.make_requests(
-            req, self.app.container_ring, container_partition, 'POST',
-            req.path_info, [headers] * len(containers))
+            cache_key = get_container_memcache_key(self.account_name,
+                                                   self.container_name)
+            self.app.memcache.delete(cache_key)
+        resp = self.make_requests(req, self.app.container_ring,
+                container_partition, 'POST', req.path_info,
+                [headers] * len(containers))
         return resp
 
     @public
-    @cors_validation
     def DELETE(self, req):
         """HTTP DELETE request handler."""
         account_partition, accounts, container_count = \
@@ -182,39 +190,21 @@ class ContainerController(Controller):
             return HTTPNotFound(request=req)
         container_partition, containers = self.app.container_ring.get_nodes(
             self.account_name, self.container_name)
-        headers = self._backend_requests(req, len(containers),
-                                         account_partition, accounts)
+        headers = []
+        for account in accounts:
+            headers.append({'X-Timestamp': normalize_timestamp(time.time()),
+                           'X-Trans-Id': self.trans_id,
+                           'X-Account-Host': '%(ip)s:%(port)s' % account,
+                           'X-Account-Partition': account_partition,
+                           'X-Account-Device': account['device'],
+                           'Connection': 'close'})
         if self.app.memcache:
             cache_key = get_container_memcache_key(self.account_name,
                                                    self.container_name)
             self.app.memcache.delete(cache_key)
-        resp = self.make_requests(
-            req, self.app.container_ring, container_partition, 'DELETE',
-            req.path_info, headers)
+        resp = self.make_requests(req, self.app.container_ring,
+                    container_partition, 'DELETE', req.path_info, headers)
         # Indicates no server had the container
         if resp.status_int == HTTP_ACCEPTED:
             return HTTPNotFound(request=req)
         return resp
-
-    def _backend_requests(self, req, n_outgoing,
-                          account_partition, accounts):
-        headers = [{'Connection': 'close',
-                    'X-Timestamp': normalize_timestamp(time.time()),
-                    'x-trans-id': self.trans_id}
-                   for _junk in range(n_outgoing)]
-
-        for header in headers:
-            self.transfer_headers(req.headers, header)
-
-        for i, account in enumerate(accounts):
-            i = i % len(headers)
-
-            headers[i]['X-Account-Partition'] = account_partition
-            headers[i]['X-Account-Host'] = csv_append(
-                headers[i].get('X-Account-Host'),
-                '%(ip)s:%(port)s' % account)
-            headers[i]['X-Account-Device'] = csv_append(
-                headers[i].get('X-Account-Device'),
-                account['device'])
-
-        return headers
