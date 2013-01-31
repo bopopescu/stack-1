@@ -77,13 +77,13 @@ cd devstack
 sudo killall screen 1>/dev/null 2>&1
 
 # Exit on any errors
-trap failed ERR
-failed() {
-    local r=$?
-    kill >/dev/null 2>&1 $(jobs -p)
-    set +o xtrace
-    exit $r
-}
+#trap failed ERR
+#failed() {
+#    local r=$?
+#    kill >/dev/null 2>&1 $(jobs -p)
+#    set +o xtrace
+#    exit $r
+#}
 
 cat <<EOF >localrc
 FLAT_INTERFACE=eth0
