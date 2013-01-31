@@ -117,6 +117,29 @@ class SchedulerManager(manager.Manager):
                                               'task_state': None},
                                              context, ex, request_spec)
 
+    def get_host(self, context, image, request_spec, filter_properties,
+                    instance, instance_type, reservations):
+        try:
+            kwargs = {
+                'context': context,
+                'image': image,
+                'request_spec': request_spec,
+                'filter_properties': filter_properties,
+                'instance': instance,
+                'instance_type': instance_type,
+                'reservations': reservations,
+            }
+            host = self.driver.schedule_get_host(**kwargs)
+            return {'host': host}
+        except Exception as ex:
+            with excutils.save_and_reraise_exception():
+                self._set_vm_state_and_notify('get_host',
+                                             {'vm_state': vm_states.ACTIVE,
+                                              'task_state': None},
+                                             context, ex, request_spec)
+                if reservations:
+                    QUOTAS.rollback(context, reservations)
+
     def prep_resize(self, context, image, request_spec, filter_properties,
                     instance, instance_type, reservations):
         """Tries to call schedule_prep_resize on the driver.
