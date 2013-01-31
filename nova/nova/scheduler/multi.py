@@ -68,6 +68,9 @@ class MultiScheduler(driver.Scheduler):
     def schedule_run_instance(self, *args, **kwargs):
         return self.drivers['compute'].schedule_run_instance(*args, **kwargs)
 
+    def schedule_get_host(self, *args, **kwargs):
+        return self.drivers['compute'].schedule_get_host(*args, **kwargs)
+
     def schedule_prep_resize(self, *args, **kwargs):
         return self.drivers['compute'].schedule_prep_resize(*args, **kwargs)
 

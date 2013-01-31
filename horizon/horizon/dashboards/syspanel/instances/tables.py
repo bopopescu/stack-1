@@ -59,8 +59,8 @@ class MigrateInstance(tables.BatchAction):
                 and not _is_deleting(instance))
 
     def action(self, request, obj_id):
-        api.server_live_migrate(request, obj_id, "sdc-openstack-compute72", True)
-#        api.server_migrate(request, obj_id)
+#        api.server_live_migrate(request, obj_id, "sdc-openstack-compute72", True)
+        api.server_migrate(request, obj_id)
 
 
 class SyspanelInstancesTable(tables.DataTable):
