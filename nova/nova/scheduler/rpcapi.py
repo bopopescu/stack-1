@@ -82,6 +82,18 @@ class SchedulerAPI(nova.openstack.common.rpc.proxy.RpcProxy):
                 filter_properties=filter_properties,
                 reservations=reservations))
 
+    #add by wyk
+    #return available host like "sdc-compute74"
+    def get_host(self, ctxt, instance, instance_type, image,
+            request_spec, filter_properties, reservations):
+        instance_p = jsonutils.to_primitive(instance)
+        instance_type_p = jsonutils.to_primitive(instance_type)
+        self.call(ctxt, self.make_msg('get_host',
+                instance=instance_p, instance_type=instance_type_p,
+                image=image, request_spec=request_spec,
+                filter_properties=filter_properties,
+                reservations=reservations))
+
     def show_host_resources(self, ctxt, host):
         return self.call(ctxt, self.make_msg('show_host_resources', host=host))
 

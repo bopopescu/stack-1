@@ -107,6 +107,18 @@ class FilterScheduler(driver.Scheduler):
         notifier.notify(context, notifier.publisher_id("scheduler"),
                         'scheduler.run_instance.end', notifier.INFO, payload)
 
+    #by wyk
+    def schedule_get_host(self, context, image, request_spec,
+                             filter_properties, instance, instance_type,
+                             reservations):
+        hosts = self._schedule(context, 'compute', request_spec,
+                               filter_properties, [instance['uuid']])
+        if not hosts:
+            raise exception.NoValidHost(reason="")
+        host = hosts.pop(0)
+        return host.host_state.host
+
+
     def schedule_prep_resize(self, context, image, request_spec,
                              filter_properties, instance, instance_type,
                              reservations):
