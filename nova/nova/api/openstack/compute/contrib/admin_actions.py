@@ -123,7 +123,7 @@ class AdminActionsController(wsgi.Controller):
         authorize(context, 'migrate')
         try:
             instance = self.compute_api.get(context, id)
-            self.compute_api.resize(req.environ['nova.context'], instance)
+            self.compute_api.live_migrate(req.environ['nova.context'], instance)
         except exception.InstanceInvalidState as state_error:
             common.raise_http_conflict_for_instance_invalid_state(state_error,
                     'migrate')
