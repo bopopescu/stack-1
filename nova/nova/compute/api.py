@@ -1946,8 +1946,34 @@ class API(base.Base):
             return False
 
     @check_instance_state(vm_state=[vm_states.ACTIVE])
-    def live_migrate(self, context, instance, block_migration,
-                     disk_over_commit, host):
+    def live_migrate(self, context, instance, block_migration=True,
+                     disk_over_commit=False, host=None):
+        #add by wyk
+        current_instance_type = instance['instance_type']
+        current_instance_type_name = current_instance_type['name']
+        if current_instance_type['disabled']:
+            raise exception.FlavorNotFound(flavor_id=flavor_id)
+
+        image = self.image_service.show(context, instance['image_ref'])
+        request_spec = {
+                'instance_type': current_instance_type,
+                'instance_uuids': [instance['uuid']],
+                'instance_properties': instance}
+
+        filter_properties = {'ignore_hosts': []}
+        filter_properties['ignore_hosts'].append(instance['host'])
+
+        args = {
+            "instance": instance,
+            "instance_type": current_instance_type,
+            "image": image,
+            "request_spec": jsonutils.to_primitive(request_spec),
+            "filter_properties": filter_properties,
+            "reservations": None,
+        }
+        scheduled_host = self.scheduler_rpcapi.get_host(context, **args).get('host', None)
+        if not host and scheduled_host:
+            host = scheduled_host
         """Migrate a server lively to a new host."""
         LOG.debug(_("Going to try to live migrate instance to %s"),
                   host, instance=instance)
