@@ -1,6 +1,6 @@
 Metadata-Version: 1.1
 Name: swift
-Version: 1.7.4.1
+Version: 1.7.7
 Summary: Swift
 Home-page: https://launchpad.net/swift
 Author: OpenStack, LLC.
@@ -13,3 +13,4 @@ Classifier: License :: OSI Approved :: Apache Software License
 Classifier: Operating System :: POSIX :: Linux
 Classifier: Programming Language :: Python :: 2.6
 Classifier: Environment :: No Input/Output (Daemon)
+Classifier: Environment :: OpenStack

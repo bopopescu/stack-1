@@ -28,10 +28,11 @@ Installing dependencies and the core code
   #. `apt-get install python-software-properties`
   #. `add-apt-repository ppa:swift-core/release`
   #. `apt-get update`
-  #. `apt-get install curl gcc git-core memcached python-configobj
-     python-coverage python-dev python-nose python-setuptools python-simplejson
-     python-xattr sqlite3 xfsprogs python-webob python-eventlet
-     python-greenlet python-pastedeploy python-netifaces`
+  #. `apt-get install curl gcc git-core memcached python-coverage python-dev
+     python-nose python-setuptools python-simplejson python-xattr sqlite3
+     xfsprogs python-eventlet python-greenlet python-pastedeploy
+     python-netifaces python-pip`
+  #. `pip install mock`
   #. Install anything else you want, like screen, ssh, vim, etc.
 
 * On Fedora, log in as root and do:
@@ -40,7 +41,7 @@ Installing dependencies and the core code
      openstack-swift-account openstack-swift-container openstack-swift-object`
   #. `yum install xinetd rsync`
   #. `yum install memcached`
-  #. `yum install python-netifaces python-nose`
+  #. `yum install python-netifaces python-nose python-mock`
 
   This installs all necessary dependencies, and also creates user `swift`
   and group `swift`. So, `swift:swift` ought to be used in every place where
@@ -88,8 +89,8 @@ Using a loopback device for storage
 If you want to use a loopback device instead of another partition, follow these instructions.
 
   #. `mkdir /srv`
-  #. `dd if=/dev/zero of=/srv/swift-disk bs=1024 count=0 seek=1000000`
-       (modify seek to make a larger or smaller partition)
+  #. `truncate -s 1GB /srv/swift-disk`
+       (modify size to make a larger or smaller partition)
   #. `mkfs.xfs -i size=1024 /srv/swift-disk`
   #. Edit `/etc/fstab` and add
        `/srv/swift-disk /mnt/sdb1 xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0`
@@ -293,6 +294,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         bind_port = 8080
         user = <your-user-name>
         log_facility = LOG_LOCAL1
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = healthcheck cache tempauth proxy-logging proxy-server
@@ -336,6 +338,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL2
         recon_cache_path = /var/cache/swift
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon account-server
@@ -363,6 +366,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL3
         recon_cache_path = /var/cache/swift2
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon account-server
@@ -390,6 +394,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL4
         recon_cache_path = /var/cache/swift3
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon account-server
@@ -417,6 +422,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL5
         recon_cache_path = /var/cache/swift4
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon account-server
@@ -444,6 +450,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL2
         recon_cache_path = /var/cache/swift
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon container-server
@@ -473,6 +480,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL3
         recon_cache_path = /var/cache/swift2
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon container-server
@@ -502,6 +510,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL4
         recon_cache_path = /var/cache/swift3
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon container-server
@@ -531,6 +540,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL5
         recon_cache_path = /var/cache/swift4
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon container-server
@@ -561,6 +571,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL2
         recon_cache_path = /var/cache/swift
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon object-server
@@ -588,6 +599,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL3
         recon_cache_path = /var/cache/swift2
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon object-server
@@ -615,6 +627,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL4
         recon_cache_path = /var/cache/swift3
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon object-server
@@ -642,6 +655,7 @@ Sample configuration files are provided with all defaults in line-by-line commen
         user = <your-user-name>
         log_facility = LOG_LOCAL5
         recon_cache_path = /var/cache/swift4
+        eventlet_debug = true
 
         [pipeline:main]
         pipeline = recon object-server

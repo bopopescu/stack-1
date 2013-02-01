@@ -40,50 +40,10 @@ be separated with a simple .split()
 import time
 from urllib import quote, unquote
 
-from webob import Request
-
+from swift.common.swob import Request
 from swift.common.utils import (get_logger, get_remote_client,
-                                get_valid_utf8_str, TRUE_VALUES)
-
-
-class InputProxy(object):
-    """
-    File-like object that counts bytes read.
-    To be swapped in for wsgi.input for accounting purposes.
-    """
-    def __init__(self, wsgi_input):
-        """
-        :param wsgi_input: file-like object to wrap the functionality of
-        """
-        self.wsgi_input = wsgi_input
-        self.bytes_received = 0
-        self.client_disconnect = False
-
-    def read(self, *args, **kwargs):
-        """
-        Pass read request to the underlying file-like object and
-        add bytes read to total.
-        """
-        try:
-            chunk = self.wsgi_input.read(*args, **kwargs)
-        except Exception:
-            self.client_disconnect = True
-            raise
-        self.bytes_received += len(chunk)
-        return chunk
-
-    def readline(self, *args, **kwargs):
-        """
-        Pass readline request to the underlying file-like object and
-        add bytes read to total.
-        """
-        try:
-            line = self.wsgi_input.readline(*args, **kwargs)
-        except Exception:
-            self.client_disconnect = True
-            raise
-        self.bytes_received += len(line)
-        return line
+                                get_valid_utf8_str, config_true_value,
+                                InputProxy)
 
 
 class ProxyLoggingMiddleware(object):
@@ -93,7 +53,9 @@ class ProxyLoggingMiddleware(object):
 
     def __init__(self, app, conf):
         self.app = app
-        self.log_hdrs = conf.get('log_headers', 'no').lower() in TRUE_VALUES
+        self.log_hdrs = config_true_value(conf.get(
+            'access_log_headers',
+            conf.get('log_headers', 'no')))
 
         # The leading access_* check is in case someone assumes that
         # log_statsd_valid_http_methods behaves like the other log_statsd_*
@@ -101,7 +63,7 @@ class ProxyLoggingMiddleware(object):
         self.valid_methods = conf.get(
             'access_log_statsd_valid_http_methods',
             conf.get('log_statsd_valid_http_methods',
-                     'GET,HEAD,POST,PUT,DELETE,COPY'))
+                     'GET,HEAD,POST,PUT,DELETE,COPY,OPTIONS'))
         self.valid_methods = [m.strip().upper() for m in
                               self.valid_methods.split(',') if m.strip()]
         access_log_conf = {}
@@ -206,10 +168,6 @@ class ProxyLoggingMiddleware(object):
                 elif isinstance(iterable, list):
                     start_response_args[0][1].append(
                         ('content-length', str(sum(len(i) for i in iterable))))
-                else:
-                    raise Exception('WSGI [proxy-logging]: No content-length '
-                                    'or transfer-encoding header sent and '
-                                    'there is content! %r' % chunk)
             start_response(*start_response_args[0])
             bytes_sent = 0
             client_disconnect = False

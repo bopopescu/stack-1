@@ -26,21 +26,20 @@
 
 import mimetypes
 import os
-import time
 from ConfigParser import ConfigParser
 import uuid
 
 from eventlet import Timeout
-from webob.exc import HTTPBadRequest, HTTPForbidden, HTTPMethodNotAllowed, \
-    HTTPNotFound, HTTPPreconditionFailed, HTTPServerError
-from webob import Request
 
 from swift.common.ring import Ring
 from swift.common.utils import cache_from_env, get_logger, \
-    get_remote_client, split_path, TRUE_VALUES
+    get_remote_client, split_path, config_true_value
 from swift.common.constraints import check_utf8
 from swift.proxy.controllers import AccountController, ObjectController, \
-    ContainerController, Controller
+    ContainerController
+from swift.common.swob import HTTPBadRequest, HTTPForbidden, \
+    HTTPMethodNotAllowed, HTTPNotFound, HTTPPreconditionFailed, \
+    HTTPServerError, Request
 
 
 class Application(object):
@@ -71,21 +70,21 @@ class Application(object):
         self.recheck_account_existence = \
             int(conf.get('recheck_account_existence', 60))
         self.allow_account_management = \
-            conf.get('allow_account_management', 'no').lower() in TRUE_VALUES
+            config_true_value(conf.get('allow_account_management', 'no'))
         self.object_post_as_copy = \
-            conf.get('object_post_as_copy', 'true').lower() in TRUE_VALUES
+            config_true_value(conf.get('object_post_as_copy', 'true'))
         self.resellers_conf = ConfigParser()
         self.resellers_conf.read(os.path.join(swift_dir, 'resellers.conf'))
         self.object_ring = object_ring or Ring(swift_dir, ring_name='object')
         self.container_ring = container_ring or Ring(swift_dir,
-                ring_name='container')
+                                                     ring_name='container')
         self.account_ring = account_ring or Ring(swift_dir,
-                ring_name='account')
+                                                 ring_name='account')
         self.memcache = memcache
         mimetypes.init(mimetypes.knownfiles +
                        [os.path.join(swift_dir, 'mime.types')])
         self.account_autocreate = \
-            conf.get('account_autocreate', 'no').lower() in TRUE_VALUES
+            config_true_value(conf.get('account_autocreate', 'no'))
         self.expiring_objects_account = \
             (conf.get('auto_create_account_prefix') or '.') + \
             'expiring_objects'
@@ -93,17 +92,22 @@ class Application(object):
             int(conf.get('expiring_objects_container_divisor') or 86400)
         self.max_containers_per_account = \
             int(conf.get('max_containers_per_account') or 0)
-        self.max_containers_whitelist = [a.strip()
+        self.max_containers_whitelist = [
+            a.strip()
             for a in conf.get('max_containers_whitelist', '').split(',')
             if a.strip()]
-        self.deny_host_headers = [host.strip() for host in
+        self.deny_host_headers = [
+            host.strip() for host in
             conf.get('deny_host_headers', '').split(',') if host.strip()]
         self.rate_limit_after_segment = \
             int(conf.get('rate_limit_after_segment', 10))
         self.rate_limit_segments_per_sec = \
             int(conf.get('rate_limit_segments_per_sec', 1))
-        self.log_handoffs = \
-            conf.get('log_handoffs', 'true').lower() in TRUE_VALUES
+        self.log_handoffs = config_true_value(conf.get('log_handoffs', 'true'))
+        self.cors_allow_origin = [
+            a.strip()
+            for a in conf.get('cors_allow_origin', '').split(',')
+            if a.strip()]
 
     def get_controller(self, path):
         """
@@ -116,9 +120,9 @@ class Application(object):
         """
         version, account, container, obj = split_path(path, 1, 4, True)
         d = dict(version=version,
-                account_name=account,
-                container_name=container,
-                object_name=obj)
+                 account_name=account,
+                 container_name=container,
+                 object_name=obj)
         if obj and container and account:
             return ObjectController, d
         elif container and account:
@@ -130,7 +134,7 @@ class Application(object):
     def __call__(self, env, start_response):
         """
         WSGI entry point.
-        Wraps env in webob.Request object and passes it down.
+        Wraps env in swob.Request object and passes it down.
 
         :param env: WSGI environment dictionary
         :param start_response: WSGI callable
@@ -141,11 +145,12 @@ class Application(object):
             req = self.update_request(Request(env))
             return self.handle_request(req)(env, start_response)
         except UnicodeError:
-            err = HTTPPreconditionFailed(request=req, body='Invalid UTF8')
+            err = HTTPPreconditionFailed(
+                request=req, body='Invalid UTF8 or contains NULL')
             return err(env, start_response)
         except (Exception, Timeout):
             start_response('500 Server Error',
-                    [('Content-Type', 'text/plain')])
+                           [('Content-Type', 'text/plain')])
             return ['Internal server error.\n']
 
     def update_request(self, req):
@@ -157,9 +162,9 @@ class Application(object):
     def handle_request(self, req):
         """
         Entry point for proxy server.
-        Should return a WSGI-style callable (such as webob.Response).
+        Should return a WSGI-style callable (such as swob.Response).
 
-        :param req: webob.Request object
+        :param req: swob.Request object
         """
         try:
             self.logger.set_statsd_prefix('proxy-server')
@@ -171,11 +176,12 @@ class Application(object):
             try:
                 if not check_utf8(req.path_info):
                     self.logger.increment('errors')
-                    return HTTPPreconditionFailed(request=req,
-                                                  body='Invalid UTF8')
+                    return HTTPPreconditionFailed(
+                        request=req, body='Invalid UTF8 or contains NULL')
             except UnicodeError:
                 self.logger.increment('errors')
-                return HTTPPreconditionFailed(request=req, body='Invalid UTF8')
+                return HTTPPreconditionFailed(
+                    request=req, body='Invalid UTF8 or contains NULL')
 
             try:
                 controller, path_parts = self.get_controller(req.path)
@@ -207,7 +213,9 @@ class Application(object):
                 handler = getattr(controller, req.method)
                 getattr(handler, 'publicly_accessible')
             except AttributeError:
-                return HTTPMethodNotAllowed(request=req)
+                allowed_methods = getattr(controller, 'allowed_methods', set())
+                return HTTPMethodNotAllowed(
+                    request=req, headers={'Allow': ', '.join(allowed_methods)})
             if path_parts['version']:
                 req.path_info_pop()
             if 'swift.authorize' in req.environ:

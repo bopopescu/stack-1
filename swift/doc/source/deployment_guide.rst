@@ -220,20 +220,31 @@ The following configuration options are available:
 
 [DEFAULT]
 
-==================  ==========  =============================================
-Option              Default     Description
-------------------  ----------  ---------------------------------------------
-swift_dir           /etc/swift  Swift configuration directory
-devices             /srv/node   Parent directory of where devices are mounted
-mount_check         true        Whether or not check if the devices are
-                                mounted to prevent accidentally writing
-                                to the root device
-bind_ip             0.0.0.0     IP Address for server to bind to
-bind_port           6000        Port for server to bind to
-workers             1           Number of workers to fork
-disable_fallocate   false       Disable "fast fail" fallocate checks if the
-                                underlying filesystem does not support it.
-==================  ==========  =============================================
+===================  ==========  =============================================
+Option               Default     Description
+-------------------  ----------  ---------------------------------------------
+swift_dir            /etc/swift  Swift configuration directory
+devices              /srv/node   Parent directory of where devices are mounted
+mount_check          true        Whether or not check if the devices are
+                                 mounted to prevent accidentally writing
+                                 to the root device
+bind_ip              0.0.0.0     IP Address for server to bind to
+bind_port            6000        Port for server to bind to
+bind_timeout         30          Seconds to attempt bind before giving up
+workers              1           Number of workers to fork
+disable_fallocate    false       Disable "fast fail" fallocate checks if the
+                                 underlying filesystem does not support it.
+log_custom_handlers  None        Comma-separated list of functions to call
+                                 to setup custom log handlers.
+eventlet_debug       false       If true, turn on debug logging for eventlet
+fallocate_reserve    0           You can set fallocate_reserve to the number of
+                                 bytes you'd like fallocate to reserve, whether
+                                 there is space for the given file size or not.
+                                 This is useful for systems that behave badly
+                                 when they completely run out of space; you can
+                                 make the services pretend they're out of space
+                                 early.
+===================  ==========  =============================================
 
 [object-server]
 
@@ -326,21 +337,32 @@ The following configuration options are available:
 
 [DEFAULT]
 
-==================  ==========  ============================================
-Option              Default     Description
-------------------  ----------  --------------------------------------------
-swift_dir           /etc/swift  Swift configuration directory
-devices             /srv/node   Parent directory of where devices are mounted
-mount_check         true        Whether or not check if the devices are
-                                mounted to prevent accidentally writing
-                                to the root device
-bind_ip             0.0.0.0     IP Address for server to bind to
-bind_port           6001        Port for server to bind to
-workers             1           Number of workers to fork
-user                swift       User to run as
-disable_fallocate   false       Disable "fast fail" fallocate checks if the
-                                underlying filesystem does not support it.
-==================  ==========  ============================================
+===================  ==========  ============================================
+Option               Default     Description
+-------------------  ----------  --------------------------------------------
+swift_dir            /etc/swift  Swift configuration directory
+devices              /srv/node   Parent directory of where devices are mounted
+mount_check          true        Whether or not check if the devices are
+                                 mounted to prevent accidentally writing
+                                 to the root device
+bind_ip              0.0.0.0     IP Address for server to bind to
+bind_port            6001        Port for server to bind to
+bind_timeout         30          Seconds to attempt bind before giving up
+workers              1           Number of workers to fork
+user                 swift       User to run as
+disable_fallocate    false       Disable "fast fail" fallocate checks if the
+                                 underlying filesystem does not support it.
+log_custom_handlers  None        Comma-separated list of functions to call
+                                 to setup custom log handlers.
+eventlet_debug       false       If true, turn on debug logging for eventlet
+fallocate_reserve    0           You can set fallocate_reserve to the number of
+                                 bytes you'd like fallocate to reserve, whether
+                                 there is space for the given file size or not.
+                                 This is useful for systems that behave badly
+                                 when they completely run out of space; you can
+                                 make the services pretend they're out of space
+                                 early.
+===================  ==========  ============================================
 
 [container-server]
 
@@ -422,25 +444,36 @@ The following configuration options are available:
 
 [DEFAULT]
 
-==================  ==========  =============================================
-Option              Default     Description
-------------------  ----------  ---------------------------------------------
-swift_dir           /etc/swift  Swift configuration directory
-devices             /srv/node   Parent directory or where devices are mounted
-mount_check         true        Whether or not check if the devices are
-                                mounted to prevent accidentally writing
-                                to the root device
-bind_ip             0.0.0.0     IP Address for server to bind to
-bind_port           6002        Port for server to bind to
-workers             1           Number of workers to fork
-user                swift       User to run as
-db_preallocation    off         If you don't mind the extra disk space usage in
-                                overhead, you can turn this on to preallocate
-                                disk space with SQLite databases to decrease
-                                fragmentation.
-disable_fallocate   false       Disable "fast fail" fallocate checks if the
-                                underlying filesystem does not support it.
-==================  ==========  =============================================
+===================  ==========  =============================================
+Option               Default     Description
+-------------------  ----------  ---------------------------------------------
+swift_dir            /etc/swift  Swift configuration directory
+devices              /srv/node   Parent directory or where devices are mounted
+mount_check          true        Whether or not check if the devices are
+                                 mounted to prevent accidentally writing
+                                 to the root device
+bind_ip              0.0.0.0     IP Address for server to bind to
+bind_port            6002        Port for server to bind to
+bind_timeout         30          Seconds to attempt bind before giving up
+workers              1           Number of workers to fork
+user                 swift       User to run as
+db_preallocation     off         If you don't mind the extra disk space usage in
+                                 overhead, you can turn this on to preallocate
+                                 disk space with SQLite databases to decrease
+                                 fragmentation.
+disable_fallocate    false       Disable "fast fail" fallocate checks if the
+                                 underlying filesystem does not support it.
+log_custom_handlers  None        Comma-separated list of functions to call
+                                 to setup custom log handlers.
+eventlet_debug       false       If true, turn on debug logging for eventlet
+fallocate_reserve    0           You can set fallocate_reserve to the number of
+                                 bytes you'd like fallocate to reserve, whether
+                                 there is space for the given file size or not.
+                                 This is useful for systems that behave badly
+                                 when they completely run out of space; you can
+                                 make the services pretend they're out of space
+                                 early.
+===================  ==========  =============================================
 
 [account-server]
 
@@ -520,6 +553,8 @@ Option                        Default          Description
 bind_ip                       0.0.0.0          IP Address for server to
                                                bind to
 bind_port                     80               Port for server to bind to
+bind_timeout                  30               Seconds to attempt bind before
+                                               giving up
 swift_dir                     /etc/swift       Swift configuration directory
 workers                       1                Number of workers to fork
 user                          swift            User to run as
@@ -529,6 +564,18 @@ cert_file                                      Path to the ssl .crt. This
 key_file                                       Path to the ssl .key. This
                                                should be enabled for testing
                                                purposes only.
+cors_allow_origin                              This is a list of hosts that
+                                               are included with any CORS 
+                                               request by default and 
+                                               returned with the 
+                                               Access-Control-Allow-Origin
+                                               header in addition to what
+                                               the container has set.
+log_custom_handlers           None             Comma separated list of functions
+                                               to call to setup custom log
+                                               handlers.
+eventlet_debug                false            If true, turn on debug logging
+                                               for eventlet
 ============================  ===============  =============================
 
 [proxy-server]
@@ -637,12 +684,27 @@ auth_prefix            /auth/                          The HTTP request path
                                                        letter `v`.
 token_life             86400                           The number of seconds a
                                                        token is valid.
+storage_url_scheme     default                         Scheme to return with
+                                                       storage urls: http,
+                                                       https, or default
+                                                       (chooses based on what
+                                                       the server is running
+                                                       as) This can be useful
+                                                       with an SSL load
+                                                       balancer in front of a
+                                                       non-SSL server.
 =====================  =============================== =======================
 
 Additionally, you need to list all the accounts/users you want here. The format
 is::
 
     user_<account>_<user> = <key> [group] [group] [...] [storage_url]
+
+or if you want to be able to include underscores in the ``<account>`` or
+``<user>`` portions, you can base64 encode them (with *no* equal signs) in a
+line like this::
+
+    user64_<account_b64>_<user_b64> = <key> [group] [group] [...] [storage_url]
 
 There are special groups of::
 
@@ -655,12 +717,14 @@ that have been explicitly allowed for them by a .admin or .reseller_admin.
 The trailing optional storage_url allows you to specify an alternate url to
 hand back to the user upon authentication. If not specified, this defaults to::
 
-    http[s]://<ip>:<port>/v1/<reseller_prefix>_<account>
+    $HOST/v1/<reseller_prefix>_<account>
 
-Where http or https depends on whether cert_file is specified in the [DEFAULT]
-section, <ip> and <port> are based on the [DEFAULT] section's bind_ip and
-bind_port (falling back to 127.0.0.1 and 8080), <reseller_prefix> is from this
-section, and <account> is from the user_<account>_<user> name.
+Where $HOST will do its best to resolve to what the requester would need to use
+to reach this host, <reseller_prefix> is from this section, and <account> is
+from the user_<account>_<user> name. Note that $HOST cannot possibly handle
+when you have a load balancer in front of it that does https while TempAuth
+itself runs with http; in such a case, you'll have to specify the
+storage_url_scheme configuration value as an override.
 
 Here are example entries, required for running the tests::
 
@@ -668,6 +732,9 @@ Here are example entries, required for running the tests::
     user_test_tester = testing .admin
     user_test2_tester2 = testing2 .admin
     user_test_tester3 = testing3
+
+    # account "test_y" and user "tester_y" (note the lack of padding = chars)
+    user64_dGVzdF95_dGVzdGVyX3k = testing4 .admin
 
 ------------------------
 Memcached Considerations
@@ -792,3 +859,5 @@ Swift is set up to log directly to syslog. Every service can be configured
 with the `log_facility` option to set the syslog log facility destination.
 We recommended using syslog-ng to route the logs to specific log
 files locally on the server and also to remote log collecting servers.
+Additionally, custom log handlers can be used via the custom_log_handlers
+setting.

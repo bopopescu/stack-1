@@ -27,10 +27,7 @@ import time
 from bisect import bisect
 from hashlib import md5
 
-try:
-    import simplejson as json
-except ImportError:
-    import json
+from swift.common.utils import json
 
 DEFAULT_MEMCACHED_PORT = 11211
 
@@ -51,6 +48,18 @@ ERROR_LIMIT_DURATION = 60
 
 def md5hash(key):
     return md5(key).hexdigest()
+
+
+def sanitize_timeout(timeout):
+    """
+    Sanitize a timeout value to use an absolute expiration time if the delta
+    is greater than 30 days (in seconds). Note that the memcached server
+    translates negative values to mean a delta of 30 days in seconds (and 1
+    additional second), client beware.
+    """
+    if timeout > (30 * 24 * 60 * 60):
+        timeout += time.time()
+    return timeout
 
 
 class MemcacheConnectionError(Exception):
@@ -82,15 +91,15 @@ class MemcacheRing(object):
     def _exception_occurred(self, server, e, action='talking'):
         if isinstance(e, socket.timeout):
             logging.error(_("Timeout %(action)s to memcached: %(server)s"),
-                {'action': action, 'server': server})
+                          {'action': action, 'server': server})
         else:
             logging.exception(_("Error %(action)s to memcached: %(server)s"),
-                {'action': action, 'server': server})
+                              {'action': action, 'server': server})
         now = time.time()
         self._errors[server].append(time.time())
         if len(self._errors[server]) > ERROR_LIMIT_COUNT:
             self._errors[server] = [err for err in self._errors[server]
-                                          if err > now - ERROR_LIMIT_TIME]
+                                    if err > now - ERROR_LIMIT_TIME]
             if len(self._errors[server]) > ERROR_LIMIT_COUNT:
                 self._error_limited[server] = now + ERROR_LIMIT_DURATION
                 logging.error(_('Error limiting server %s'), server)
@@ -145,8 +154,7 @@ class MemcacheRing(object):
         :param timeout: ttl in memcache
         """
         key = md5hash(key)
-        if timeout > 0:
-            timeout += time.time()
+        timeout = sanitize_timeout(timeout)
         flags = 0
         if serialize and self._allow_pickle:
             value = pickle.dumps(value, PICKLE_PROTOCOL)
@@ -156,8 +164,8 @@ class MemcacheRing(object):
             flags |= JSON_FLAG
         for (server, fp, sock) in self._get_conns(key):
             try:
-                sock.sendall('set %s %d %d %s noreply\r\n%s\r\n' % \
-                              (key, flags, timeout, len(value), value))
+                sock.sendall('set %s %d %d %s noreply\r\n%s\r\n' %
+                             (key, flags, timeout, len(value), value))
                 self._return_conn(server, fp, sock)
                 return
             except Exception, e:
@@ -217,6 +225,7 @@ class MemcacheRing(object):
         if delta < 0:
             command = 'decr'
         delta = str(abs(int(delta)))
+        timeout = sanitize_timeout(timeout)
         for (server, fp, sock) in self._get_conns(key):
             try:
                 sock.sendall('%s %s %s\r\n' % (command, key, delta))
@@ -225,8 +234,8 @@ class MemcacheRing(object):
                     add_val = delta
                     if command == 'decr':
                         add_val = '0'
-                    sock.sendall('add %s %d %d %s\r\n%s\r\n' % \
-                                  (key, 0, timeout, len(add_val), add_val))
+                    sock.sendall('add %s %d %d %s\r\n%s\r\n' %
+                                 (key, 0, timeout, len(add_val), add_val))
                     line = fp.readline().strip().split()
                     if line[0].upper() == 'NOT_STORED':
                         sock.sendall('%s %s %s\r\n' % (command, key, delta))
@@ -284,8 +293,7 @@ class MemcacheRing(object):
         :param timeout: ttl for memcache
         """
         server_key = md5hash(server_key)
-        if timeout > 0:
-            timeout += time.time()
+        timeout = sanitize_timeout(timeout)
         msg = ''
         for key, value in mapping.iteritems():
             key = md5hash(key)
