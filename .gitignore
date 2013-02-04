@@ -7,3 +7,14 @@ stack-screenrc
 *.img
 localrc
 screen_log
+*.tar.gz
+.bash_history
+.cache/
+.cinderclient/
+.my.cnf
+.novaclient/
+.rnd
+data/
+devstack/files/images/
+keystone-signing/
+
