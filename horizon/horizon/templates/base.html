@@ -59,8 +59,8 @@ function MM_swapImage() { //v3.0
     <table width="444" height="60" border="0" align="right" cellpadding="0" cellspacing="0" >
       <tr>
         <td width="65"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image2','','/static/dashboard/image/tubiao-1.png',1)"><img src="/static/dashboard/image/tubiao-2.png" name="Image2" width="64" height="63" border="0" id="Image2"  /></a> </td>
-        <td width="64"><a href="/horizon/dashboards/Instance/" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','/static/dashboard/image/tubiao-3.png',1)"><img src="/static/dashboard/image/tubiao-4.png" name="Image3" width="64" height="63" border="0" id="Image3" /></a> </td>
-        <td width="64"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image4','','/static/dashboard/image/tubiao-5.png',1)"><img src="/static/dashboard/image/tubiao-6.png" name="Image4" width="64" height="63" border="0" id="Image4" /></a> </td>
+        <td width="64"><a href="{% url horizon:syspanel:instances:index %}" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image3','','/static/dashboard/image/tubiao-3.png',1)"><img src="/static/dashboard/image/tubiao-4.png" name="Image3" width="64" height="63" border="0" id="Image3" /></a> </td>
+        <td width="64"><a href="{% url horizon:syspanel:volumes:index %}" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image4','','/static/dashboard/image/tubiao-5.png',1)"><img src="/static/dashboard/image/tubiao-6.png" name="Image4" width="64" height="63" border="0" id="Image4" /></a> </td>
         <td width="64"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image5','','/static/dashboard/image/tubiao-7.png',1)"><img src="/static/dashboard/image/tubiao-8.png" name="Image5" width="64" height="63" border="0" id="Image5" /></a> </td>
         <td width="64"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image6','','/static/dashboard/image/tubiao-9.png',1)"><img src="/static/dashboard/image/tubiao-10.png" name="Image6" width="64" height="63" border="0" id="Image6" /></a> </td>
         <td width="64"><a href="#" onmouseout="MM_swapImgRestore()" onmouseover="MM_swapImage('Image7','','/static/dashboard/image/tubiao-11.png',1)"><img src="/static/dashboard/image/tubiao-12.png" name="Image7" width="64" height="63" border="0" id="Image7" /></a></td>
@@ -101,7 +101,6 @@ function MM_swapImage() { //v3.0
         </div>
     </div>
     {%endblock%}
-
     {% block content %}
       <div id="container">
         {% block sidebar %}
@@ -116,6 +115,7 @@ function MM_swapImage() { //v3.0
         </div>
       </div>
     {% endblock %}
+
     <div id="footer">
       {% block footer %}{% endblock %}
     </div>

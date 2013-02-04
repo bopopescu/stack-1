@@ -1,0 +1,30 @@
+@charset "utf-8";
+/* CSS Document */
+
+body{font:12px/1.5 tahoma,arial,\5b8b\4f53;color:#000000;background:#13A1E6;}
+button,input,select,textarea{font:12px/1.5 tahoma,arial,\5b8b\4f53}
+input,select,textarea{font-size:100%}
+html,body,h1,h2,h3,h4,h5,h6,hr,p,dl,dt,dd,ul,ol,li,pre,code,form,fieldset,legend,button,input,textarea,blockquote,th,td{margin:0;padding:0}
+img,fieldset,abbr,acronym{border:0}
+ol,ul{list-style:none}
+h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:500}
+table{border-collapse:collapse;border-spacing:0}
+th{text-align:inherit}
+br{height:0;overflow:hidden;line-height:0}
+a{text-decoration:none;outline:none;color:#4d68b5}
+a:hover{color:#f90;text-decoration:none}
+table{border-collapse:collapse;border-spacing:0}
+input,textarea{outline:none}
+textarea{resize:none}
+
+.menu{width:190px; height:auto; padding:0px; margin:0px 0px 0px 0px;}
+.main_left_menu01 a{height:34px; width:160px; display:block; font-size:14px; background:url(../image/daohang-1.png) no-repeat; line-height:30px; padding-left:35px; color:#FFF; font-weight:bold; text-decoration:none; margin-bottom:5px; padding-top:2px; padding-left:45px;}
+.main_left_menu01 a:hover{background:url(../image/daohang-2.png) no-repeat;  font-weight:bold; color:#FFF;}
+.bg{ width:184px;  padding-left:3px; padding-top:3px;}
+.bg1{ width:184px; height:7px; background:url(../image/yuanjiao-1.png) no-repeat;}
+.bg2{ width:184px; min-height:640px; background:url(../image/yuanjiao-2.png) repeat-y ;}
+.bg3{ width:184px;height:7px; background:url(../image/yuanjiao-3.png) no-repeat;}
+.div_pic{_margin-top:7px; width:175px; height:auto;}
+.div_pic img{margin-top:12px;_margin-top:7px; padding-left:5px;}
+.left_table{padding-left:7px; }
+.dibian{background:url(../image/daohang-3.png) bottom no-repeat;}

@@ -47,3 +47,4 @@ if Horizon:
     get_default_dashboard = Horizon.get_default_dashboard
     get_dashboards = Horizon.get_dashboards
     urls = Horizon._lazy_urls
+

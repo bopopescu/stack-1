@@ -27,6 +27,7 @@ INSTANCES = r'^(?P<instance_id>[^/]+)/%s$'
 
 
 urlpatterns = patterns('horizon.dashboards.syspanel.instances.views',
+#    url(r'^$', 'index',name='index1'),
     url(r'^$', AdminIndexView.as_view(), name='index'),
     url(INSTANCES % 'detail', DetailView.as_view(), name='detail'),
     url(INSTANCES % 'console', 'console', name='console'),

@@ -29,10 +29,15 @@ from horizon import exceptions
 from horizon import tables
 from horizon.dashboards.syspanel.instances.tables import SyspanelInstancesTable
 from horizon.dashboards.nova.instances.views import console, DetailView, vnc
+from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect,HttpResponse
 
 LOG = logging.getLogger(__name__)
 
-
+def index(request):
+    template_name = 'syspanel/instances/index1.html'
+#    return render_to_response('index1.html',locals())
+#    return HttpResponseRedirect('/index1/')
 class AdminIndexView(tables.DataTableView):
     table_class = SyspanelInstancesTable
     template_name = 'syspanel/instances/index.html'

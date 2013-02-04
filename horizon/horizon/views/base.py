@@ -159,3 +159,7 @@ class APIView(generic.TemplateView):
         except:
             exceptions.handle(request)
         return self.render_to_response(context)
+
+
+def left(request):
+    return HttpResponse('/left/')
