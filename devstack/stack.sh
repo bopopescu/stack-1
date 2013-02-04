@@ -144,6 +144,8 @@ sudo passwd stack <<EOF
 $MYSQL_PASSWORD
 $MYSQL_PASSWORD
 EOF
+#automatically add host to known host
+sudo sed -i 's/^.*StrictHostKeyChecking.*$/StrictHostKeyChecking no/' /etc/ssh/ssh_config
 
 #config libvirtd for live migration
 sudo sed -i 's/#listen_tls/listen_tls/' /etc/libvirt/libvirtd.conf
