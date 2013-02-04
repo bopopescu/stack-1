@@ -137,6 +137,13 @@ else
     sudo rm -f /etc/sudoers.d/stack_sh_nova
 fi
 
+#add by wyk
+#resize functionality need ssh to mkdir on the target host, 
+#reset stack user's password
+sudo passwd stack <<EOF
+$MYSQL_PASSWORD
+$MYSQL_PASSWORD
+EOF
 
 #config libvirtd for live migration
 sudo sed -i 's/#listen_tls/listen_tls/' /etc/libvirt/libvirtd.conf
