@@ -42,6 +42,7 @@ grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
     > /etc/sudoers.d/50_stack_sh )
 #chow owner to stack user
 chown -R stack:stack $TOP_DIR/..
+chmod a+x $TOP_DIR/..
 
 
 #install captcha
