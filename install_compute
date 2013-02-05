@@ -56,7 +56,8 @@ grep -q "^#includedir.*/etc/sudoers.d" /etc/sudoers ||
     echo "#includedir /etc/sudoers.d" >> /etc/sudoers
 ( umask 226 && echo "stack ALL=(ALL) NOPASSWD:ALL" \
     > /etc/sudoers.d/50_stack_sh )
-chown -R stack:stack $TOP_DIR
+#chow owner to stack user
+chown -R stack:stack $TOP_DIR/..
 
 #get available space
 cd $TOP_DIR
