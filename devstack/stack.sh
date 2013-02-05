@@ -140,6 +140,7 @@ fi
 #add by wyk
 #resize functionality need ssh to mkdir on the target host, 
 #reset stack user's password
+echo "set password for user stack"
 sudo passwd stack <<EOF
 $MYSQL_PASSWORD
 $MYSQL_PASSWORD
